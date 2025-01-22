@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>WebFrame</title>
+        <link href ='webIcon.ico' rel='shortcut icon'>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <script>
+            function onLoad() {
+
+                console.log("onLoad");
+
+                var felem = document.getElementById("rootBody");
+
+                var elem = document.createElement("div");
+                elem.id = "div1";
+                elem.style.position = "absolute";
+                elem.style.overflow = "hidden";
+                //elem.style.pointerEvents = op.pointerEvents;
+                //=====================================
+                elem.style.left = (0) + "px";
+                elem.style.top = (0) + "px";
+                elem.style.width = (500) + "px";
+                elem.style.height = (500) + "px";
+                elem.style.backgroundColor = "#f00";
+                //=====================================
+                elem.style.userSelect = "none";
+                //=====================================
+
+                var mouseClick1 = function (iobj) {
+                    console.log("div1");
+                    return false;
+                };
+                elem.addEventListener("click", mouseClick1);
+                elem.addEventListener("wheel", mouseClick1);
+
+
+
+                var selem = document.createElement("div");
+                selem.id = "div2";
+                selem.style.position = "absolute";
+                selem.style.overflow = "hidden";
+                //elem.style.pointerEvents = op.pointerEvents;
+                //=====================================
+                selem.style.left = (0) + "px";
+                selem.style.top = (0) + "px";
+                selem.style.width = (400) + "px";
+                selem.style.height = (400) + "px";
+                selem.style.backgroundColor = "#0f0";
+                selem.style.lineHeight = (400) + "px";
+                selem.innerHTML = "12345";
+
+
+
+
+                //=====================================
+                selem.style.userSelect = "none";
+                //=====================================
+                var mouseClick2 = function (iobj) {
+                    console.log("div2");
+                    return false;
+                };
+                selem.addEventListener("click", mouseClick2);
+                selem.addEventListener("wheel", mouseClick2);
+
+
+                felem.appendChild(elem);
+
+                elem.appendChild(selem);
+
+
+
+
+
+
+
+
+
+            }
+        </script>
+    </head>
+    <body id="rootBody" onload="onLoad()" oncontextmenu='return false;' style="margin:0;font-family:monospace;">
+    </body>
+</html>
