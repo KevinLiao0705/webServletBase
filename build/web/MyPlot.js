@@ -382,7 +382,6 @@ class MyNewScope {
 
         opts.title = "OSCILLOSCOPE";
         opts.baseColor = "#222";
-        opts.bufferSize = 2000;
         opts.powerOn_f = 1;
         opts.grid_f = 1;
         opts.run_f = 1;
@@ -431,10 +430,16 @@ class MyNewScope {
         //===============
         opts.sampleUnit = "ns";
         opts.sampleAmt = 1000;
-        opts.sampleSize = 2000;
+        opts.sampleSize = 20000;
         opts.ySubAxeGridAmt = 5;
         opts.lines = [];
-        opts.bufs = [0, 0, 0, 0];
+        opts.bufs = [];
+        for(var i=0;i<4;i++){
+            var buf=[];
+            for(var j=0;j<2000;j++)
+                buf.push(10);
+            opts.bufs.push(buf);
+        }
         //===============
         var lineObj = {};
         var buffer = [];
@@ -585,37 +590,37 @@ class MyNewScope {
             var opts = op.lines[0];
             self.drawBufs(opts, op.bufs[0]);
             var opts = op.lines[1];
-            self.drawBufs(opts, op.bufs[0]);
+            self.drawBufs(opts, op.bufs[1]);
             var opts = op.lines[2];
-            self.drawBufs(opts, op.bufs[0]);
+            self.drawBufs(opts, op.bufs[2]);
             var opts = op.lines[3];
-            self.drawBufs(opts, op.bufs[0]);
+            self.drawBufs(opts, op.bufs[3]);
             return;
         }
 
         //=========================================
         var opts = op.lines[0];
         opts.stInx += 1;
-        if (opts.stInx >= 2000)
-            opts.stInx -= 2000;
+        if (opts.stInx >= op.sampleSize)
+            opts.stInx -= op.sampleSize;
         self.drawLine(opts);
         //=========================================
         var opts = op.lines[1];
         opts.stInx += 2;
-        if (opts.stInx >= 2000)
-            opts.stInx -= 2000;
+        if (opts.stInx >= op.sampleSize)
+            opts.stInx -= op.sampleSize;
         self.drawLine(opts);
         //=========================================
         var opts = op.lines[2];
         opts.stInx += 3;
-        if (opts.stInx >= 2000)
-            opts.stInx -= 2000;
+        if (opts.stInx >= op.sampleSize)
+            opts.stInx -= op.sampleSize;
         self.drawLine(opts);
         //=========================================
         var opts = op.lines[3];
         opts.stInx += 4;
-        if (opts.stInx >= 2000)
-            opts.stInx -= 2000;
+        if (opts.stInx >= op.sampleSize)
+            opts.stInx -= op.sampleSize;
         self.drawLine(opts);
         //=========================================
 
@@ -682,7 +687,7 @@ class MyNewScope {
         var minY = st.containerHeight - st.xyOffy - st.yAxeLen;
         if (!st.sampleTime)
             st.sampleTime = st.xScale * op.xAxeGridAmt / op.sampleAmt;
-        var stepLen = st.xAxeLen * st.sampleTime / (st.xScale * 10);
+        var stepLen = st.xAxeLen * st.sampleTime / (st.xScale * 10);//every sample pixel length
         //=================================================
         var first_f = 0;
         var timev = 0;
@@ -754,7 +759,6 @@ class MyNewScope {
     }
 
     drawBufs(opts, bufObj, clr) {
-        return;
         var op = this.md.opts;
         var st = this.md.stas;
         var ctx = st.ctx1;

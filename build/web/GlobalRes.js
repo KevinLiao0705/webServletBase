@@ -2,7 +2,7 @@ class GlobalRes {
     constructor() {
         //this.appName="webBuilder";
         this.appName="sync";
-        this.appId=0;
+        this.appId=3;
         this.globleTime="DummyTargetMaster.globleTime()";
 
         //=========
