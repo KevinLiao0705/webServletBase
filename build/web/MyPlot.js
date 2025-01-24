@@ -15,7 +15,7 @@ class MyNewScopeCtr {
         this.subTypeOpts(opts);
         opts.title = "title";
         opts.baseColor = "#ccc";
-        opts.tunerSetInx=-1;
+        opts.tunerSetInx = -1;
         opts.xm = 30;
         opts.chSelectInx = 0;
         opts.bitSelectInx = 3;
@@ -106,7 +106,7 @@ class MyNewScopeCtr {
             ["0.5rw", 9999]
         ];
         //
-        
+
         var adjustActionPrg = function (iobj) {
             console.log(iobj);
             var sobj = iobj.setOptsObj;
@@ -136,17 +136,17 @@ class MyNewScopeCtr {
                 }
 
             }
-            
+
             if (iobj.act === "blur") {
-                op.tunerSetInx=setInx;
-                if(op.tunerSetInx===0){
-                    var tuner=md.blockRefs["tuner"];
+                op.tunerSetInx = setInx;
+                if (op.tunerSetInx === 0) {
+                    var tuner = md.blockRefs["tuner"];
                     tuner.opts.addAngleMul = 0.02;
                 }
                 return;
             }
-            
-            
+
+
             if (iobj.act === "valueChanged" || iobj.act === "pressEnter") {
                 var obj = {};
                 if (setInx === 0)//grid
@@ -174,8 +174,8 @@ class MyNewScopeCtr {
                 return;
             }
         };
-        
-        
+
+
         var names = op.chNames;
         var ids = ["signal", "signal1", "signal2", "signal3", "signal4", "signal5"];
         var regDatas = "self.fatherMd.fatherMd.fatherMd.stas.signalButtonColors";
@@ -210,26 +210,26 @@ class MyNewScopeCtr {
         opts.baseColor = "#006";
         opts.actionFunc = function (iobj) {
             console.log(iobj);
-            if(iobj.act==="rotated"){
-                if(op.tunerSetInx>=0){
-                    var signalAdjust=md.blockRefs["signalAdjust"];                    
-                    var setLine=signalAdjust.blockRefs["mdaSetLine#"+op.tunerSetInx];                    
-                    setLine.opts.setOpts.value+=iobj.addValue*-1;
-                    if(setLine.opts.setOpts.value>setLine.opts.setOpts.max)
-                        setLine.opts.setOpts.value=setLine.opts.setOpts.max;
-                    if(setLine.opts.setOpts.value<setLine.opts.setOpts.min)
-                        setLine.opts.setOpts.value=setLine.opts.setOpts.min;
-                    var newSetLine=setLine.reCreate();
-                    if(iobj.addValue!==0){
-                        var obj={};
-                        obj.act="valueChanged";
-                        obj.setOptsObj=newSetLine;
+            if (iobj.act === "rotated") {
+                if (op.tunerSetInx >= 0) {
+                    var signalAdjust = md.blockRefs["signalAdjust"];
+                    var setLine = signalAdjust.blockRefs["mdaSetLine#" + op.tunerSetInx];
+                    setLine.opts.setOpts.value += iobj.addValue * -1;
+                    if (setLine.opts.setOpts.value > setLine.opts.setOpts.max)
+                        setLine.opts.setOpts.value = setLine.opts.setOpts.max;
+                    if (setLine.opts.setOpts.value < setLine.opts.setOpts.min)
+                        setLine.opts.setOpts.value = setLine.opts.setOpts.min;
+                    var newSetLine = setLine.reCreate();
+                    if (iobj.addValue !== 0) {
+                        var obj = {};
+                        obj.act = "valueChanged";
+                        obj.setOptsObj = newSetLine;
                         adjustActionPrg(obj);
                     }
                     return;
                 }
             }
-            
+
         };
         blocks[cname] = {name: "tuner", type: "Model~MyNewTuner~base.sys0", opts: opts};
         //=======================================
@@ -385,7 +385,7 @@ class MyNewScope {
         opts.powerOn_f = 1;
         opts.grid_f = 1;
         opts.run_f = 1;
-        opts.testSinWave_f = 1;
+        opts.testSinWave_f = 0;
         opts.centerLine_f = 1;
         opts.axeWidth = 0.5;
         //===
@@ -429,21 +429,21 @@ class MyNewScope {
         opts.messages.push(mesObj);
         //===============
         opts.sampleUnit = "ns";
-        opts.sampleAmt = 1000;
-        opts.sampleSize = 20000;
+        opts.sampleAmt = 10000;
+        opts.sampleBufSize = 20000;
         opts.ySubAxeGridAmt = 5;
         opts.lines = [];
         opts.bufs = [];
-        for(var i=0;i<4;i++){
-            var buf=[];
-            for(var j=0;j<2000;j++)
+        for (var i = 0; i < 4; i++) {
+            var buf = [];
+            for (var j = 0; j < 2000; j++)
                 buf.push(10);
             opts.bufs.push(buf);
         }
         //===============
         var lineObj = {};
         var buffer = [];
-        for (var i = 0; i < opts.sampleSize; i++) {
+        for (var i = 0; i < opts.sampleBufSize; i++) {
             var sin = Math.sin(Math.PI * 2 * i / 100);
             buffer.push(sin * 50);
         }
@@ -458,7 +458,7 @@ class MyNewScope {
         //=======================
         var lineObj = {};
         var buffer = [];
-        for (var i = 0; i < opts.sampleSize; i++) {
+        for (var i = 0; i < opts.sampleBufSize; i++) {
             var sin = Math.sin(Math.PI * 2 * i / 100);
             buffer.push(sin * 75);
         }
@@ -473,7 +473,7 @@ class MyNewScope {
         //=======================
         var lineObj = {};
         var buffer = [];
-        for (var i = 0; i < opts.sampleSize; i++) {
+        for (var i = 0; i < opts.sampleBufSize; i++) {
             var sin = Math.sin(Math.PI * 2 * i / 100);
             buffer.push(sin * 25);
         }
@@ -488,7 +488,7 @@ class MyNewScope {
         //=======================
         var lineObj = {};
         var buffer = [];
-        for (var i = 0; i < opts.sampleSize; i++) {
+        for (var i = 0; i < opts.sampleBufSize; i++) {
             var sin = Math.sin(Math.PI * 2 * i / 100);
             buffer.push(sin * 12);
         }
@@ -586,41 +586,64 @@ class MyNewScope {
         if (!op.run_f)
             return;
         self.drawClear();
+        if (!st.speed)
+            st.speed = 0;
+        st.speed += 1;
+        if (st.speed >= 1000)
+            st.speed = 0;
+
+        for (var i = 0; i < 4; i++) {
+            var angOff = Math.PI * 2 * st.speed * (i + 1) * 4 / 1000;
+
+            var lineObj = op.lines[i];
+            lineObj.stInx += 1 + i;
+            if (lineObj.stInx >= op.sampleBufSize)
+                lineObj.stInx -= op.sampleBufSize;
+            for (var j = 0; j < op.sampleAmt; j++) {
+                var sin = Math.sin((Math.PI * 2 * j / 2000) + angOff);
+                var inx = lineObj.stInx + j;
+                if (inx >= op.sampleBufSize)
+                    inx -= op.sampleBufSize;
+                lineObj.buffer[inx] = sin * 10 * (i + 1);
+            }
+        }
         if (!op.testSinWave_f) {
             var opts = op.lines[0];
-            self.drawBufs(opts, op.bufs[0]);
+            self.drawBufs(opts);
             var opts = op.lines[1];
-            self.drawBufs(opts, op.bufs[1]);
+            self.drawBufs(opts);
             var opts = op.lines[2];
-            self.drawBufs(opts, op.bufs[2]);
+            self.drawBufs(opts);
             var opts = op.lines[3];
-            self.drawBufs(opts, op.bufs[3]);
+            self.drawBufs(opts);
             return;
         }
 
         //=========================================
+
+
         var opts = op.lines[0];
         opts.stInx += 1;
-        if (opts.stInx >= op.sampleSize)
-            opts.stInx -= op.sampleSize;
+        if (opts.stInx >= op.sampleBufSize)
+            opts.stInx -= op.sampleBufSize;
         self.drawLine(opts);
         //=========================================
         var opts = op.lines[1];
         opts.stInx += 2;
-        if (opts.stInx >= op.sampleSize)
-            opts.stInx -= op.sampleSize;
+        if (opts.stInx >= op.sampleBufSize)
+            opts.stInx -= op.sampleBufSize;
         self.drawLine(opts);
         //=========================================
         var opts = op.lines[2];
         opts.stInx += 3;
-        if (opts.stInx >= op.sampleSize)
-            opts.stInx -= op.sampleSize;
+        if (opts.stInx >= op.sampleBufSize)
+            opts.stInx -= op.sampleBufSize;
         self.drawLine(opts);
         //=========================================
         var opts = op.lines[3];
         opts.stInx += 4;
-        if (opts.stInx >= op.sampleSize)
-            opts.stInx -= op.sampleSize;
+        if (opts.stInx >= op.sampleBufSize)
+            opts.stInx -= op.sampleBufSize;
         self.drawLine(opts);
         //=========================================
 
@@ -640,9 +663,9 @@ class MyNewScope {
                 self.drawLine(opts);
             }
         } else {
-            for (var i = 0; i < op.bufs.length; i++) {
+            for (var i = 0; i < op.lines.length; i++) {
                 var opts = op.lines[i];
-                self.drawBufs(opts, op.bufs[i]);
+                self.drawBufs(opts);
             }
         }
 
@@ -687,7 +710,7 @@ class MyNewScope {
         var minY = st.containerHeight - st.xyOffy - st.yAxeLen;
         if (!st.sampleTime)
             st.sampleTime = st.xScale * op.xAxeGridAmt / op.sampleAmt;
-        var stepLen = st.xAxeLen * st.sampleTime / (st.xScale * 10);//every sample pixel length
+        var stepLen = st.xAxeLen * st.sampleTime / (st.xScale * op.xAxeGridAmt);//every sample pixel length
         //=================================================
         var first_f = 0;
         var timev = 0;
@@ -695,11 +718,11 @@ class MyNewScope {
         var first_f = 0;
         var xOffset = (st.xScale * 10) * op.xAxeOffs / 100;
         //================================================
-        var offx = st.xAxeLen * xOffset / (st.xScale * 10);
+        var offx = st.xAxeLen * xOffset / (st.xScale * op.xAxeGridAmt);
         var xlen = st.xAxeLen / 2 + offx;
         var inx = opts.stInx - halfSamples - 1;
         if (inx < 0)
-            inx += op.sampleSize;
+            inx += op.sampleBufSize;
         for (var i = 0; i < halfSamples; i++) {
             var vv = opts.buffer[inx];
             var ylen = vv * yGridLen / opts.yScale;
@@ -717,8 +740,8 @@ class MyNewScope {
                 first_f = 1;
             }
             inx++;
-            if (inx >= op.sampleSize)
-                inx -= op.sampleSize;
+            if (inx >= op.sampleBufSize)
+                inx -= op.sampleBufSize;
             xlen += stepLen;
             if (xlen > st.xAxeLen)
                 break;
@@ -728,7 +751,7 @@ class MyNewScope {
         var xlen = st.xAxeLen / 2 + offx;
         var inx = opts.stInx - halfSamples - 1;
         if (inx < 0)
-            inx += op.sampleSize;
+            inx += op.sampleBufSize;
         for (var i = 0; i < halfSamples; i++) {
             var vv = opts.buffer[inx];
             var ylen = vv * yGridLen / opts.yScale;
@@ -749,7 +772,7 @@ class MyNewScope {
 
             inx--;
             if (inx < 0)
-                inx += op.sampleSize;
+                inx += op.sampleBufSize;
             xlen -= stepLen;
             if (xlen < 0)
                 break;
@@ -758,7 +781,83 @@ class MyNewScope {
         return;
     }
 
-    drawBufs(opts, bufObj, clr) {
+    drawBufs(opts, clr) {
+        var op = this.md.opts;
+        var st = this.md.stas;
+        var ctx = st.ctx1;
+        if (clr)
+            ctx.clearRect(0, 0, st.containerWidth, st.containerHeight);
+        if (!opts.offOn_f)
+            return;
+        ctx.strokeStyle = opts.color;
+        ctx.beginPath();
+        var xzero = st.xyOffx;
+        var ycen = st.containerHeight - st.xyOffy - st.yAxeLen / 2;
+        var yGridLen = st.yAxeLen / op.yAxeGridAmt;
+        var yOffset = st.yAxeLen * opts.offset / 100;
+        //============================================
+        var maxY = st.containerHeight - st.xyOffy;
+        var minY = st.containerHeight - st.xyOffy - st.yAxeLen;
+
+        if (op.run_f) {
+            st.dispSampleLen = op.sampleAmt;
+            st.roomCenterInx = opts.stInx +parseInt(st.dispSampleLen / 2);
+            if (st.roomCenterInx >= op.sampleBufSize)
+                st.roomCenterInx -= op.sampleBufSize;
+            st.roomSize = op.sampleAmt;
+            st.sampleTime = st.xScale * op.xAxeGridAmt / op.sampleAmt;
+        } else {
+            st.roomSize = (st.xScale * op.xAxeGridAmt / st.sampleTime) | 0;
+        }
+        var stepLenPerSamp = st.xAxeLen / st.roomSize;//every sample pixel length
+        //=================================================
+        var first_f = 0;
+        var timev = 0;
+        var first_f = 0;
+        var xOffset = (st.xScale * 10) * op.xAxeOffs / 100;
+        //================================================
+        var offx = st.xAxeLen * xOffset / (st.xScale * op.xAxeGridAmt);
+        var xlen = offx;
+        var viewSize=st.roomSize;
+        var offSize=0;
+        if(viewSize>op.sampleAmt){
+            viewSize=op.sampleAmt;
+            var offSize=((st.roomSize-viewSize)/2)|0;
+            var xlen=offx+offSize*stepLenPerSamp;
+        }    
+        var inx = st.roomCenterInx - ((st.roomSize / 2) | 0);
+        if (inx >= op.sampleBufSize)
+            inx -= op.sampleBufSize;
+
+        for (var i = 0; i < viewSize; i++) {
+            var vv = opts.buffer[inx];
+            var ylen = vv * yGridLen / opts.yScale;
+            var realY = ycen + ylen - yOffset;
+            if (realY > maxY)
+                realY = maxY;
+            if (realY < minY)
+                realY = minY;
+            if (xlen >= 0) {
+                if (!first_f)
+                    ctx.moveTo(xzero + xlen, realY);
+                else
+                    ctx.lineTo(xzero + xlen, realY);
+                first_f = 1;
+            }
+            inx++;
+            if (inx >= op.sampleBufSize)
+                inx -= op.sampleBufSize;
+            xlen += stepLenPerSamp;
+            if (xlen > st.xAxeLen)
+                break;
+            if (xlen < 0)
+                break;
+        }
+        ctx.stroke();
+        return;
+    }
+
+    drawBufsxxx(opts, bufObj, clr) {
         var op = this.md.opts;
         var st = this.md.stas;
         var ctx = st.ctx1;
