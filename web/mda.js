@@ -3165,6 +3165,11 @@ class MdaSelector {
             var cname = lyMaps["main"] + "~" + i;
             var opts = {};
             opts.innerText = op.kvTexts[inx];
+            if(opts.innerText===null){
+                inx++;
+                continue;
+            }
+                
             if (op.selectInx === inx)
                 opts.baseColor = "#88f";
             opts.actionFunc = function (iobj) {
@@ -3970,6 +3975,7 @@ class MdaSetLine {
 
                 if (strA[1] === "inc" || strA[1] === "dec") {
                     var kobj = md.blockRefs["inputText"];
+                    var preValue = setOpts.value;
                     kobj.opts.editValue = setOpts.value;
                     var elem = kobj.elems["inputText"];
                     if (dt === "kvType") {
@@ -4029,6 +4035,7 @@ class MdaSetLine {
                         iobj.setOptsObj = md;
                         iobj.sender = md;
                         iobj.value = setOpts.value;
+                        iobj.preValue=preValue;
                         KvLib.exe(op.actionFunc, iobj);
                         return;
 
@@ -4141,7 +4148,7 @@ class MdaSetLine {
                     if (items)
                         md.setInputWatch(opts, items[0], items[1], items[2], items[3]);
                 }
-                opts.textAlign="left";
+                opts.textAlign = "left";
                 md.newBlock(cname, opts, "Component~Cp_base~plate.none", "labelMain#" + i);
             }
             return;
@@ -4243,12 +4250,9 @@ class MdaSetLine {
                 console.log(iobj);
                 iobj.sender = md;
                 iobj.setOptsObj = md;
-                var strA = iobj.kvObj.name.split("#");
-                var inx = KvLib.toInt(strA[1]);
-                iobj.buttonInx = inx;
-                iobj.buttonText = md.opts.setOpts.enum[inx];
+                iobj.buttonText = md.opts.setOpts.enum[0];
                 if (md.opts.setOpts.enumId)
-                    iobj.buttonId = md.opts.setOpts.enumId[inx];
+                    iobj.buttonId = md.opts.setOpts.enumId[0];
                 iobj.act = "actButtonClick";
                 iobj.kvObj = md;
                 KvLib.exeFunc(op.actionFunc, iobj);
@@ -4260,7 +4264,7 @@ class MdaSetLine {
                     md.setInputWatch(opts, items[0], items[1], items[2], items[3]);
                 }
             }
-            md.newBlock(cname, opts, "Component~Cp_base~button.sys0", "buttonMain#" + i);
+            md.newBlock(cname, opts, "Component~Cp_base~button.sys0", "buttonMain#" + 0);
             return;
         }
 
@@ -5914,7 +5918,7 @@ class MdaSetGroup {
         opts.tm = 30;
         opts.xm = op.xm;
         opts.ym = op.ym;
-        opts.lm=op.lm;
+        opts.lm = op.lm;
         opts.yArr = op.yArr;
         opts.xyArr = op.xyArr;
         layouts[cname] = {name: cname, type: "Layout~Ly_base~xyArray.sys0", opts: opts};

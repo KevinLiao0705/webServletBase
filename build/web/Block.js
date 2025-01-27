@@ -946,7 +946,7 @@ class Block {
                 continue;
             ipObj.cnt = 0;
             var value;
-            if (ipObj.inputName === "self.fatherMd.fatherMd.fatherMd.stas.sspaModuleStatusAA#0#0") {
+            if (ipObj.inputName === "self.fatherMd.fatherMd.fatherMd.fatherMd.stas.watchDatas#0") {
                 var uu = 0;
             }
             if (ipObj.type === "directReg") {
