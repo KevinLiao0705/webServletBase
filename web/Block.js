@@ -81,6 +81,7 @@ class Block {
         opts["group~font"] = [0];
         opts.innerText = "";//"1234568<br>abcd";
         opts.fontSize = "0.7rh";
+        opts.maxFontSize=35;
         //======================
         //opts.fontFamily="Impact";
         //opts.fontFamily="Monospace";//fit width
@@ -865,7 +866,7 @@ class Block {
                 st.fontSizeObj = KvLib.measureText(testText, st.fontSize, op.fontWeight, op.fontFamily);
                 if (st.fontSizeObj.w > st.cw) {
                     st.fontSize = (st.fontSize * st.cw / st.fontSizeObj.w);
-                    st.fontSize--;
+                    st.fontSize-=3;
                     st.fontSize = KvLib.minMax(st.fontSize, gr.minFontSize, gr.maxFontSize);
                 }
             } else {

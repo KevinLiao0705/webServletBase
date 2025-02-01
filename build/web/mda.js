@@ -55,8 +55,8 @@ class Mda {
         }
         obj.maskColor = "rgba(0,0,0,0.5)";
         obj.center_f = 1;
-        obj.outsideShadowBlur = 10,
-                MdaPopWin.popMaskObjA(obj);
+        obj.outsideShadowBlur = 10;
+        MdaPopWin.popMaskObjA(obj);
     }
 
     popObjOpts(opts) {
@@ -3165,11 +3165,11 @@ class MdaSelector {
             var cname = lyMaps["main"] + "~" + i;
             var opts = {};
             opts.innerText = op.kvTexts[inx];
-            if(opts.innerText===null){
+            if (opts.innerText === null) {
                 inx++;
                 continue;
             }
-                
+
             if (op.selectInx === inx)
                 opts.baseColor = "#88f";
             opts.actionFunc = function (iobj) {
@@ -4035,7 +4035,7 @@ class MdaSetLine {
                         iobj.setOptsObj = md;
                         iobj.sender = md;
                         iobj.value = setOpts.value;
-                        iobj.preValue=preValue;
+                        iobj.preValue = preValue;
                         KvLib.exe(op.actionFunc, iobj);
                         return;
 

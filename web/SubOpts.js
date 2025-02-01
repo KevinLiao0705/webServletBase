@@ -266,7 +266,7 @@ class SubOpts {
             opts.borderRadius = 0;
             opts.fontSize="1.0rh";
             opts.fontWeight="bold";
-            
+            opts.maxFontSize=100;
             
             /*
             opts.mouseClick_f = 0;

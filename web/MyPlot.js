@@ -222,7 +222,7 @@ class MyNewScopeCtr {
                         for (var i = 0; i < 4; i++) {
                             var lineObj = scope.opts.lines[i];
                             lineObj.sampleRate = 200000000;
-                            lineObj.offOn_f=1;
+                            lineObj.offOn_f = 1;
                             scope.opts.xScale = 8;
                             lineObj.name = "測試信號" + (op.signalModeInx + 1) + "-" + (i + 1);
                         }
@@ -232,7 +232,7 @@ class MyNewScopeCtr {
                             var lineObj = scope.opts.lines[i];
                             lineObj.sampleRate = 200;
                             scope.opts.xScale = 29;
-                            lineObj.offOn_f=1;
+                            lineObj.offOn_f = 1;
                             lineObj.name = "測試信號" + (op.signalModeInx + 1) + "-" + (i + 1);
                         }
                     }
@@ -242,27 +242,28 @@ class MyNewScopeCtr {
                         var lineObj = scope.opts.lines[i];
                         lineObj.sampleRate = 200000000;
                         scope.opts.xScale = 8;
-                        lineObj.offOn_f=1;
-                        if(i===0)
+                        lineObj.offOn_f = 1;
+                        if (i === 0)
                             lineObj.name = "遠端脈波";
-                        if(i===1)
+                        if (i === 1)
                             lineObj.name = "本地脈波";
-                        
+
                     }
                 }
                 if (op.signalMode === 3) {
                     for (var i = 0; i < 4; i++) {
                         var lineObj = scope.opts.lines[i];
-                        lineObj.sampleRate = 200000000;
-                        scope.opts.xScale = 8;
-                        lineObj.offOn_f=1;
-                        if(i===0)
+                        lineObj.sampleRate = 200;
+                        scope.opts.xScale = 29;
+
+                        lineObj.offOn_f = 1;
+                        if (i === 0)
                             lineObj.name = "輸入功率";
-                        if(i===1)
+                        if (i === 1)
                             lineObj.name = "順向輸出功率";
-                        if(i===2)
+                        if (i === 2)
                             lineObj.name = "反向輸出功率";
-                        if(i===3)
+                        if (i === 3)
                             lineObj.name = "放大器電源總電流";
                     }
                 }
@@ -271,15 +272,15 @@ class MyNewScopeCtr {
                         var lineObj = scope.opts.lines[i];
                         lineObj.sampleRate = 200000000;
                         scope.opts.xScale = 8;
-                        lineObj.offOn_f=1;
-                        if(i===0)
-                            lineObj.name = selectText+" 50V電壓";
-                        if(i===1)
-                            lineObj.name = selectText+" 32V電壓";
-                        if(i===2)
-                            lineObj.name = selectText+" 32V電流";
-                        if(i===3)
-                            lineObj.name = selectText+" 溫度";
+                        lineObj.offOn_f = 1;
+                        if (i === 0)
+                            lineObj.name = selectText + " 50V電壓";
+                        if (i === 1)
+                            lineObj.name = selectText + " 32V電壓";
+                        if (i === 2)
+                            lineObj.name = selectText + " 32V電流";
+                        if (i === 3)
+                            lineObj.name = selectText + " 溫度";
                     }
                 }
 
@@ -288,11 +289,11 @@ class MyNewScopeCtr {
                         var lineObj = scope.opts.lines[i];
                         lineObj.sampleRate = 200000000;
                         scope.opts.xScale = 8;
-                        lineObj.offOn_f=1;
-                        if(i===0)
-                            lineObj.name = selectText+" 射頻功率輸出";
-                        if(i===1)
-                            lineObj.name = selectText+" 模組溫度";
+                        lineObj.offOn_f = 1;
+                        if (i === 0)
+                            lineObj.name = selectText + " 射頻功率輸出";
+                        if (i === 1)
+                            lineObj.name = selectText + " 模組溫度";
                     }
                 }
 
@@ -455,7 +456,7 @@ class MyNewScopeCtr {
 
 
         var setOpts = sopt.getOptsPara("incEnum");
-        setOpts.enum = MyNewScope.yScaleTbl;
+        setOpts.enum = MyNewScope.yScaleVoltTbl;
         setOpts.max = setOpts.enum.length;
         setOpts.value = op.yScales[op.chSelectInx];
         setOpts.iconWidth = 40;
@@ -529,7 +530,7 @@ class MyNewScopeCtr {
         setOpts.title = "TRIG";
         setOpts.enum = ["TRIG"];
         setOpts.enumId = ['trig'];
-        setOpts.fontSize = "0.9rh";
+        setOpts.fontSize = "fixWidth";
         var watchDatas = setOpts.watchDatas = [];
         var regDatas = "self.fatherMd.fatherMd.fatherMd.stas.watchDatas";
         watchDatas.push(["directReg", regDatas + "#2", "baseColor", 1]);
@@ -542,7 +543,7 @@ class MyNewScopeCtr {
         setOpts.enum = ['MAIN', 'ROLL'];
         setOpts.selectColor = "#cfc";
         setOpts.value = op.typeCnt;
-        setOpts.fontSize = "0.7rh";
+        setOpts.fontSize = "fixWidth";
         setOptss.push(setOpts);
 
         var setOpts = sopt.getOptsPara("buttonOnOffs");
@@ -552,7 +553,7 @@ class MyNewScopeCtr {
         setOpts.enumId = ['ch1', 'ch2', 'ch3', 'ch4'];
         setOpts.selectColor = "#cfc";
         setOpts.value = op.dispValue;
-        setOpts.fontSize = "0.6rh";
+        setOpts.fontSize = "fixWidth";
         setOptss.push(setOpts);
 
 
@@ -582,7 +583,11 @@ class MyNewScope {
         "2 S", "5 S", "10 S", "20 S", "50 S", "100 S"
     ];
 
-    static yScaleTbl = ["1 mV", "2 mV", "5 mV", "10 mV", "20 mV", "50 mV", "100 mV", "200 mV", "500 mV", "1 V", "2 V", "5 V", "10 V"];
+    static yScaleVoltTbl = ["1 mV", "2 mV", "5 mV", "10 mV", "20 mV", "50 mV", "100 mV", "200 mV", "500 mV", "1 V", "2 V", "5 V", "10 V","20 V","50 V","100 V"];
+    static yScaleAmpTbl = ["1 mA", "2 mA", "5 mA", "10 mA", "20 mA", "50 mA", "100 mA", "200 mA", "500 mA", "1 A", "2 A", "5 A", "10 A","20 A", "50 A", "100 A"];
+    static yScaleDbTbl = ["10 DB", "20 DB", "30 DB", "40 DB", "50 DB ", "60 DB"];
+    static yScaleDucTbl = ["20 ℃", "40 ℃", "60 ℃", "80 ℃", "100 ℃ ", "120 ℃", "140 ℃", "160 ℃", "180 ℃", "200 ℃"];
+    
 
     static transXScale(inStr) {
         var strA = inStr.split(" ");
@@ -608,7 +613,7 @@ class MyNewScope {
 
     static transYScale(op) {
         for (var i = 0; i < op.lines.length; i++) {
-            var str = MyNewScope.yScaleTbl[op.lines[i].yScaleSet];
+            var str = op.lines[i].yScaleTbl[op.lines[i].yScaleSet];
             var strA = str.split(" ");
             var yScale = 1000;
             op.lines[i].yScale = yScale;
@@ -617,13 +622,16 @@ class MyNewScope {
             var ii = KvLib.toInt(strA[0], null);
             if (ii === null)
                 continue;
-            if (strA[1] === "mV") {
+            if (strA[1] === "mV" || strA[1] === "mA") {
                 op.lines[i].yScale = ii;
                 continue;
             }
-            if (strA[1] === "V") {
+            if (strA[1] === "V" || strA[1] === "A") {
                 op.lines[i].yScale = ii * 1000;
                 continue;
+            }
+            else{
+                op.lines[i].yScale = ii;
             }
         }
     }
@@ -704,6 +712,7 @@ class MyNewScope {
             lineObj.offset = -10 + 10 * i;
             lineObj.offOn_f = 0;
             lineObj.yScaleSet = 4;//
+            lineObj.yScaleTbl = MyNewScope.yScaleVoltTbl;
             lineObj.stInx = 0;
             lineObj.recordLen = 0;
             lineObj.buffer = buffer;
@@ -793,17 +802,22 @@ class MyNewScope {
         var st = md.stas;
         if (!op.run_f)
             return;
-        self.drawClear();
+        if (st.drawed_f)
+            self.drawClear();
+        st.drawed_f = 0;
         if (!st.phaseSpeed)
             st.phaseSpeed = 0;
         st.phaseSpeed += 2;
         if (st.phaseSpeed >= 1000)
             st.phaseSpeed -= 1000;
 
-        if (op.signalMode === 1 && op.signalModeInx === 0) {
-            for (var i = 0; i < 4; i++) {
+        for (var i = 0; i < 4; i++) {
+            var lineObj = op.lines[i];
+            if (!lineObj.offOn_f)
+                continue;
+            st.drawed_f = 1;
+            if (op.signalMode === 1 && op.signalModeInx === 0) {
                 var angOff = Math.PI * 2 * st.phaseSpeed * (i + 2) * 4 / 1000;
-                var lineObj = op.lines[i];
                 lineObj.stInx += 1 + i;
                 if (lineObj.stInx >= op.sampleBufSize)
                     lineObj.stInx -= op.sampleBufSize;
@@ -816,10 +830,7 @@ class MyNewScope {
                 }
                 lineObj.recordLen = op.sampleAmt;
             }
-        }
-        if (op.signalMode === 1 && op.signalModeInx === 1) {
-            for (var i = 0; i < 4; i++) {
-                var lineObj = op.lines[i];
+            if (op.signalMode === 1 && op.signalModeInx === 1) {
                 if (!lineObj.sampleRest)
                     lineObj.sampleRest = 0;
                 var timef = lineObj.sampleRate / 62;
@@ -829,20 +840,11 @@ class MyNewScope {
                     lineObj.sampleRest - 1;
                     timei++;
                 }
+                var buf = [];
                 for (var j = 0; j < timei; j++) {
-                    if (lineObj.recordLen === op.sampleAmt) {
-                        lineObj.stInx++;
-                        if (lineObj.stInx >= op.sampleBufSize)
-                            lineObj.stInx -= op.sampleBufSize;
-                        var inx = lineObj.stInx + lineObj.recordLen;
-                    } else {
-                        var inx = lineObj.stInx + lineObj.recordLen;
-                        lineObj.recordLen++;
-                    }
-                    if (inx >= op.sampleBufSize)
-                        inx -= op.sampleBufSize;
-                    lineObj.buffer[inx] = Math.round(10 * Math.random() - 5);
+                    buf.push(Math.round(10 * Math.random() - 5));
                 }
+                self.addLineBuf(buf, i);
             }
         }
 
@@ -858,6 +860,28 @@ class MyNewScope {
         return;
 
     }
+    addLineBuf(buf, inx) {
+        var self = this;
+        var md = this.md;
+        var op = md.opts;
+        var st = md.stas;
+        st.drawed_f = 1;
+        var lineObj = op.lines[inx];
+        for (var j = 0; j < buf.length; j++) {
+            if (lineObj.recordLen === op.sampleAmt) {
+                lineObj.stInx++;
+                if (lineObj.stInx >= op.sampleBufSize)
+                    lineObj.stInx -= op.sampleBufSize;
+                var inx = lineObj.stInx + lineObj.recordLen;
+            } else {
+                var inx = lineObj.stInx + lineObj.recordLen;
+                lineObj.recordLen++;
+            }
+            if (inx >= op.sampleBufSize)
+                inx -= op.sampleBufSize;
+            lineObj.buffer[inx] = buf[j];
+        }
+    }
 
     createScope(editObj) {
         var self = this;
@@ -869,7 +893,7 @@ class MyNewScope {
         st.xScale = MyNewScope.transXScale(MyNewScope.xScaleTbl[op.xScale]);
         MyNewScope.transYScale(op);
         self.drawAxe(1);
-        self.drawClear();
+        self.drawClear(1);
         for (var i = 0; i < op.lines.length; i++) {
             var opts = op.lines[i];
             self.drawBufs(opts);
@@ -929,6 +953,12 @@ class MyNewScope {
         var inx = zoomCenterInx - ((viewSize / 2) | 0);
         var first_f = 0;
         var xlen = 0;
+        var loopLim = 1;
+        var loopCnt = 0;
+        var vvBuf = 0;
+        if (viewSize > 2000)
+            loopLim = (viewSize / 2000) | 0;
+
         for (var i = 0; i < viewSize; i++) {
             if (inx < opts.stInx) {
                 var delta = opts.stInx - inx;
@@ -942,6 +972,20 @@ class MyNewScope {
             if (inx >= opts.stInx + op.sampleAmt) {
                 break;
             }
+            /*
+             loopCnt++;
+             if ((opts.stInx + i) % loopLim) {
+             inx++;
+             xlen += stepLenPerSamp;
+             if (xlen >= st.xAxeLen)
+             break;
+             continue;
+             }
+             //vv=vvBuf/loopCnt;    
+             loopCnt = 0;
+             //vvBuf=0;
+             */
+
             var rinx = inx;
             for (; ; ) {
                 if (rinx < 0) {
@@ -954,19 +998,24 @@ class MyNewScope {
                 }
                 break;
             }
+
+
+
             var vv = opts.buffer[rinx];
-            var ylen = vv * yGridLen / opts.yScale;
-            var realY = ycen - ylen - yOffset;
-            if (realY > maxY)
-                realY = maxY;
-            if (realY < minY)
-                realY = minY;
-            if (xlen >= 0) {
-                if (!first_f)
-                    ctx.moveTo(xzero + xlen, realY);
-                else
-                    ctx.lineTo(xzero + xlen, realY);
-                first_f = 1;
+            if ((rinx % loopLim) === 0) {
+                var ylen = vv * yGridLen / opts.yScale;
+                var realY = ycen - ylen - yOffset;
+                if (realY > maxY)
+                    realY = maxY;
+                if (realY < minY)
+                    realY = minY;
+                if (xlen >= 0) {
+                    if (!first_f)
+                        ctx.moveTo(xzero + xlen, realY);
+                    else
+                        ctx.lineTo(xzero + xlen, realY);
+                    first_f = 1;
+                }
             }
             inx++;
             xlen += stepLenPerSamp;
@@ -1071,7 +1120,7 @@ class MyNewScope {
             if (!opts.offOn_f)
                 continue
             var mesObj = {};
-            var vStr = MyNewScope.yScaleTbl[opts.yScaleSet];
+            var vStr = op.lines[i].yScaleTbl[opts.yScaleSet];
             mesObj.x = x;
             mesObj.y = st.containerHeight - st.xyOffy - st.yAxeLen - 4;
             mesObj.text = (i + 1) + ":" + vStr + "/";
@@ -1250,6 +1299,7 @@ class MyNewScope {
         var layouts = op.layouts;
         st.xScale = MyNewScope.transXScale(MyNewScope.xScaleTbl[op.xScale]);
         MyNewScope.transYScale(op);
+        gr.wavePageObj = md;
         //======================================    
         var cname = "c";
         var opts = {};

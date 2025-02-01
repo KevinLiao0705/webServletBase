@@ -541,6 +541,13 @@ class DummyTargetMaster {
                         MdaPopWin.popOff(2);
                 };
                 var kvObj = new Block("scope", "Model~MyNewScope~base.sys0", opts);
+                //var mesObj = mda.popObj(0, 0, kvObj);
+                kvObj.opts.popStackCnt = gr.mdSystem.mdClass.stackCnt;
+                var waveForm = MdaPopWin.popObj(opts);
+
+                return;
+
+
                 var mesObj = mda.popObj(0, 0, kvObj);
                 return;
             }
@@ -1378,10 +1385,10 @@ class DummyTargetSub {
                 var opts = {};
                 opts.actionFunc = function (iobj) {
                     console.log(iobj);
-                    if (iobj.act === "mouseClick"){
-                        if(iobj.kvObj.opts.itemId==="esc")
+                    if (iobj.act === "mouseClick") {
+                        if (iobj.kvObj.opts.itemId === "esc")
                             MdaPopWin.popOff(2);
-                    }    
+                    }
                 };
                 var kvObj = new Block("selfTest", "Model~SelfTest~base.sys0", opts);
                 var mesObj = mda.popObj(0, 0, kvObj);
@@ -1614,7 +1621,7 @@ class SubRadarPane {
                     var para = sopt.getParaSetOpts({paraSetName: "ctr1" + "Remote", titleWidth: 0, titleFontSize: "0.5rh"});
                 if (gr.appId === 2)
                     var para = sopt.getParaSetOpts({paraSetName: "ctr2" + "Remote", titleWidth: 0, titleFontSize: "0.5rh"});
-                
+
                 opts.title = "遠端遙控";
                 setOpts.enum = para.enum;
                 setOpts.value = para.value;
@@ -3796,7 +3803,7 @@ class DummyTargetCtr {
             var escPrg = function (iobj) {
                 console.log(iobj);
                 if (iobj.act === "esc") {
-                    MdaPopWin.popOff(2);
+                    MdaPopWin.popOffTo(iobj.sender.opts.popStackCnt);
                     return;
                 }
                 if (iobj.act === "mouseClick" && iobj.kvObj.opts.itemId === "esc") {
@@ -3838,9 +3845,35 @@ class DummyTargetCtr {
 
             if (iobj.buttonId === "wave") {
                 var opts = {};
-                opts.actionFunc = escPrg;
+                opts.actionFunc = function (iobj) {
+                    console.log(iobj);
+                    if (iobj.act === "esc") {
+                        var kvObj = iobj.sender;
+                        if (!kvObj.opts.signalMode) {
+                            gr.hideWavePageElem = null;
+                            gr.wavePageObj = null;
+                            MdaPopWin.popOffTo(kvObj.opts.popStackCnt);
+                            return;
+                        }
+                        var basePanel = kvObj.fatherMd.blockRefs["basePanel#" + kvObj.opts.popStackCnt];
+                        var elem = basePanel.elems["base"];
+                        elem.style.visibility = "hidden";
+                        gr.hideWavePageElem = elem;
+                        gr.wavePageObj = kvObj;
+                        return;
+                    }
+                };
+                if (gr.hideWavePageElem) {
+                    gr.hideWavePageElem.style.visibility = "visible";
+                    return;
+                }
                 var kvObj = new Block("scope", "Model~MyNewScope~base.sys0", opts);
-                var mesObj = mda.popObj(0, 0, kvObj);
+                //var mesObj = mda.popObj(0, 0, kvObj);
+                opts.kvObj = kvObj;
+                kvObj.opts.popStackCnt = gr.mdSystem.mdClass.stackCnt;
+                MdaPopWin.popObj(opts);
+
+
                 return;
             }
 
@@ -5513,7 +5546,6 @@ class Emulate {
         if (gr.syncData[preText + "SystemStatusA"][1]) {//rfDulse detect
             gr.syncData[preText + "MeterStatusA"][2] = gr.syncData[preText + "MeterStatusA"][0] + 100;
             gr.syncData[preText + "MeterStatusA"][3] = gr.syncData[preText + "MeterStatusA"][0] + 200;
-            ;
         }
         gr.syncData[preText + "MeterStatusA"][4] = 0;
         gr.syncData[preText + "MeterStatusA"][5] = 0;
@@ -5659,8 +5691,32 @@ class Emulate {
             }
         }
         //============================================
+        if (gr.wavePageObj) {
+            var wopts = gr.wavePageObj.opts;
+            var prg = function (data, name) {
+                var value = (data - gr.paraSet[preText + name + "Offs"]) * gr.paraSet[preText + name + "Gain"];
+                if (value < gr.paraSet[preText + name + "Zero"])
+                    value = 0;
+                return value;
+            };
+            if (wopts.signalMode) {
+                if (wopts.signalMode === 3) {
+                    var buf0 = [];
+                    var buf1 = [];
+                    for (var i = 0; i < 3; i++) {
+                        var ran=Math.round(100 * Math.random() - 50);
+                        buf0.push(prg(gr.syncData[preText + "MeterStatusA"][4]+ran,"CwAmpOutRfpow"));
+                        var ran=Math.round(100 * Math.random() - 50);
+                        buf1.push(prg(gr.syncData[preText + "MeterStatusA"][5]+ran,"CcwAmpOutRfpow"));
+                    }
+                    gr.wavePageObj.mdClass.addLineBuf(buf0, 0);
+                    gr.wavePageObj.mdClass.addLineBuf(buf1, 1);
+                    //wopts.lines.a
 
+                }
 
+            }
+        }
 
     }
     timer() {
@@ -5690,7 +5746,7 @@ class Emulate {
             if (gr.appId === 0) {
                 gr.syncData.slotIdA = [1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 0, 0];
             }
-            if (gr.appId === 1 || gr.appId === 2 ) {
+            if (gr.appId === 1 || gr.appId === 2) {
                 gr.syncData.slotIdA = [1, 2, 3, 4, 5, 6, 9, 11, 0, 0, 0, 0];
             }
 
