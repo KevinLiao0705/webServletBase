@@ -183,7 +183,7 @@ class KvLib {
             return str;
         }
     }
-    
+
     static lineMoveEditor(kvObj, line) {
         if (!kvObj)
             return;
@@ -200,26 +200,26 @@ class KvLib {
         var column = editor.session.getLine(cur.row).length;
         editor.gotoLine(cur.row + 1, column);
     }
-    
-    static getDateTime(){
+
+    static getDateTime() {
         var today = new Date();
-        var va=[];
+        var va = [];
         va.push(today.getFullYear());
-        va.push(today.getMonth()+1);
+        va.push(today.getMonth() + 1);
         va.push(today.getDate());
         va.push(today.getHours());
         va.push(today.getMinutes());
         va.push(today.getSeconds());
-        for(var i=0;i<6;i++){
-            if(va[i]<10)
-                va[i]="0"+va[i];
+        for (var i = 0; i < 6; i++) {
+            if (va[i] < 10)
+                va[i] = "0" + va[i];
             else
-                va[i]=""+va[i];
+                va[i] = "" + va[i];
         }
-        
-        var date = va[0]+'-'+va[1]+'-'+va[2];
-        var time = va[3]+':'+va[4]+':'+va[5];
-        return (date + ' '+ time);        
+
+        var date = va[0] + '-' + va[1] + '-' + va[2];
+        var time = va[3] + ':' + va[4] + ':' + va[5];
+        return (date + ' ' + time);
     }
 
     static endInputEditor(kvObj, text, color) {
@@ -634,7 +634,7 @@ class KvLib {
         }
     }
 
-    static getByteLen(str){
+    static getByteLen(str) {
         let len = 0;
         for (let i = 0; i < str.length; i++) {
             str.charCodeAt(i) < 256 ? (len += 1) : (len += 2);
@@ -666,6 +666,14 @@ class KvLib {
         return retStr;
     }
 
+    static setKvText(str, id) {
+        var obj = {};
+        obj.objName = "textObj";
+        obj.type = "text";
+        obj.id = id;
+        obj.english = str;
+        return obj;
+    }
     static getKvText(istr, language, type) {
         if (istr === undefined || istr === null)
             return {text: ""};

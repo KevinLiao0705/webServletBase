@@ -262,6 +262,10 @@ class Macro {
                     gr.userName = userName;
                     gr.password = password;
                     gr.appPageCnt = 2;
+                    if(gr.paraSet.appId!==undefined){
+                        gr.appId=gr.paraSet.appId;
+                        GlobalRes.initApp(gr);                        
+                    }
                     sys.dispWebPage();
                 }
                 return;
@@ -1689,6 +1693,7 @@ class KvBox {
                 }
                 MdaPopWin.popOff(2);
                 KvLib.exeFunc(_op.actionFunc, iobj);
+                return;
 
             }
             if (iobj.act === "escape") {

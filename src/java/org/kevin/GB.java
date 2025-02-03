@@ -36,7 +36,7 @@ public class GB {
     public static int loaded_f=0;
     //======================================
     //public static String paraSetPath = "e:/kevin/myCode/webServletBase/web/user-sync";
-    public static String paraSetPath = "e:/kevin/myCode/pbxSet";
+    public static String paraSetPath = "e:/kevin/myCode/syncSet";
     public static String webSrcPath = "";
     public static String rootPath = "";
     public static String webRootPath = "";

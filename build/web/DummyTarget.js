@@ -14,91 +14,43 @@ class DummyTargetMaster {
             opts.h = 700;
             opts.kvTexts = [];
             if (gr.appId === 0) {
-                opts.kvTexts.push("雷達參數設定");
-                opts.kvTexts.push("測試脈波設定");
+                opts.kvTexts.push("雷達信號參數設定");
                 opts.kvTexts.push("同步參數設定");
                 opts.kvTexts.push("GPS參數設定");
+                opts.kvTexts.push("測試脈波設定");
+                opts.kvTexts.push("進階設定");
                 opts.kvTexts.push("下載記錄檔");
                 opts.kvTexts.push("系統重啟");
-                opts.kvTexts.push("主控同步控制器測試");
-                opts.kvTexts.push("副控1同步控制器測試");
-                opts.kvTexts.push("副控2同步控制器測試");
-                opts.kvTexts.push("副控1中央制器測試");
-                opts.kvTexts.push("副控2中央制器測試");
             }
-            
+            if (gr.appId === 1 || gr.appId === 2) {
+                opts.kvTexts.push("雷達信號參數設定");
+                opts.kvTexts.push("同步參數設定");
+                opts.kvTexts.push("GPS參數設定");
+                opts.kvTexts.push("測試脈波設定");
+                opts.kvTexts.push("進階設定");
+                opts.kvTexts.push("下載記錄檔");
+                opts.kvTexts.push("系統重啟");
+            }
             if (gr.appId === 3 || gr.appId === 4) {
                 opts.kvTexts.push("雷達參數設定");
-                opts.kvTexts.push("功率參數設定");
-                opts.kvTexts.push("測試脈波設定");
+                opts.kvTexts.push("電源參數設定");
+                opts.kvTexts.push("固態放大器參數設定");
+                opts.kvTexts.push("功率表參數設定");
                 opts.kvTexts.push("脈波參數設定");
-                opts.kvTexts.push("GPS參數設定");
+                opts.kvTexts.push("測試脈波設定");
+                opts.kvTexts.push("進階設定");
                 opts.kvTexts.push("下載記錄檔");
                 opts.kvTexts.push("系統重啟");
-                opts.kvTexts.push("進階設定");
-                
-                
-                //opts.kvTexts.push("主控同步控制器測試");
-                //opts.kvTexts.push("副控1同步控制器測試");
-                //opts.kvTexts.push("副控2同步控制器測試");
-                //opts.kvTexts.push("副控1中央制器測試");
-                //opts.kvTexts.push("副控2中央制器測試");
             }
-            
-            
             opts.actionFunc = function (iobj) {
                 console.log(iobj);
-                if (iobj.selectInx === 0) {
-                    var opts = {};
-                    opts.paraSet = gr.paraSet;
-                    opts.title = iobj.selectText;
-                    opts.actionFunc = function (iobj) {
-                        console.log(iobj);
-                        KvLib.deepCoverObject(gr.paraSet, iobj.paraSet);
-                        var fileName = "paraSet";
-                        var content = JSON.stringify(gr.paraSet);
-                        sv.saveStringToFile("responseDialogError", "null", fileName, content);
-                    };
-                    opts.setNames = [];
-                    /*
-                     var keys = Object.keys(gr.paraSet);
-                     for (var i = 0; i < keys.length; i++) {
-                     var strA = keys[i].split("~");
-                     if (strA[0] === "dsc")
-                     continue;
-                     opts.setNames.push(keys[i]);
-                     }
-                     */
-                    if (gr.appId >= 0) {
-                        opts.setNames.push("mastPulseSource");
-                        opts.setNames.push("mastToSub1CommType");
-                        opts.setNames.push("mastToSub2CommType");
-                        opts.setNames.push("mastToSub1SpeechEnable");
-                        opts.setNames.push("mastToSub2SpeechEnable");
-                        opts.setNames.push("sub1ChCommSet");
-                        opts.setNames.push("sub2ChCommSet");
-                        opts.setNames.push("sub1ChRfTxCh");
-                        opts.setNames.push("sub1ChRfRxCh");
-                        opts.setNames.push("sub2ChRfTxCh");
-                        opts.setNames.push("sub2ChRfRxCh");
-                        opts.setNames.push("pulseWidthMax");
-                        opts.setNames.push("pulseWidthMin");
-                        opts.setNames.push("pulseDutyMax");
-                        opts.setNames.push("pulseDutyMin");
-                        opts.setNames.push("pulseFreqMax");
-                        opts.setNames.push("pulseFreqMin");
-                        opts.setNames.push("radarStartAngle");
-                        opts.setNames.push("radarEndAngle");
-                        opts.setNames.push("radarScanRpm");
-                        opts.setNames.push("radarFadeTime");
 
-                    }
-
-
-                    box.paraEditBox(opts);
+                if (iobj.selectText === "系統重啟") {
+                    window.location.reload();
                     return;
                 }
-                if (iobj.selectInx === 1) {
+
+                if (iobj.selectText === "測試脈波設定") {
                     var opts = {};
                     opts.actionFunc = function (iobj) {
                         console.log(iobj);
@@ -220,6 +172,242 @@ class DummyTargetMaster {
                     box.setLineBox(opts);
                     return;
                 }
+
+
+
+                var opts = {};
+                opts.paraSet = gr.paraSet;
+                opts.title = iobj.selectText;
+                opts.actionFunc = function (iobj) {
+                    console.log(iobj);
+                    KvLib.deepCoverObject(gr.paraSet, iobj.paraSet);
+                    var fileName = "paraSet";
+                    var content = JSON.stringify(gr.paraSet);
+                    sv.saveStringToFile("responseDialogError", "null", fileName, content);
+                };
+                opts.setNames = [];
+                if (iobj.selectText === "進階設定") {
+                    if (gr.appId >= 0) {
+                        opts.setNames.push("version");
+                        opts.setNames.push("appId");
+                        opts.setNames.push("emulate");
+                        opts.setNames.push("paraSetPassword");
+
+                    }
+                }
+                if (iobj.selectText === "雷達信號參數設定") {
+                    if (gr.appId === 0) {
+                        opts.setNames.push("mastPulseSource");
+                        opts.setNames.push("mastToSub1CommType");
+                        opts.setNames.push("mastToSub2CommType");
+                        opts.setNames.push("mastToSub1SpeechEnable");
+                        opts.setNames.push("mastToSub2SpeechEnable");
+                        opts.setNames.push("radarStartAngle");
+                        opts.setNames.push("radarEndAngle");
+                        opts.setNames.push("radarScanRpm");
+                        opts.setNames.push("radarFadeTime");
+                    } else {
+                        opts.setNames.push("sub1PulseSource");
+                        opts.setNames.push("sub1CommType");
+                    }
+                }
+                if (iobj.selectText === "雷達參數設定") {
+                    if (gr.appId === 3) {
+                        opts.setNames.push("ctr1Remote");
+                        opts.setNames.push("ctr1PulseSource");
+                        opts.setNames.push("ctr1BatShort");
+                        opts.setNames.push("ctr1TxLoad");
+                    }
+                    if (gr.appId === 4) {
+                        opts.setNames.push("ctr2Remote");
+                        opts.setNames.push("ctr2PulseSource");
+                        opts.setNames.push("ctr2BatShort");
+                        opts.setNames.push("ctr2TxLoad");
+                    }
+                }
+                if (iobj.selectText === "電源參數設定") {
+                    if (gr.appId === 3)
+                        var preText = "ctr1";
+                    if (gr.appId === 4)
+                        var preText = "ctr2";
+                    opts.setNames.push(preText + "SspaPowerV50vOffs");
+                    opts.setNames.push(preText + "SspaPowerV50vGain");
+                    opts.setNames.push(preText + "SspaPowerV50vZero");
+                    opts.setNames.push(preText + "SspaPowerV50vLimD");
+                    opts.setNames.push(preText + "SspaPowerV50vLimU");
+                    //
+                    opts.setNames.push(preText + "SspaPowerV50iOffs");
+                    opts.setNames.push(preText + "SspaPowerV50iGain");
+                    opts.setNames.push(preText + "SspaPowerV50iZero");
+                    opts.setNames.push(preText + "SspaPowerV50iLimD");
+                    opts.setNames.push(preText + "SspaPowerV50iLimU");
+                    //
+                    opts.setNames.push(preText + "SspaPowerV50tOffs");
+                    opts.setNames.push(preText + "SspaPowerV50tGain");
+                    opts.setNames.push(preText + "SspaPowerV50tZero");
+                    opts.setNames.push(preText + "SspaPowerV50tLimD");
+                    opts.setNames.push(preText + "SspaPowerV50tLimU");
+                    //
+                    opts.setNames.push(preText + "SspaPowerV32vOffs");
+                    opts.setNames.push(preText + "SspaPowerV32vGain");
+                    opts.setNames.push(preText + "SspaPowerV32vZero");
+                    opts.setNames.push(preText + "SspaPowerV32vLimD");
+                    opts.setNames.push(preText + "SspaPowerV32vLimU");
+                    //
+                    opts.setNames.push(preText + "SspaPowerV32iOffs");
+                    opts.setNames.push(preText + "SspaPowerV32iGain");
+                    opts.setNames.push(preText + "SspaPowerV32iZero");
+                    opts.setNames.push(preText + "SspaPowerV32iLimD");
+                    opts.setNames.push(preText + "SspaPowerV32iLimU");
+                    //
+                    opts.setNames.push(preText + "SspaPowerV32tOffs");
+                    opts.setNames.push(preText + "SspaPowerV32tGain");
+                    opts.setNames.push(preText + "SspaPowerV32tZero");
+                    opts.setNames.push(preText + "SspaPowerV32tLimD");
+                    opts.setNames.push(preText + "SspaPowerV32tLimU");
+                    //
+                    opts.setNames.push(preText + "SspaPowerV32OnDly");
+                    opts.setNames.push(preText + "SspaPowerV32OffDly");
+
+                }
+                if (iobj.selectText === "固態放大器參數設定") {
+                    if (gr.appId === 3)
+                        var preText = "ctr1";
+                    if (gr.appId === 4)
+                        var preText = "ctr2";
+                    opts.setNames.push(preText + "SspaModuleRfOutOffs");
+                    opts.setNames.push(preText + "SspaModuleRfOutGain");
+                    opts.setNames.push(preText + "SspaModuleRfOutZero");
+                    opts.setNames.push(preText + "SspaModuleRfOutLimD");
+                    opts.setNames.push(preText + "SspaModuleRfOutLimU");
+                    opts.setNames.push(preText + "SspaModuleTemprOffs");
+                    opts.setNames.push(preText + "SspaModuleTemprGain");
+                    opts.setNames.push(preText + "SspaModuleTemprZero");
+                    opts.setNames.push(preText + "SspaModuleTemprLimD");
+                    opts.setNames.push(preText + "SspaModuleTemprLimU");
+                }
+                if (iobj.selectText === "功率表參數設定") {
+                    if (gr.appId === 3)
+                        var preText = "ctr1";
+                    if (gr.appId === 4)
+                        var preText = "ctr2";
+                    opts.setNames.push(preText + "InRfpowOffs");
+                    opts.setNames.push(preText + "InRfpowGain");
+                    opts.setNames.push(preText + "InRfpowZero");
+                    opts.setNames.push(preText + "InRfpowLimD");
+                    opts.setNames.push(preText + "InRfpowLimU");
+                    //
+                    opts.setNames.push(preText + "PreAmpOutRfpowOffs");
+                    opts.setNames.push(preText + "PreAmpOutRfpowGain");
+                    opts.setNames.push(preText + "PreAmpOutRfpowZero");
+                    opts.setNames.push(preText + "PreAmpOutRfpowLimD");
+                    opts.setNames.push(preText + "PreAmpOutRfpowLimU");
+                    //
+                    opts.setNames.push(preText + "DriverAmpOutRfpowOffs");
+                    opts.setNames.push(preText + "DriverAmpOutRfpowGain");
+                    opts.setNames.push(preText + "DriverAmpOutRfpowZero");
+                    opts.setNames.push(preText + "DriverAmpOutRfpowLimD");
+                    opts.setNames.push(preText + "DriverAmpOutRfpowLimU");
+                    //
+                    opts.setNames.push(preText + "CwAmpOutRfpowOffs");
+                    opts.setNames.push(preText + "CwAmpOutRfpowGain");
+                    opts.setNames.push(preText + "CwAmpOutRfpowZero");
+                    opts.setNames.push(preText + "CwAmpOutRfpowLimD");
+                    opts.setNames.push(preText + "CwAmpOutRfpowLimU");
+                    //
+                    opts.setNames.push(preText + "CcwAmpOutRfpowOffs");
+                    opts.setNames.push(preText + "CcwAmpOutRfpowGain");
+                    opts.setNames.push(preText + "CcwAmpOutRfpowZero");
+                    opts.setNames.push(preText + "CcwAmpOutRfpowLimD");
+                    opts.setNames.push(preText + "CcwAmpOutRfpowLimU");
+                    //
+                    opts.setNames.push(preText + "Attenuator");
+
+
+
+
+                }
+                if (iobj.selectText === "脈波參數設定") {
+                    opts.setNames.push("pulseWidthMin");
+                    opts.setNames.push("pulseWidthMax");
+                    opts.setNames.push("pulseDutyMin");
+                    opts.setNames.push("pulseDutyMax");
+                    opts.setNames.push("pulseFreqMin");
+                    opts.setNames.push("pulseFreqMax");
+                }
+
+                if (iobj.selectText === "同步參數設定") {
+                    if (gr.appId === 0) {
+                        opts.setNames.push("commTestPacks");
+                        opts.setNames.push("vgTimeDelay");
+                        opts.setNames.push("sub1ChTimeFineTune");
+                        opts.setNames.push("sub2ChTimeFineTune");
+                        opts.setNames.push("sub1ChSyncType");
+                        opts.setNames.push("sub2ChSyncType");
+                        opts.setNames.push("sub1ChCommSet");
+                        opts.setNames.push("sub2ChCommSet");
+                        opts.setNames.push("sub1ChFiberDelay");
+                        opts.setNames.push("sub2ChFiberDelay");
+                        opts.setNames.push("sub1ChRfDelay");
+                        opts.setNames.push("sub2ChRfDelay");
+                        opts.setNames.push("sub1ChRfTxCh");
+                        opts.setNames.push("sub1ChRfRxCh");
+                        opts.setNames.push("sub2ChRfTxCh");
+                        opts.setNames.push("sub2ChRfRxCh");
+                    } else {
+                        if (gr.appId === 1)
+                            var preText = "sub1";
+                        if (gr.appId === 2)
+                            var preText = "sub2";
+                        opts.setNames.push("commTestPacks");
+                        opts.setNames.push("vgTimeDelay");
+                        opts.setNames.push(preText + "ChTimeFineTune");
+                        opts.setNames.push(preText + "ChSyncType");
+                        opts.setNames.push(preText + "ChCommSet");
+                        opts.setNames.push(preText + "ChFiberDelay");
+                        opts.setNames.push(preText + "ChRfDelay");
+                        opts.setNames.push(preText + "ChRfTxCh");
+                        opts.setNames.push(preText + "ChRfRxCh");
+                    }
+                }
+                if (iobj.selectText === "GPS參數設定") {
+                    if (gr.appId === 0) {
+                        opts.setNames.push("locationFromSource");
+                        opts.setNames.push("mastLatitude");
+                        opts.setNames.push("mastLongitude");
+                        opts.setNames.push("mastAttitude");
+                        opts.setNames.push("sub1Latitude");
+                        opts.setNames.push("sub1Longitude");
+                        opts.setNames.push("sub1Attitude");
+                        opts.setNames.push("sub2Latitude");
+                        opts.setNames.push("sub2Longitude");
+                        opts.setNames.push("sub2Attitude");
+                    }
+                    if (gr.appId === 1) {
+                        opts.setNames.push("locationFromSource");
+                        opts.setNames.push("sub1Latitude");
+                        opts.setNames.push("sub1Longitude");
+                        opts.setNames.push("sub1Attitude");
+                    }
+                    if (gr.appId === 2) {
+                        opts.setNames.push("locationFromSource");
+                        opts.setNames.push("sub2Latitude");
+                        opts.setNames.push("sub2Longitude");
+                        opts.setNames.push("sub2Attitude");
+                    }
+
+
+                }
+
+                box.paraEditBox(opts);
+                return;
+
+
+
+
+
+
+
                 if (iobj.selectInx === 2) {
                     var opts = {};
                     opts.paraSet = gr.paraSet;
@@ -277,7 +465,6 @@ class DummyTargetMaster {
                     box.paraEditBox(opts);
                     return;
                 }
-
                 if (iobj.selectInx === 6) {
                     gr.appId = 0;
                     gr.appType = "Model~DummyTargetMaster~base.sys0";
@@ -312,7 +499,8 @@ class DummyTargetMaster {
 
 
 
-            };
+            }
+
 
             box.selectBox(opts);
         };
@@ -345,7 +533,8 @@ class DummyTargetMaster {
 
     }
 
-    initOpts(md) {
+    initOpts(md)
+    {
         var self = this;
         var opts = {};
         Block.setBaseOpts(opts);
@@ -413,11 +602,11 @@ class DummyTargetMaster {
                 opts.paraSet = gr.paraSet;
                 if (setF === 1) {
                     opts.title = "副控1雷達設定";
-                    var preText = "sub1";
+                    var preText = "ctr1";
                 }
                 if (setF === 2) {
                     opts.title = "副控2雷達設定";
-                    var preText = "sub2";
+                    var preText = "ctr2";
                 }
                 opts.h = 350;
                 opts.eh = 60;
@@ -431,10 +620,10 @@ class DummyTargetMaster {
                     sv.saveStringToFile("responseDialogError", "null", fileName, content);
                 };
                 opts.setNames = [];
-                opts.setNames.push(preText + "BatShort");
+                opts.setNames.push(preText + "Remote");
                 opts.setNames.push(preText + "PulseSource");
                 opts.setNames.push(preText + "TxLoad");
-                opts.setNames.push(preText + "CommType");
+                opts.setNames.push(preText + "BatShort");
                 box.paraEditBox(opts);
                 return;
             }
@@ -507,7 +696,7 @@ class DummyTargetMaster {
         //======================================    
         var cname = lyMaps["body"] + "~" + 0;
         var opts = {};
-        opts.yArr = [50, 70, 9999];
+        opts.yArr = [50, 70, 9999, 20];
         layouts[cname] = {name: cname, type: "Layout~Ly_base~xyArray.sys0", opts: opts};
         lyMaps["mainBody"] = cname;
         //==============================
@@ -516,6 +705,12 @@ class DummyTargetMaster {
         opts.innerText = "主控雷達同步控制器";
         blocks[cname] = {name: "basePanel", type: "Component~Cp_base~label.title", opts: opts};
         //==============================
+        var cname = lyMaps["mainBody"] + "~" + 3;
+        mac.setFootBar(md, cname);
+
+
+
+
         var cname = lyMaps["mainBody"] + "~" + 1;
         var opts = {};
         opts.buttons = ["自測", "佈署", "同步", "波形", "通話", "設定"];
@@ -561,18 +756,31 @@ class DummyTargetMaster {
                 var opts = {};
                 opts.actionFunc = function (iobj) {
                     console.log(iobj);
-                    if (iobj.act === "esc")
-                        MdaPopWin.popOff(2);
+                    if (iobj.act === "esc") {
+                        var kvObj = iobj.sender;
+                        if (!kvObj.opts.signalMode) {
+                            gr.hideWavePageElem = null;
+                            gr.wavePageObj = null;
+                            MdaPopWin.popOffTo(kvObj.opts.popStackCnt);
+                            return;
+                        }
+                        var basePanel = kvObj.fatherMd.blockRefs["basePanel#" + kvObj.opts.popStackCnt];
+                        var elem = basePanel.elems["base"];
+                        elem.style.visibility = "hidden";
+                        gr.hideWavePageElem = elem;
+                        gr.wavePageObj = kvObj;
+                        return;
+                    }
                 };
+                if (gr.hideWavePageElem) {
+                    gr.hideWavePageElem.style.visibility = "visible";
+                    return;
+                }
                 var kvObj = new Block("scope", "Model~MyNewScope~base.sys0", opts);
                 //var mesObj = mda.popObj(0, 0, kvObj);
+                opts.kvObj = kvObj;
                 kvObj.opts.popStackCnt = gr.mdSystem.mdClass.stackCnt;
-                var waveForm = MdaPopWin.popObj(opts);
-
-                return;
-
-
-                var mesObj = mda.popObj(0, 0, kvObj);
+                MdaPopWin.popObj(opts);
                 return;
             }
 
@@ -1257,7 +1465,7 @@ class MasterRadarPane {
         //==============================
         var cname = lyMaps["mainBody"] + "~" + lyInx++;
         var opts = {};
-        opts.ym = 2;
+        opts.xm = 10;
         opts.yArr = [9999, 40];
         layouts[cname] = {name: cname, type: "Layout~Ly_base~xyArray.sys0", opts: opts};
         lyMaps["rightDownBody"] = cname;
@@ -1269,43 +1477,38 @@ class MasterRadarPane {
         //==
         var cname = lyMaps["rightDownBody"] + "~" + 1;
         var opts = {};
-        opts.xm = 2;
-        opts.xArr = [9999, 60, 60, 60];
-        layouts[cname] = {name: cname, type: "Layout~Ly_base~xyArray.sys0", opts: opts};
-        lyMaps["barBody"] = cname;
-        //===================================
-        var cname = lyMaps["barBody"] + "~" + 0;
-        var opts = {};
-        opts.innerText = ""; //"無線"|光纖;
-        opts.baseColor = "#ccc";
-        opts.textAlign = "left";
-        opts.fontSize = 14;
-        opts.lpd = 4;
-        var watchReg = "self.fatherMd.stas.connectCnt";
-        md.setInputWatch(opts, "directName", watchReg, "innerText", 1);
-        blocks[cname] = {name: "messageLabel", type: "Component~Cp_base~label.sys0", opts: opts};
+        opts.buttons = ['<i class="gf">&#xe316;</i>', '<i class="gf">&#xe313;</i>', "CLR"];
+        opts.buttonAmt = 3;
+        opts.buttonIds = ["upPage", "downPage", "clear"];
+        //opts.layoutType = "collum";
+        opts.margin = 4;
+        opts.fontSize = "0.8rh";
+        opts.xm = 4;
+        opts.ym = 10;
+        opts.iw = 100;
+        opts.baseColor = "#444";
+        opts.actionFunc = function (iobj) {
+            console.log(iobj);
+            if (iobj.buttonId === "upPage") {
+                var kvObj = md.blockRefs["editor"];
+                KvLib.lineMoveEditor(kvObj, -8);
+                return;
+            }
+            if (iobj.buttonId === "downPage") {
+                var kvObj = md.blockRefs["editor"];
+                KvLib.lineMoveEditor(kvObj, 8);
+                return;
+            }
 
-        var cname = lyMaps["barBody"] + "~" + 1;
-        var opts = {};
-        opts.innerText = '<i class="gf">&#xe316;</i>';
-        opts.baseColor = "#ccf";
-        opts.actionFunc = actionPrg;
-        blocks[cname] = {name: "upButton", type: "Component~Cp_base~button.sys0", opts: opts};
-        //==============================
-        var cname = lyMaps["barBody"] + "~" + 2;
-        var opts = {};
-        opts.innerText = '<i class="gf">&#xe313;</i>';
-        opts.baseColor = "#ccf";
-        opts.actionFunc = actionPrg;
-        blocks[cname] = {name: "downButton", type: "Component~Cp_base~button.sys0", opts: opts};
-        //==============================
-        var cname = lyMaps["barBody"] + "~" + 3;
-        var opts = {};
-        opts.innerText = 'clr';
-        opts.baseColor = "#ccf";
-        opts.actionFunc = actionPrg;
-        blocks[cname] = {name: "clrButton", type: "Component~Cp_base~button.sys0", opts: opts};
-        //==============================
+            if (iobj.buttonId === "clear") {
+                var kvObj = md.blockRefs["editor"];
+                var editor = kvObj.objs["editor"];
+                KvLib.clearEditorMaker(editor);
+                editor.getSession().setValue("");
+                return;
+            }
+        };
+        blocks[cname] = {name: "headButtons", type: "Model~MdaButtons~base.sys0", opts: opts};
 
 
 
@@ -1378,7 +1581,7 @@ class DummyTargetSub {
         //======================================    
         var cname = lyMaps["body"] + "~" + 0;
         var opts = {};
-        opts.yArr = [50, 70, 9999];
+        opts.yArr = [50, 70, 9999, 20];
         layouts[cname] = {name: cname, type: "Layout~Ly_base~xyArray.sys0", opts: opts};
         lyMaps["mainBody"] = cname;
         //==============================
@@ -1487,6 +1690,12 @@ class DummyTargetSub {
         opts.buttonAmt = 6;
         blocks[cname] = {name: "headButtons", type: "Model~MdaButtons~base.sys0", opts: opts};
         //==============================
+        var cname = lyMaps["mainBody"] + "~" + 3;
+        mac.setFootBar(md, cname);
+
+
+
+
         var cname = lyMaps["mainBody"] + "~" + 2;
         var opts = {};
         opts.xArr = [0, 9999];
@@ -1738,46 +1947,41 @@ class SubRadarPane {
         var opts = {};
         opts.readOnly_f = 1;
         blocks[cname] = {name: "editor", type: "Component~Cp_base~editor.sys0", opts: opts};
-        //==
+        //===================================
         var cname = lyMaps["rightDownBody"] + "~" + 1;
         var opts = {};
-        opts.xm = 2;
-        opts.xArr = [9999, 60, 60, 60];
-        layouts[cname] = {name: cname, type: "Layout~Ly_base~xyArray.sys0", opts: opts};
-        lyMaps["barBody"] = cname;
-        //===================================
-        var cname = lyMaps["barBody"] + "~" + 0;
-        var opts = {};
-        opts.innerText = ""; //"無線"|光纖;
-        opts.baseColor = "#ccc";
-        opts.textAlign = "left";
-        opts.fontSize = 14;
-        opts.lpd = 4;
-        var watchReg = "self.fatherMd.stas.connectCnt";
-        md.setInputWatch(opts, "directName", watchReg, "innerText", 1);
-        blocks[cname] = {name: "messageLabel", type: "Component~Cp_base~label.sys0", opts: opts};
+        opts.buttons = ['<i class="gf">&#xe316;</i>', '<i class="gf">&#xe313;</i>', "CLR"];
+        opts.buttonAmt = 3;
+        opts.buttonIds = ["upPage", "downPage", "clear"];
+        //opts.layoutType = "collum";
+        opts.margin = 4;
+        opts.fontSize = "0.8rh";
+        opts.xm = 4;
+        opts.ym = 10;
+        opts.iw = 100;
+        opts.baseColor = "#444";
+        opts.actionFunc = function (iobj) {
+            console.log(iobj);
+            if (iobj.buttonId === "upPage") {
+                var kvObj = md.blockRefs["editor"];
+                KvLib.lineMoveEditor(kvObj, -8);
+                return;
+            }
+            if (iobj.buttonId === "downPage") {
+                var kvObj = md.blockRefs["editor"];
+                KvLib.lineMoveEditor(kvObj, 8);
+                return;
+            }
 
-        var cname = lyMaps["barBody"] + "~" + 1;
-        var opts = {};
-        opts.innerText = '<i class="gf">&#xe316;</i>';
-        opts.baseColor = "#ccf";
-        opts.actionFunc = actionPrg;
-        blocks[cname] = {name: "upButton", type: "Component~Cp_base~button.sys0", opts: opts};
-        //==============================
-        var cname = lyMaps["barBody"] + "~" + 2;
-        var opts = {};
-        opts.innerText = '<i class="gf">&#xe313;</i>';
-        opts.baseColor = "#ccf";
-        opts.actionFunc = actionPrg;
-        blocks[cname] = {name: "downButton", type: "Component~Cp_base~button.sys0", opts: opts};
-        //==============================
-        var cname = lyMaps["barBody"] + "~" + 3;
-        var opts = {};
-        opts.innerText = 'clr';
-        opts.baseColor = "#ccf";
-        opts.actionFunc = actionPrg;
-        blocks[cname] = {name: "clrButton", type: "Component~Cp_base~button.sys0", opts: opts};
-        //==============================
+            if (iobj.buttonId === "clear") {
+                var kvObj = md.blockRefs["editor"];
+                var editor = kvObj.objs["editor"];
+                KvLib.clearEditorMaker(editor);
+                editor.getSession().setValue("");
+                return;
+            }
+        };
+        blocks[cname] = {name: "headButtons", type: "Model~MdaButtons~base.sys0", opts: opts};
     }
 }
 class LocationTarget {
@@ -3064,7 +3268,6 @@ class SelfTest {
         opts.xm = 4;
         opts.ym = 10;
         opts.baseColor = "#444";
-
         opts.actionFunc = function (iobj) {
             console.log(iobj);
 
@@ -3765,7 +3968,7 @@ class DummyTargetCtr {
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
-        ws.tick();
+        //ws.tick();
         return;
 
 
@@ -3889,8 +4092,6 @@ class DummyTargetCtr {
                 opts.kvObj = kvObj;
                 kvObj.opts.popStackCnt = gr.mdSystem.mdClass.stackCnt;
                 MdaPopWin.popObj(opts);
-
-
                 return;
             }
 

@@ -1,23 +1,28 @@
 class GlobalRes {
+    
+    
+    static initApp(self){
+        if(self.appId===0)
+            self.appType="Model~DummyTargetMaster~base.sys0";
+        if(self.appId===1)
+            self.appType="Model~DummyTargetSub~base.sys0";
+        if(self.appId===2)
+            self.appType="Model~DummyTargetSub~base.sys0";
+        if(self.appId===3)
+            self.appType="Model~DummyTargetCtr~base.sys0";
+        if(self.appId===4)
+            self.appType="Model~DummyTargetCtr~base.sys0";
+        if(self.appId===99)
+            self.appType="Model~MdaMdTest~base.sys0";
+    }
     constructor() {
         //this.appName="webBuilder";
         this.appName="sync";
         this.appId=3;
+        this.appType="Model~DummyTargetCtr~base.sys0";
         this.globleTime="DummyTargetMaster.globleTime()";
-
-        //=========
-        if(this.appId===0)
-            this.appType="Model~DummyTargetMaster~base.sys0";
-        if(this.appId===1)
-            this.appType="Model~DummyTargetSub~base.sys0";
-        if(this.appId===2)
-            this.appType="Model~DummyTargetSub~base.sys0";
-        if(this.appId===3)
-            this.appType="Model~DummyTargetCtr~base.sys0";
-        if(this.appId===4)
-            this.appType="Model~DummyTargetCtr~base.sys0";
-        if(this.appId===99)
-            this.appType="Model~MdaMdTest~base.sys0";
+        GlobalRes.initApp(this);
+        
         
         this.language = "chnT";
         this.appPageCnt=0;

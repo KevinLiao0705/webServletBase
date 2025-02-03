@@ -23,7 +23,19 @@ class MyNewScopeCtr {
         //=========================
         opts.signalMode = 0;
         opts.signalModeInx = 0;
+
         opts.chNames = ["測試信號", "脈波信號 A", "脈波信號 B", "輸出功率", "反射功率", "總電流"];
+        if (gr.appId === 0)
+            opts.chNames = ["關閉", "測試信號", "脈波信號"];
+        if (gr.appId === 1)
+            opts.chNames = ["關閉", "測試信號", "脈波信號"];
+        if (gr.appId === 2)
+            opts.chNames = ["關閉", "測試信號", "脈波信號"];
+        if (gr.appId === 3)
+            opts.chNames = ["關閉", "測試信號", "脈波信號", "功率信號", "電源信號", "放大器信號"];
+        if (gr.appId === 4)
+            opts.chNames = ["關閉", "測試信號", "脈波信號", "功率信號", "電源信號", "放大器信號"];
+
         //==============
         opts.xScale = 8;
         opts.xOffset = 0;
@@ -76,8 +88,8 @@ class MyNewScopeCtr {
     }
     afterCreate() {
         this.setChAlign();
-    }    
-    setChAlign(){    
+    }
+    setChAlign() {
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
@@ -246,13 +258,13 @@ class MyNewScopeCtr {
                     if (op.signalModeInx === 1) {
                         for (var i = 0; i < 4; i++) {
                             var lineObj = scope.opts.lines[i];
-                            lineObj.yScaleTbl=MyNewScope.yScaleVoltTbl;
+                            lineObj.yScaleTbl = MyNewScope.yScaleVoltTbl;
                             lineObj.sampleRate = 200;
                             scope.opts.xScale = 29;
                             lineObj.offOn_f = 1;
                             lineObj.name = "測試信號" + (op.signalModeInx + 1) + "-" + (i + 1);
                         }
-                        md=md.reCreate();
+                        md = md.reCreate();
                     }
                 }
                 if (op.signalMode === 2) {
@@ -266,8 +278,8 @@ class MyNewScopeCtr {
                         if (i === 1)
                             lineObj.name = "本地脈波";
                     }
-                    md=md.reCreate();
-            }
+                    md = md.reCreate();
+                }
                 if (op.signalMode === 3) {
                     for (var i = 0; i < 4; i++) {
                         var lineObj = scope.opts.lines[i];
@@ -276,27 +288,27 @@ class MyNewScopeCtr {
                         lineObj.offOn_f = 1;
                         if (i === 0) {
                             lineObj.name = "輸入功率";
-                            lineObj.yScaleTbl=MyNewScope.yScaleDbTbl;
+                            lineObj.yScaleTbl = MyNewScope.yScaleDbTbl;
                             lineObj.yScaleSet = 0;
-                            op.chSelectInx=0;
+                            op.chSelectInx = 0;
                         }
-                        if (i === 1){
+                        if (i === 1) {
                             lineObj.name = "順向輸出功率";
-                            lineObj.yScaleTbl=MyNewScope.yScaleDbTbl;
+                            lineObj.yScaleTbl = MyNewScope.yScaleDbTbl;
                             lineObj.yScaleSet = 4;
                         }
-                        if (i === 2){
+                        if (i === 2) {
                             lineObj.name = "反向輸出功率";
-                            lineObj.yScaleTbl=MyNewScope.yScaleDbTbl;
+                            lineObj.yScaleTbl = MyNewScope.yScaleDbTbl;
                             lineObj.yScaleSet = 3;
-                        }    
-                        if (i === 3){
-                            lineObj.yScaleTbl=MyNewScope.yScaleAmpTbl;
+                        }
+                        if (i === 3) {
+                            lineObj.yScaleTbl = MyNewScope.yScaleAmpTbl;
                             lineObj.yScaleSet = 8;
                             lineObj.name = "放大器電源總電流";
-                        }    
+                        }
                     }
-                    md=md.reCreate();
+                    md = md.reCreate();
                 }
                 if (op.signalMode === 4) {
                     for (var i = 0; i < 4; i++) {
@@ -1450,7 +1462,7 @@ class MyNewScope {
         };
         //=========================
         opts.signalMode = 0;
-        opts.chNames = ["關閉", "測試信號", "脈波信號", "功率信號", "電源信號", "放大器信號"];
+        opts.chNames = op.chNames;
         //==============
         opts.xScale = op.xScale;
         opts.yOffsets = [0, -50, 50, 100];

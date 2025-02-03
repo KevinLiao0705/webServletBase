@@ -3350,6 +3350,9 @@ class MdaSetLine {
             var inputText = md.blockRefs["textArea"];
             var inputElem = inputText.elems["textArea"];
         }
+        if (setOpts.setType === "incEnum") {
+            return;
+        }
 
         if (inputText) {
             var inValue = inputElem.value;
