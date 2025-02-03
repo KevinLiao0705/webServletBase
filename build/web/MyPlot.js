@@ -31,9 +31,7 @@ class MyNewScopeCtr {
         opts.yScales = [1, 2, 3, 4];
         opts.gridDispInx = 0;
 
-        opts.run_f = 1;
         opts.typeCnt = 0;
-        opts.trig_f = 0;
         opts.dispValue = 15;
         //==============
         return opts;
@@ -46,27 +44,59 @@ class MyNewScopeCtr {
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
+        var scope = md.fatherMd;
         st.signalButtonColors = ["#ccf", "#ccf", "#ccf", "#ccf", "#ccf", "#ccf"];
         st.signalButtonColors[op.signalMode ] = "#cfc";
-        //setOpts.enum = ['<i class="gf">&#xe034</i>', '<i class="gf">&#xe037</i>'];
-
-        var watchDatas = st.watchDatas = ["#ccc", '<i class="gf">&#xe037</i>', "#ccc"];
-        if (op.run_f) {
+        //===========================================
+        var watchDatas = st.watchDatas = ["#ccc", '<i class="gf">&#xe037</i>', "#ccc", 1, 3];
+        if (scope.opts.run_f) {
             watchDatas[0] = "#ccf";
             watchDatas[1] = '<i class="gf">&#xe034</i>';
         }
-        if (op.trig_f) {
+        if (scope.opts.trig_f) {
             watchDatas[2] = "#ccf";
         }
+        //====================================
+        if (scope.opts.displayType)
+            watchDatas[3] = 2;
+
+
+
+        var value = 0;
+        for (var i = 0; i < scope.opts.lines.length; i++) {
+            var line = scope.opts.lines[i];
+            if (line.offOn_f) {
+                value += 1 << i;
+            }
+        }
+        watchDatas[4] = value;
+
+
+
     }
     afterCreate() {
+        this.setChAlign();
+    }    
+    setChAlign(){    
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
-        var iobj = {};
-        iobj.act = "afterCreate";
-        iobj.sender = md;
-        KvLib.exe(op.actionFunc, iobj);
+
+        var signalAdjust = md.blockRefs["signalAdjust"];
+        var scope = md.fatherMd;
+        var line = scope.opts.lines[op.chSelectInx];
+
+        var setLine = signalAdjust.blockRefs["mdaSetLine#4"];
+        var setOpts = setLine.opts.setOpts;
+        setOpts.enum = line.yScaleTbl;
+        setOpts.value = line.yScaleSet;
+        setLine.reCreate();
+
+        var setLine = signalAdjust.blockRefs["mdaSetLine#5"];
+        var setOpts = setLine.opts.setOpts;
+        setOpts.value = line.offset;
+        setLine.reCreate();
+        return;
     }
     build() {
         var self = this;
@@ -118,21 +148,9 @@ class MyNewScopeCtr {
                 var strB = iobj.kvObj.name.split("#");
                 var butInx = KvLib.toInt(strB[1], -1);
                 if (strA[0] === "mdaSetLine") {
-                    op.chSelectInx = sobj.opts.setOpts.value;
-                    var signalAdjust = md.blockRefs["signalAdjust"];
                     if (setInx === 3) {//ch select
-                        var setLine = signalAdjust.blockRefs["mdaSetLine#4"];
-                        var setOpts = setLine.opts.setOpts;
-                        setOpts.enum = MyNewScope.yScaleTbl;
-                        setOpts.value = op.yScales[op.chSelectInx];
-                        setLine.reCreate();
-
-                        var setLine = signalAdjust.blockRefs["mdaSetLine#5"];
-                        var setOpts = setLine.opts.setOpts;
-                        setOpts.value = op.yOffsets[op.chSelectInx];
-                        setLine.reCreate();
-
-
+                        op.chSelectInx = sobj.opts.setOpts.value;
+                        md.mdClass.setChAlign();
                         return;
                     }
                 }
@@ -176,11 +194,9 @@ class MyNewScopeCtr {
                 }
                 if (setInx === 4) {//
                     obj.act = "yScaleChanged";
-                    obj.valueText = MyNewScope.yScaleTbl[iobj.setOptsObj.opts.setOpts.value];
                 }
                 if (setInx === 5) {//
                     obj.act = "yOffsetChanged";
-                    obj.valueText = MyNewScope.yScaleTbl[iobj.setOptsObj.opts.setOpts.value];
                 }
                 obj.chInx = op.chSelectInx;
                 obj.sender = md;
@@ -230,11 +246,13 @@ class MyNewScopeCtr {
                     if (op.signalModeInx === 1) {
                         for (var i = 0; i < 4; i++) {
                             var lineObj = scope.opts.lines[i];
+                            lineObj.yScaleTbl=MyNewScope.yScaleVoltTbl;
                             lineObj.sampleRate = 200;
                             scope.opts.xScale = 29;
                             lineObj.offOn_f = 1;
                             lineObj.name = "測試信號" + (op.signalModeInx + 1) + "-" + (i + 1);
                         }
+                        md=md.reCreate();
                     }
                 }
                 if (op.signalMode === 2) {
@@ -247,25 +265,38 @@ class MyNewScopeCtr {
                             lineObj.name = "遠端脈波";
                         if (i === 1)
                             lineObj.name = "本地脈波";
-
                     }
-                }
+                    md=md.reCreate();
+            }
                 if (op.signalMode === 3) {
                     for (var i = 0; i < 4; i++) {
                         var lineObj = scope.opts.lines[i];
                         lineObj.sampleRate = 200;
                         scope.opts.xScale = 29;
-
                         lineObj.offOn_f = 1;
-                        if (i === 0)
+                        if (i === 0) {
                             lineObj.name = "輸入功率";
-                        if (i === 1)
+                            lineObj.yScaleTbl=MyNewScope.yScaleDbTbl;
+                            lineObj.yScaleSet = 0;
+                            op.chSelectInx=0;
+                        }
+                        if (i === 1){
                             lineObj.name = "順向輸出功率";
-                        if (i === 2)
+                            lineObj.yScaleTbl=MyNewScope.yScaleDbTbl;
+                            lineObj.yScaleSet = 4;
+                        }
+                        if (i === 2){
                             lineObj.name = "反向輸出功率";
-                        if (i === 3)
+                            lineObj.yScaleTbl=MyNewScope.yScaleDbTbl;
+                            lineObj.yScaleSet = 3;
+                        }    
+                        if (i === 3){
+                            lineObj.yScaleTbl=MyNewScope.yScaleAmpTbl;
+                            lineObj.yScaleSet = 8;
                             lineObj.name = "放大器電源總電流";
+                        }    
                     }
+                    md=md.reCreate();
                 }
                 if (op.signalMode === 4) {
                     for (var i = 0; i < 4; i++) {
@@ -413,8 +444,7 @@ class MyNewScopeCtr {
         opts.setOptss = [];
         var setOptss = opts.setOptss;
         mac.setXyArr(opts, 6);
-        //
-
+        //==========
         var setOpts = sopt.getOptsPara("nature");
         setOpts.iconWidth = 40;
         setOpts.image = "systemResource/icons8-grid-50.png";
@@ -423,8 +453,7 @@ class MyNewScopeCtr {
         setOpts.value = op.gridDispInx;
         setOpts.actButtons = ["inc", "dec"];
         setOptss.push(setOpts);
-
-
+        //==========
         var setOpts = sopt.getOptsPara("incEnum");
         setOpts.enum = MyNewScope.xScaleTbl;
         setOpts.max = setOpts.enum.length;
@@ -432,8 +461,7 @@ class MyNewScopeCtr {
         setOpts.iconWidth = 40;
         setOpts.image = "systemResource/icons8-magnifierLR-80.png";
         setOptss.push(setOpts);
-
-
+        //==========
         var setOpts = sopt.getOptsPara("int");
         setOpts.iconWidth = 40;
         setOpts.image = "systemResource/xlr-64.png";
@@ -494,27 +522,17 @@ class MyNewScopeCtr {
         var actionPrg = function (iobj) {
             console.log(iobj);
             if (iobj.act === "actButtonClick") {
-                if (iobj.buttonId === "runStop") {
-                    if (op.run_f)
-                        op.run_f = 0;
-                    else
-                        op.run_f = 1;
-                    iobj.value = op.run_f;
-                }
-                if (iobj.buttonId === "trig") {
-                    if (op.trig_f)
-                        op.trig_f = 0;
-                    else
-                        op.trig_f = 1;
-                    iobj.value = op.trig_f;
-                }
+                KvLib.exe(op.actionFunc, iobj);
+                return;
             }
-            KvLib.exe(op.actionFunc, iobj);
+            if (iobj.act === "mouseClick") {
+                KvLib.exe(op.actionFunc, iobj);
+                return;
+            }
         };
 
         var setOpts = sopt.getOptsPara("button");
         setOpts.titleWidth = 0;
-        setOpts.title = "RUN";
         setOpts.enum = [""];
         setOpts.enumId = ['runStop'];
         setOpts.fontSize = "0.9rh";
@@ -527,23 +545,25 @@ class MyNewScopeCtr {
 
         var setOpts = sopt.getOptsPara("button");
         setOpts.titleWidth = 0;
-        setOpts.title = "TRIG";
         setOpts.enum = ["TRIG"];
         setOpts.enumId = ['trig'];
-        setOpts.fontSize = "fixWidth";
+        setOpts.fontSize = "0.5rh";
         var watchDatas = setOpts.watchDatas = [];
         var regDatas = "self.fatherMd.fatherMd.fatherMd.stas.watchDatas";
         watchDatas.push(["directReg", regDatas + "#2", "baseColor", 1]);
         setOptss.push(setOpts);
 
 
-        var setOpts = sopt.getOptsPara("buttonSelect");
+        var setOpts = sopt.getOptsPara("buttonOnOffs");
         setOpts.titleWidth = 60;
         setOpts.title = "TYPE";
         setOpts.enum = ['MAIN', 'ROLL'];
-        setOpts.selectColor = "#cfc";
-        setOpts.value = op.typeCnt;
-        setOpts.fontSize = "fixWidth";
+        setOpts.enumId = ['dispTypeMain', 'dispTypeRoll'];
+        setOpts.value = 0;
+        var watchDatas = setOpts.watchDatas = [];
+        var regDatas = "self.fatherMd.fatherMd.stas.watchDatas";
+        watchDatas.push(["directReg", regDatas + "#3", "setOpts.value", 1]);
+        setOpts.fontSize = "0.5rh";
         setOptss.push(setOpts);
 
         var setOpts = sopt.getOptsPara("buttonOnOffs");
@@ -551,8 +571,10 @@ class MyNewScopeCtr {
         setOpts.title = "DISP";
         setOpts.enum = ['CH1', 'CH2', 'CH3', 'CH4'];
         setOpts.enumId = ['ch1', 'ch2', 'ch3', 'ch4'];
-        setOpts.selectColor = "#cfc";
-        setOpts.value = op.dispValue;
+        var watchDatas = setOpts.watchDatas = [];
+        var regDatas = "self.fatherMd.fatherMd.stas.watchDatas";
+        watchDatas.push(["directReg", regDatas + "#4", "setOpts.value", 1]);
+        setOpts.value = 0;
         setOpts.fontSize = "fixWidth";
         setOptss.push(setOpts);
 
@@ -583,11 +605,10 @@ class MyNewScope {
         "2 S", "5 S", "10 S", "20 S", "50 S", "100 S"
     ];
 
-    static yScaleVoltTbl = ["1 mV", "2 mV", "5 mV", "10 mV", "20 mV", "50 mV", "100 mV", "200 mV", "500 mV", "1 V", "2 V", "5 V", "10 V","20 V","50 V","100 V"];
-    static yScaleAmpTbl = ["1 mA", "2 mA", "5 mA", "10 mA", "20 mA", "50 mA", "100 mA", "200 mA", "500 mA", "1 A", "2 A", "5 A", "10 A","20 A", "50 A", "100 A"];
-    static yScaleDbTbl = ["10 DB", "20 DB", "30 DB", "40 DB", "50 DB ", "60 DB"];
+    static yScaleVoltTbl = ["1 mV", "2 mV", "5 mV", "10 mV", "20 mV", "50 mV", "100 mV", "200 mV", "500 mV", "1 V", "2 V", "5 V", "10 V", "20 V", "50 V", "100 V"];
+    static yScaleAmpTbl = ["1 mA", "2 mA", "5 mA", "10 mA", "20 mA", "50 mA", "100 mA", "200 mA", "500 mA", "1 A", "2 A", "5 A", "10 A", "20 A", "50 A", "100 A"];
+    static yScaleDbTbl = ["10 DB", "20 DB", "30 DB", "40 DB", "50 DB", "60 DB"];
     static yScaleDucTbl = ["20 ℃", "40 ℃", "60 ℃", "80 ℃", "100 ℃ ", "120 ℃", "140 ℃", "160 ℃", "180 ℃", "200 ℃"];
-    
 
     static transXScale(inStr) {
         var strA = inStr.split(" ");
@@ -629,8 +650,7 @@ class MyNewScope {
             if (strA[1] === "V" || strA[1] === "A") {
                 op.lines[i].yScale = ii * 1000;
                 continue;
-            }
-            else{
+            } else {
                 op.lines[i].yScale = ii;
             }
         }
@@ -646,8 +666,10 @@ class MyNewScope {
         opts.powerOn_f = 1;
         opts.grid_f = 1;
         opts.run_f = 1;
+        opts.trig_f = 0;
         opts.signalMode = 0;
         opts.signalCnt = 0;
+        opts.displayType = 0;//main|roll
 
         opts.centerLine_f = 1;
         opts.axeWidth = 0.5;
@@ -1374,21 +1396,21 @@ class MyNewScope {
 
             if (iobj.act === "actButtonClick") {
                 if (iobj.buttonId === "runStop") {
-                    md.opts.run_f = iobj.value;
+                    md.opts.run_f ^= 1;
                     return;
                 }
                 if (iobj.buttonId === "trig") {
-                    md.opts.trig_f = iobj.value;
+                    md.opts.trig_f ^= 1;
                     return;
                 }
             }
             if (iobj.act === "mouseClick") {
-                if (iobj.buttonId === "run") {
-                    md.opts.run_f = 1;
+                if (iobj.buttonId === "dispTypeMain") {
+                    md.opts.displayType = 0;
                     return;
                 }
-                if (iobj.buttonId === "pause") {
-                    md.opts.run_f = 0;
+                if (iobj.buttonId === "dispTypeRoll") {
+                    md.opts.displayType = 1;
                     return;
                 }
                 if (iobj.buttonId === "ch1") {

@@ -347,8 +347,10 @@ class MySystem {
         if (optsName !== "innerText")
             self.watch["_sysReDraw_f"] = 1;
         self.watch[optsName] = 1;
+        /*
         if (value !== undefined)
             self.opts[optsName] = value;
+        */                            
     }
     setReDraw(self, optsName, value) {
         self.watch["_sysReDraw_f"] = 1;

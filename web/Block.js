@@ -81,7 +81,7 @@ class Block {
         opts["group~font"] = [0];
         opts.innerText = "";//"1234568<br>abcd";
         opts.fontSize = "0.7rh";
-        opts.maxFontSize=35;
+        opts.maxFontSize = 35;
         //======================
         //opts.fontFamily="Impact";
         //opts.fontFamily="Monospace";//fit width
@@ -866,7 +866,7 @@ class Block {
                 st.fontSizeObj = KvLib.measureText(testText, st.fontSize, op.fontWeight, op.fontFamily);
                 if (st.fontSizeObj.w > st.cw) {
                     st.fontSize = (st.fontSize * st.cw / st.fontSizeObj.w);
-                    st.fontSize-=3;
+                    st.fontSize -= 3;
                     st.fontSize = KvLib.minMax(st.fontSize, gr.minFontSize, gr.maxFontSize);
                 }
             } else {
@@ -908,8 +908,6 @@ class Block {
         if (reDraw_f)
             self.watch["_sysReDraw_f"] = 1;
         self.watch[optsName] = 1;
-        if (value !== undefined)
-            self.opts[optsName] = value;
     }
 
     static setInputWatch(opts, type, regName, optName, redraw_f) {
@@ -941,13 +939,19 @@ class Block {
     chkInputWatch() {
         var self = this;
         for (var i = 0; i < self.opts.inputRegs.length; i++) {
+
+            if (self.baseType === "MdaSetLine") {
+                var ii = 0;
+            }
+
+
             var ipObj = self.opts.inputRegs[i];
             ipObj.cnt++;
             if (ipObj.cnt < ipObj.period)
                 continue;
             ipObj.cnt = 0;
             var value;
-            if (ipObj.inputName === "self.fatherMd.fatherMd.fatherMd.fatherMd.stas.watchDatas#0") {
+            if (ipObj.inputName === "self.fatherMd.fatherMd.stas.watchDatas#3") {
                 var uu = 0;
             }
             if (ipObj.type === "directReg") {
@@ -994,13 +998,21 @@ class Block {
                 if (value.length === self.opts[ipObj.optName].length) {
                     for (var j = 0; j < value.length; j++) {
                         if (self.opts[ipObj.optName][j] !== value[j]) {
+                            self.opts[ipObj.optName][j] = value;
                             self.setWatch(self, ipObj.optName, value, ipObj.redraw_f);
                             break;
                         }
                     }
                 }
             } else {
-                if (self.opts[ipObj.optName] !== value) {
+                var strA=ipObj.optName.split(".");
+                var reg=self.opts;
+                var optsName=strA[strA.length-1];
+                for(var j=0;j<strA.length-1;j++){
+                    var reg=reg[strA[j]];
+                }
+                if (reg[optsName] !== value) {
+                    reg[optsName]=value;
                     self.setWatch(self, ipObj.optName, value, ipObj.redraw_f);
                 }
             }
@@ -1039,6 +1051,7 @@ class Block {
         var md = this;
         md.chkTimer();
         md.chkInputWatch();
+
         if (md.watch["_sysReDraw_f"])
             md = md.reCreate();
         if (md.mdClass.chkWatch)
@@ -1558,7 +1571,7 @@ class Cp_base {
         if (!st.checkBoxWidth)
             return;
         md.checkBoxClick = function () {
-            if(op.readOnly_f)
+            if (op.readOnly_f)
                 return;
             var checkElem = md.elems["checkBox"];
             if (md.opts.radioName) {
@@ -1596,7 +1609,7 @@ class Cp_base {
         sonElem.style.height = (st.fontSizeObj.h - 5) + "px";
         sonElem.style.backgroundColor = "rgba(0,0,0,0)";
         sonElem.style.pointerEvents = "none";
-        
+
         if (op.checked_f)
             sonElem.checked = true;
         sonElem.md = md;

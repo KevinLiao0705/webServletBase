@@ -1,5 +1,7 @@
 class DummyTargetMaster {
     constructor() {
+        gr.hideWavePageElem = null;
+
     }
 
     static paraSetPrg() {
@@ -11,17 +13,39 @@ class DummyTargetMaster {
             opts.yc = 11;
             opts.h = 700;
             opts.kvTexts = [];
-            opts.kvTexts.push("雷達參數設定");
-            opts.kvTexts.push("測試脈波設定");
-            opts.kvTexts.push("同步參數設定");
-            opts.kvTexts.push("GPS參數設定");
-            opts.kvTexts.push("下載記錄檔");
-            opts.kvTexts.push("系統重啟");
-            opts.kvTexts.push("主控同步控制器測試");
-            opts.kvTexts.push("副控1同步控制器測試");
-            opts.kvTexts.push("副控2同步控制器測試");
-            opts.kvTexts.push("副控1中央制器測試");
-            opts.kvTexts.push("副控2中央制器測試");
+            if (gr.appId === 0) {
+                opts.kvTexts.push("雷達參數設定");
+                opts.kvTexts.push("測試脈波設定");
+                opts.kvTexts.push("同步參數設定");
+                opts.kvTexts.push("GPS參數設定");
+                opts.kvTexts.push("下載記錄檔");
+                opts.kvTexts.push("系統重啟");
+                opts.kvTexts.push("主控同步控制器測試");
+                opts.kvTexts.push("副控1同步控制器測試");
+                opts.kvTexts.push("副控2同步控制器測試");
+                opts.kvTexts.push("副控1中央制器測試");
+                opts.kvTexts.push("副控2中央制器測試");
+            }
+            
+            if (gr.appId === 3 || gr.appId === 4) {
+                opts.kvTexts.push("雷達參數設定");
+                opts.kvTexts.push("功率參數設定");
+                opts.kvTexts.push("測試脈波設定");
+                opts.kvTexts.push("脈波參數設定");
+                opts.kvTexts.push("GPS參數設定");
+                opts.kvTexts.push("下載記錄檔");
+                opts.kvTexts.push("系統重啟");
+                opts.kvTexts.push("進階設定");
+                
+                
+                //opts.kvTexts.push("主控同步控制器測試");
+                //opts.kvTexts.push("副控1同步控制器測試");
+                //opts.kvTexts.push("副控2同步控制器測試");
+                //opts.kvTexts.push("副控1中央制器測試");
+                //opts.kvTexts.push("副控2中央制器測試");
+            }
+            
+            
             opts.actionFunc = function (iobj) {
                 console.log(iobj);
                 if (iobj.selectInx === 0) {
@@ -3728,6 +3752,7 @@ class StatusBar {
 //==================================================
 class DummyTargetCtr {
     constructor() {
+        gr.hideWavePageElem = null;
     }
     initOpts(md) {
         var self = this;
@@ -3740,16 +3765,8 @@ class DummyTargetCtr {
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
+        ws.tick();
         return;
-        st.radarStatusText = [];
-        st.radarStatusColor = [];
-
-        /*
-         SP雷達信號     0.0: 無信號, 0.1: 信號備便
-         脈波來源       1.0: 主雷同步, 1.1: 本機脈波
-         與副控1連線方式  2.0: 光纖, 2.1: 無線, 2.2: 自動 
-         與副控2連線方式  2.0: 光纖, 2.1: 無線, 2.2: 自動 
-         */
 
 
 
@@ -5704,10 +5721,10 @@ class Emulate {
                     var buf0 = [];
                     var buf1 = [];
                     for (var i = 0; i < 3; i++) {
-                        var ran=Math.round(100 * Math.random() - 50);
-                        buf0.push(prg(gr.syncData[preText + "MeterStatusA"][4]+ran,"CwAmpOutRfpow"));
-                        var ran=Math.round(100 * Math.random() - 50);
-                        buf1.push(prg(gr.syncData[preText + "MeterStatusA"][5]+ran,"CcwAmpOutRfpow"));
+                        var ran = Math.round(100 * Math.random() - 50);
+                        buf0.push(prg(gr.syncData[preText + "MeterStatusA"][4] + ran, "CwAmpOutRfpow"));
+                        var ran = Math.round(100 * Math.random() - 50);
+                        buf1.push(prg(gr.syncData[preText + "MeterStatusA"][5] + ran, "CcwAmpOutRfpow"));
                     }
                     gr.wavePageObj.mdClass.addLineBuf(buf0, 0);
                     gr.wavePageObj.mdClass.addLineBuf(buf1, 1);
@@ -6261,6 +6278,11 @@ class SyncGloble {
             return;
         }
         console.log(iobj);
+        if (gr.paraSet.emulate === 0) {
+            return;
+        }
+
+
         if (gr.appId === 1)
             var preText = "sub1";
         if (gr.appId === 2)

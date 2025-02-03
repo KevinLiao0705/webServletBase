@@ -35,7 +35,10 @@ class GlobalRes {
         //this.webSocketAddress = "127.0.0.1";
         //this.webSocketAddress = "192.168.0.28";
         this.webIp="127.0.0.1";
-        this.webSocketPort = "80";
+        this.webSocketPort = "8899";
+        this.webSocketConnTime = 0;
+        this.webSocketConnect_f=0;
+        //
         this.userName = "sync";
         this.password = "1234";
         this.mouseAct = {};

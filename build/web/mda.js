@@ -3441,6 +3441,9 @@ class MdaSetLine {
 
         }
     }
+    chkWatch() {
+
+    }
 
     addInputText(inStr, setAll_f) {
         var self = this;
@@ -4369,6 +4372,15 @@ class MdaSetLine {
 
                 md.newBlock(cname, opts, "Component~Cp_base~button.sys0", "buttonMain#" + i);
             }
+
+            if (setOpts.watchDatas) {
+                for (var i = 0; i < setOpts.watchDatas.length; i++) {
+                    var items = setOpts.watchDatas[i];
+                    md.setInputWatch(op, items[0], items[1], items[2], items[3]);
+                }
+            }
+
+
             return;
 
 
@@ -4417,6 +4429,15 @@ class MdaSetLine {
                     opts.fontSize = setOpts.fontSize;
                 md.newBlock(cname, opts, "Component~Cp_base~button.sys0", "buttonMain#" + i);
             }
+
+            if (setOpts.watchDatas) {
+                for (var i = 0; i < setOpts.watchDatas.length; i++) {
+                    var items = setOpts.watchDatas[i];
+                    md.setInputWatch(op, items[0], items[1], items[2], items[3]);
+                }
+            }
+
+
             return;
         }
         if (setOpts.setType === "buttonRadio") {
@@ -4555,6 +4576,12 @@ class MdaSetLine {
             opts.lpd = 0;
             opts.rpd = 0;
             md.newBlock(cname, opts, "Component~Cp_base~inputText.sys0", "inputText");
+            if (setOpts.watchDatas) {
+                for (var i = 0; i < setOpts.watchDatas.length; i++) {
+                    var items = setOpts.watchDatas[i];
+                    md.setInputWatch(op, items[0], items[1], items[2], items[3]);
+                }
+            }
             return;
         }
 
