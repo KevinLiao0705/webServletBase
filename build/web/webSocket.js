@@ -52,7 +52,9 @@ class MyWebSocket {
                 console.log(recObj.testBackValue);
             }
             if (recObj.syncData) {
-                gr.syncData = JSON.parse(recObj.syncData);
+                if (gr.socketRetPrgTbl["tick"]) {
+                    gr.socketRetPrgTbl["tick"](recObj.syncData);
+                }
             }
         };
         return;
@@ -92,6 +94,15 @@ class MyWebSocket {
             obj.act = "tick";
             self.sendSocket(obj);
         }
+    }
+
+    cmd(cmd, paras) {
+        var self = this;
+        self.tickTime = 0;
+        var obj = {};
+        obj.act = cmd;
+        obj.paras = paras;
+        self.sendSocket(obj);
     }
 
 }

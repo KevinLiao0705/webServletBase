@@ -3956,6 +3956,19 @@ class StatusBar {
 class DummyTargetCtr {
     constructor() {
         gr.hideWavePageElem = null;
+        gr.socketRetPrgTbl["tick"] = function (syncData) {
+            gr.syncData.slotIdA = syncData.slotIdA;
+            gr.syncData.slotStatusA = syncData.slotStatusA;
+            gr.syncData.slotTestStatusA = syncData.slotTestStatusA;
+            gr.syncData.ctr1SspaPowerStatusAA = syncData.ctr1SspaPowerStatusAA;
+            gr.syncData.ctr1SspaModuleStatusAA = syncData.ctr1SspaModuleStatusAA;
+            gr.syncData.ctr1SystemStatusA = syncData.ctr1SystemStatusA;
+            gr.syncData.ctr1RadarStatusA = syncData.ctr1RadarStatusA;
+            gr.syncData.ctr1MeterStatusA = syncData.ctr1MeterStatusA;
+            gr.syncData.ctr1EnvStatusA = syncData.ctr1EnvStatusA;
+            console.log("syncData");
+
+        };
     }
     initOpts(md) {
         var self = this;
@@ -3968,7 +3981,7 @@ class DummyTargetCtr {
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
-        //ws.tick();
+        ws.tick();
         return;
 
 
@@ -4036,7 +4049,7 @@ class DummyTargetCtr {
             if (iobj.buttonId === "selfTest") {
                 var opts = {};
                 opts.actionFunc = escPrg;
-                var kvObj = new Block("selfTest", "Model~SelfTest~base.sys0", opts);
+                kvObj = new Block("selfTest", "Model~SelfTest~base.sys0", opts);
                 var mesObj = mda.popObj(0, 0, kvObj);
                 return;
             }
@@ -4394,6 +4407,44 @@ class DummyTargetCtrPane {
                 var preText = "ctr2";
             if (iobj.act === "actButtonClick") {
                 var inx = KvLib.toInt(iobj.sender.name.split('#')[1], -1);
+                if (inx === 16) {
+                    var opts = {};
+                    opts.title = iobj.buttonText;
+                    opts.xc = 2;
+                    opts.yc = 17;
+                    opts.h = 800;
+                    opts.w = 1000;
+                    opts.fontSize="0.5rh";
+                    opts.kvTexts = [];
+                    
+                    for(var i=0;i<gr.paraSet.localPulseGenParas.length;i++){
+                        var strA=gr.paraSet.localPulseGenParas[i].split(" ");
+                        if(strA[0]==="0")
+                            continue;
+                        var str=strA[1]+"us ";
+                        str+=strA[2]+"% ";
+                        str+=strA[3]+"GHz ";
+                        str+="X"+strA[4];
+                        opts.kvTexts.push(str);
+                    }
+                    opts.kvTexts.push("隨機脈波");
+                    opts.kvTexts.push("停止");
+                    opts.actionFunc = function (iobj) {
+                        console.log(iobj);
+                        MdaPopWin.popOff(2);
+
+                    };
+                    box.selectBox(opts);
+                    
+                    
+                    
+                    
+                    
+                    return;
+                }
+                
+                
+                
                 if (inx === 14) {
                     gr.gbcs.command({'act': preText + "AllSspaPowerOnOff"});
                     return;
@@ -6405,10 +6456,6 @@ class SyncGloble {
 
         var location = syncData.location = {};
         var radarStatus = syncData.radarStatus = {};
-        syncData.ctr1PowerStatus = {};
-        syncData.ctr2PowerStatus = {};
-        syncData.ctr1SspaStatusA = [];
-        syncData.ctr2SspaStatusA = [];
 
 
         /*
@@ -6449,7 +6496,6 @@ class SyncGloble {
          脈波來源    7.0: 未連線, 7.1: 主雷同步, 7.2: 本機脈波
          輸出裝置    8.0: 未連線, 8.1: 天線, 8.2:假負載 
          連線方式    9.0: 未連線, 9.1: 光纖, 9.2:無線, 9.3:自動 
-         0.1
          */
         radarStatus.sub1Status = [1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         radarStatus.sub2Status = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -6478,12 +6524,6 @@ class SyncGloble {
             emu.command(iobj);
             return;
         }
-        console.log(iobj);
-        if (gr.paraSet.emulate === 0) {
-            return;
-        }
-
-
         if (gr.appId === 1)
             var preText = "sub1";
         if (gr.appId === 2)
@@ -6492,6 +6532,72 @@ class SyncGloble {
             var preText = "ctr1";
         if (gr.appId === 4)
             var preText = "ctr2";
+        if (iobj.act === preText + "AllSspaPowerOnOff") {
+            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
+            
+            if (gr.syncData[preText + "SystemStatusA"][9])//emergency
+                return;
+            var onf = 0;
+            for (var i = 0; i < 36; i++) {
+                if (gr.syncData[preText + "SspaPowerStatusAA"][i][2])
+                    onf = 1;
+                if (gr.syncData[preText + "SspaPowerStatusAA"][i][3])
+                    onf = 1;
+            }
+            if (onf) {
+                gr.gbcs.command({'act': preText + "CloseAllSspaModule"});
+                gr.gbcs.command({'act': preText + "CloseAllSspaPower"});
+            } else {
+                gr.gbcs.command({'act': preText + "OpenAllSspaPower"});
+            }
+            return;
+        }
+        
+        
+        
+        if (iobj.act === preText + "OpenAllSspaPower") {
+            ws.cmd("openAllSspaPower");
+            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
+            return;
+        }   
+        if (iobj.act === preText + "CloseAllSspaPower") {
+            ws.cmd("closeAllSspaPower");
+            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
+        }   
+        
+        
+        if (iobj.act === preText + "AllSspaModuleOnOff") {
+            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
+            
+            if (gr.syncData[preText + "SystemStatusA"][9])//emergency
+                return;
+            var onf = 0;
+            for (var i = 0; i < 36; i++) {
+                if (gr.syncData[preText + "SspaModuleStatusAA"][i][1])
+                    onf = 1;
+            }
+            if (onf) {
+                gr.gbcs.command({'act': preText + "CloseAllSspaModule"});
+            } else {
+                gr.gbcs.command({'act': preText + "OpenAllSspaModule"});
+            }
+            return;
+        }
+        
+        
+        if (iobj.act === preText + "OpenAllSspaModule") {
+            ws.cmd("openAllSspaModule");
+            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
+            return;
+        }   
+        if (iobj.act === preText + "CloseAllSspaModule") {
+            ws.cmd("closeAllSspaModule");
+            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
+        }   
+            
+        console.log(iobj);
+        return;
+        //============================================================================================================
         var messageId = iobj.act;
         if (iobj.act === "selfTestStartAll") {
             gr.logMessage.messages.push({type: "cmd", text: iobj.act});
