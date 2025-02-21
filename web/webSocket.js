@@ -101,7 +101,8 @@ class MyWebSocket {
         self.tickTime = 0;
         var obj = {};
         obj.act = cmd;
-        obj.paras = paras;
+        if(paras)
+            obj.paras = paras;
         self.sendSocket(obj);
     }
 

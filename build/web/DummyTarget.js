@@ -4416,6 +4416,7 @@ class DummyTargetCtrPane {
                     opts.w = 1000;
                     opts.fontSize="0.5rh";
                     opts.kvTexts = [];
+                    var selectNo = [];
                     
                     for(var i=0;i<gr.paraSet.localPulseGenParas.length;i++){
                         var strA=gr.paraSet.localPulseGenParas[i].split(" ");
@@ -4425,6 +4426,7 @@ class DummyTargetCtrPane {
                         str+=strA[2]+"% ";
                         str+=strA[3]+"GHz ";
                         str+="X"+strA[4];
+                        selectNo.push(i);
                         opts.kvTexts.push(str);
                     }
                     opts.kvTexts.push("隨機脈波");
@@ -4432,6 +4434,21 @@ class DummyTargetCtrPane {
                     opts.actionFunc = function (iobj) {
                         console.log(iobj);
                         MdaPopWin.popOff(2);
+                        if(iobj.act==="selected"){
+                            if(iobj.selectText==="隨機脈波"){
+                                gr.gbcs.command({'act': preText + "LocalPulseOn","paras":[1]});
+                                return;
+                                
+                            }
+                            if(iobj.selectText==="停止"){
+                                gr.gbcs.command({'act': preText + "LocalPulseOff"});
+                                return;
+                            }
+                            gr.gbcs.command({'act': preText + "LocalPulseOn","paras":[0,selectNo[iobj.selectInx]]});
+                            return;
+                            
+                            
+                        }
 
                     };
                     box.selectBox(opts);
@@ -6379,19 +6396,17 @@ class SyncGloble {
         syncData.slotStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         //0:none, 1:PreTest,2:testing;
         syncData.slotTestStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
         /*
          0 mainStatus 0:none, 1:warn up, 2:ready, 3:error
          1 rfPulse detect flag      0:none 1: ok
-         2 envi status 0:none ,     1:ok ,2:error           //generate
+         2 envi status 0:none ,     1:ok ,2:error              //generate
          3 sspa power status        0:none , 1:ok ,2:error     //generate
-         4 sspa module status       0:none , 1:ok ,2:error    //generate
+         4 sspa module status       0:none , 1:ok ,2:error     //generate
          5 rfPulsee over duty flag  0:none , 1:ok ,2:error
          6 rfPulse over width flag  0:none , 1:ok ,2:error
          7 
          8 local pulse generate flag    0:none 1:ok
          9 emergency on flag            0:none 1:emergency
-         
          */
         syncData.mastSystemStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         syncData.sub1SystemStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -6422,6 +6437,7 @@ class SyncGloble {
 
 
         //===================================================================================
+        //0 connectFlag, 1 faultLed, 2:v50enLed, 3:v32enLed, 4:v50v, 5:v50i, 6:v50i, 7:v32v, 8:v32i, 9:v32t  
         syncData.ctr1SspaPowerStatusAA = [];
         syncData.ctr2SspaPowerStatusAA = [];
         for (var j = 0; j < 2; j++) {
@@ -6434,6 +6450,7 @@ class SyncGloble {
                 sspaPowerStatusAA.push(va);
             }
         }
+        
         //===================================================================================
         /*
          0:connect, 1:致能, 2 保護觸發, 3:工作比過高, 4:脈寬過高, 5:溫度過高, 6:反射過高, 7:RF輸出, 8:溫度
@@ -6594,7 +6611,40 @@ class SyncGloble {
             ws.cmd("closeAllSspaModule");
             gr.logMessage.messages.push({type: "cmd", text: iobj.act});
         }   
-            
+        if (iobj.act === preText + "LocalPulseOff") {
+            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
+            ws.cmd("localPulseOff");
+            return;
+        }
+        if (iobj.act === preText + "LocalPulseOn") {
+            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
+            ws.cmd("localPulseOn",iobj.paras);
+            return;
+        }
+
+        if (iobj.act === preText + "EmergencyOnOff") {
+            if (gr.syncData[preText + "SystemStatusA"][9]){
+                gr.gbcs.command({'act': preText + "EmergencyRelease"});
+            }
+            else{
+                gr.gbcs.command({'act': preText + "EmergencyStop"});
+            }
+            return;
+        }
+        
+        
+        if (iobj.act === preText + "EmergencyStop") {
+            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
+            ws.cmd("emergencyStop",iobj.paras);
+            return;
+        }
+        if (iobj.act === preText + "EmergencyRelease") {
+            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
+            ws.cmd("emergencyRelease",iobj.paras);
+            return;
+        }
+        
+        
         console.log(iobj);
         return;
         //============================================================================================================
