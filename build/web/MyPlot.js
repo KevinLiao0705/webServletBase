@@ -270,13 +270,17 @@ class MyNewScopeCtr {
                 if (op.signalMode === 2) {
                     for (var i = 0; i < 2; i++) {
                         var lineObj = scope.opts.lines[i];
-                        lineObj.sampleRate = 200000000;
-                        scope.opts.xScale = 8;
+                        lineObj.sampleRate = 1000000;
+                        scope.opts.xScale = 18;
                         lineObj.offOn_f = 1;
-                        if (i === 0)
+                        if (i === 0) {
                             lineObj.name = "遠端脈波";
-                        if (i === 1)
+                        }
+                        if (i === 1) {
                             lineObj.name = "本地脈波";
+                        }
+                        lineObj.yScaleTbl = MyNewScope.yScaleVoltTbl;
+                        lineObj.yScaleSet = 10;
                     }
                     md = md.reCreate();
                 }
@@ -613,8 +617,8 @@ class MyNewScope {
     static  xScaleTbl = [
         "1 nS", "2 nS", "5 nS", "10 nS", "20 nS", "50 nS", "100 nS", "200 nS", "500 nS",
         "1 uS", "2 uS", "5 uS", "10 uS", "20 uS", "50 uS", "100 uS", "200 uS", "500 uS",
-        "1 mS", "2 mS", "5 mS", "10 mS", "20 mS", "50 mS", "100 mS", "200 mS", "500 mS", "1 S",
-        "2 S", "5 S", "10 S", "20 S", "50 S", "100 S"
+        "1 mS", "2 mS", "5 mS", "10 mS", "20 mS", "50 mS", "100 mS", "200 mS", "500 mS",
+        "1 S", "2 S", "5 S", "10 S", "20 S", "50 S", "100 S"
     ];
 
     static yScaleVoltTbl = ["1 mV", "2 mV", "5 mV", "10 mV", "20 mV", "50 mV", "100 mV", "200 mV", "500 mV", "1 V", "2 V", "5 V", "10 V", "20 V", "50 V", "100 V"];
@@ -845,40 +849,84 @@ class MyNewScope {
         if (st.phaseSpeed >= 1000)
             st.phaseSpeed -= 1000;
 
-        for (var i = 0; i < 4; i++) {
-            var lineObj = op.lines[i];
-            if (!lineObj.offOn_f)
-                continue;
+        if (op.signalMode === 2) {
             st.drawed_f = 1;
-            if (op.signalMode === 1 && op.signalModeInx === 0) {
-                var angOff = Math.PI * 2 * st.phaseSpeed * (i + 2) * 4 / 1000;
-                lineObj.stInx += 1 + i;
-                if (lineObj.stInx >= op.sampleBufSize)
-                    lineObj.stInx -= op.sampleBufSize;
-                for (var j = 0; j < op.sampleAmt; j++) {
-                    var sin = Math.sin((Math.PI * 2 * j * (i + 1) / 2000) + angOff);
-                    var inx = lineObj.stInx + j;
-                    if (inx >= op.sampleBufSize)
-                        inx -= op.sampleBufSize;
-                    lineObj.buffer[inx] = sin * 10 * (i + 1);
-                }
-                lineObj.recordLen = op.sampleAmt;
+            var lineObj = op.lines[0];
+            var totalTime = st.xScale
+            var sampleTime = (totalTime * 10) / op.sampleAmt;
+            var pulseWidthDataA = [];
+            var nowPulseLevel = 0;
+            var nowPulseLen = 100;
+            
+            for (var i = 0; i < 100; i++) {
+                pulseWidthDataA.push(900000);
+                pulseWidthDataA.push(100000);
             }
-            if (op.signalMode === 1 && op.signalModeInx === 1) {
-                if (!lineObj.sampleRest)
-                    lineObj.sampleRest = 0;
-                var timef = lineObj.sampleRate / 62;
-                var timei = timef | 0;
-                lineObj.sampleRest += timef - timei;
-                if (lineObj.sampleRest >= 1) {
-                    lineObj.sampleRest - 1;
-                    timei++;
+            
+            var nowTime1=pulseWidthDataA[0];
+            var nowTime0=0;
+            var nowInx=0;
+            lineObj.stInx = 0;
+            if (lineObj.stInx >= op.sampleBufSize)
+                lineObj.stInx -= op.sampleBufSize;
+            for (var j = 0; j < op.sampleAmt; j++) {
+                var inx = lineObj.stInx + j;
+                if (inx >= op.sampleBufSize)
+                    inx -= op.sampleBufSize;
+                lineObj.buffer[inx] = nowPulseLevel*1000;
+                nowTime0+=sampleTime;
+                if(nowTime0>=nowTime1){
+                    nowPulseLevel^=1;
+                    nowInx++;
+                    nowTime1+=pulseWidthDataA[nowInx];
                 }
-                var buf = [];
-                for (var j = 0; j < timei; j++) {
-                    buf.push(Math.round(10 * Math.random() - 5));
+                
+            }
+            lineObj.recordLen = op.sampleAmt;
+
+
+
+
+
+        }
+
+
+        if (op.signalMode === 1) {
+            for (var i = 0; i < 4; i++) {
+                var lineObj = op.lines[i];
+                if (!lineObj.offOn_f)
+                    continue;
+                st.drawed_f = 1;
+                if (op.signalModeInx === 0) {
+                    var angOff = Math.PI * 2 * st.phaseSpeed * (i + 2) * 4 / 1000;
+                    lineObj.stInx += 1 + i;
+                    if (lineObj.stInx >= op.sampleBufSize)
+                        lineObj.stInx -= op.sampleBufSize;
+                    for (var j = 0; j < op.sampleAmt; j++) {
+                        var sin = Math.sin((Math.PI * 2 * j * (i + 1) / 2000) + angOff);
+                        var inx = lineObj.stInx + j;
+                        if (inx >= op.sampleBufSize)
+                            inx -= op.sampleBufSize;
+                        lineObj.buffer[inx] = sin * 10 * (i + 1);
+                    }
+                    lineObj.recordLen = op.sampleAmt;
                 }
-                self.addLineBuf(buf, i);
+                if (op.signalModeInx === 1) {
+                    if (!lineObj.sampleRest)
+                        lineObj.sampleRest = 0;
+                    var timef = lineObj.sampleRate / 62;
+                    var timei = timef | 0;
+                    lineObj.sampleRest += timef - timei;
+                    if (lineObj.sampleRest >= 1) {
+                        lineObj.sampleRest - 1;
+                        timei++;
+                    }
+                    var buf = [];
+                    for (var j = 0; j < timei; j++) {
+                        buf.push(Math.round(10 * Math.random() - 5));
+                    }
+                    self.addLineBuf(buf, i);
+                }
             }
         }
 
