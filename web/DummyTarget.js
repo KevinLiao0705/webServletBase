@@ -3094,7 +3094,10 @@ class SelfTest {
         for (var i = 0; i < 12; i++) {
             var str = gr.syncSet.slotNameTbl[slotDataA[i] & 15];
             var slotCnt = (slotDataA[i] >> 4) & 15;
-            st.slotNames.push(str + (slotCnt + 1));
+            if ((slotDataA[i] & 15) > 4) {
+                str = str + " " + (gr.syncSet.numTbl[slotCnt]);
+            }
+            st.slotNames.push(str);
         }
 
         st.slotLeds = [];
@@ -3113,8 +3116,13 @@ class SelfTest {
                 inx = 1;
             if (status === 2)
                 inx = 2;
-            if (status === 3)
-                inx = 3;
+            if (status === 3) {
+                if (gr.flash_f)
+                    inx = 0;
+                else
+                    inx = 1;
+
+            }
             if (testStatus) {
                 inx = 4;
                 if (testStatus === 2) {
@@ -3916,6 +3924,9 @@ class StatusBar {
                 opts.innerText = op.itemValues[i];
                 opts.fontSize = "0.5rh";
                 opts.baseColor = op.baseColor;
+                var watchReg = op.itemWatch["c" + i + "#0"];
+                if (watchReg)
+                    md.setInputWatch(opts, "directReg", watchReg, "baseColor", 1);
                 blocks[cname] = {name: "item#" + i, type: "Component~Cp_base~label.sys0", opts: opts};
             }
             if (op.itemTypes[i] === "button") {
@@ -3959,13 +3970,13 @@ class DummyTargetCtr {
             var keys = Object.keys(radarData);
             for (var i = 0; i < keys.length; i++) {
                 var strA = keys[i].split("#");
-                if (strA.length === 0) {
+                if (strA.length === 1) {
                     gr.radarData[keys[i]] = radarData[keys[i]];
                     continue;
                 }
-                if (strA.length === 1) {
+                if (strA.length === 2) {
                     var inx0 = KvLib.toInt(strA[1], 0);
-                    gr.radarData[keys[i]][inx0] = radarData[keys[i]];
+                    gr.radarData[strA[0]][inx0] = radarData[keys[i]];
                     continue;
                 }
             }
@@ -4285,8 +4296,12 @@ class DummyTargetCtrPane {
 
         var sysStatus = (gr.radarData.systemStatus0 >> (gr.appId * 2)) & 3;
         wb[0] = 0;
-        if (sysStatus === 1)//system warn up
-            wb[0] = 3;
+        if (sysStatus === 1) {//system warn up
+            if (gr.flash_f)
+                wb[0] = 0;
+            else
+                wb[0] = 1;
+        }
         if (sysStatus === 2)//system ready
             wb[0] = 1;
         if (sysStatus === 3)//system error
@@ -4312,25 +4327,36 @@ class DummyTargetCtrPane {
             var pulseWidthErr = (gr.radarData.systemStatus1 >> 15) & 1;
             var pulseDutyErr = (gr.radarData.systemStatus1 >> 16) & 1;
         }
+        var sspaPowerStatusA = gr.radarData.sspaPowerStatusAA[gr.appId - 3];
+        var sspaModuleStatusA = gr.radarData.sspaModuleStatusAA[gr.appId - 3];
+        var powerOn_f = 0;
+        for (var i = 0; i < 36; i++) {
+            if ((sspaPowerStatusA[i] >> 4) & 1)
+                powerOn_f = 1;
+        }
+        var moduleOn_f = 0;
+        for (var i = 0; i < 36; i++) {
+            if ((sspaModuleStatusA[i] >> 1) & 1)
+                moduleOn_f = 1;
+        }
+
         var pulseErr = pulseWidthErr | pulseDutyErr;
         wb[2] = enviErr + 1;//envi status
         wb[3] = powerErr + 1;//power status
         wb[4] = moduleErr + 1;//sspa status
         wb[5] = pulseErr + 1;
-        //=====================================
+        if (sysStatus <= 1) {
+            wb[2] = 0;
+            wb[3] = 0;
+            wb[4] = 0;
+            wb[5] = 0;
+        }
 
-        if (gr.appId === 3)
-            var powOn = (gr.radarData.systemStatus0 >> 23) & 1;
-        if (gr.appId === 4)
-            var powOn = (gr.radarData.systemStatus0 >> 28) & 1;
-        if (powOn)
+        //=====================================
+        if (powerOn_f)
             wc[0] = "#ffc";
         //
-        if (gr.appId === 3)
-            var moduleOn = (gr.radarData.systemStatus0 >> 24) & 1;
-        if (gr.appId === 4)
-            var moduleOn = (gr.radarData.systemStatus0 >> 29) & 1;
-        if (moduleOn)
+        if (moduleOn_f)
             wc[1] = "#ffc";
         //
         if (gr.appId === 3)
@@ -4495,22 +4521,8 @@ class DummyTargetCtrPane {
                 if (inx === 15) {
                     gr.gbcs.command({'act': preText + "AllSspaModuleOnOff"});
                     return;
-                    if (gr.syncData[preText + "SystemStatusA"][9])//emergency
-                        return;
-                    var onf = 0;
-                    for (var i = 0; i < 36; i++) {
-                        if (gr.syncData[preText + "SspaModuleStatusAA"][i][1])
-                            onf = 1;
-                    }
-                    if (onf)
-                        gr.gbcs.command({'act': preText + "CloseAllSspaModule"});
-                    else
-                        gr.gbcs.command({'act': preText + "OpenAllSspaModule"});
-                    return;
                 }
                 if (inx === 16) {
-                    if (gr.syncData[preText + "SystemStatusA"][9])//emergency
-                        return;
                     gr.gbcs.command({'act': preText + "LocalPulseOnOff"});
                     return;
                 }
@@ -4518,7 +4530,6 @@ class DummyTargetCtrPane {
                     gr.gbcs.command({'act': preText + "EmergencyOnOff"});
                     return;
                 }
-
                 return;
             }
             if (iobj.act === "mouseClick") {
@@ -4808,45 +4819,61 @@ class CtrRadarStatus {
             0, 0, 0, 0, 0, 0, 0, 0, 0
         ];
 
-        if (gr.appId === 3){
+        if (gr.appId === 3) {
             var preText = "ctr1";
-            var inx=0;
-        }    
-        if (gr.appId === 4){
+            var inx = 0;
+        }
+        if (gr.appId === 4) {
             var preText = "ctr2";
-            var inx=1;
-        }    
+            var inx = 1;
+        }
         //===========================================
         for (var i = 0; i < 10; i++) {
-            wb[i] = (gr.radarData["EnvStatusA"][inx]>>i)&1;
+            wb[i] = (gr.radarData["enviStatusA"][inx] >> i) & 1;
         }
         //=========================================
-        var dd = gr.syncData[preText + "SystemStatusA"];
-        wc[0] = dd[1];  //rfPulse detected
-        wc[1] = dd[5];  //over pulse duty
-        wc[2] = dd[6];  //over pulse width
-        wd[0] = dd[3];  //all sspaPower status
-        wd[1] = dd[4];  //all sspaModule status
+        if (gr.appId === 3) {
+            var rfDet = (gr.radarData.systemStatus0 >> 22) & 1;
+            var overDuty = (gr.radarData.systemStatus1 >> 11) & 1;
+            var overWidth = (gr.radarData.systemStatus1 >> 10) & 1;
+            var sspaPowerErr = (gr.radarData.systemStatus1 >> 8) & 1;
+            var sspaModuleErr = (gr.radarData.systemStatus1 >> 9) & 1;
+            var sspaPowerStatusA = gr.radarData.sspaPowerStatusAA[0];
+            var sspaModuleStatusA = gr.radarData.sspaModuleStatusAA[0];
+        }
+        if (gr.appId === 4) {
+            var rfDet = (gr.radarData.systemStatus0 >> 27) & 1;
+            var overDuty = (gr.radarData.systemStatus1 >> 16) & 1;
+            var overWidth = (gr.radarData.systemStatus1 >> 15) & 1;
+            var sspaPowerErr = (gr.radarData.systemStatus1 >> 13) & 1;
+            var sspaModuleErr = (gr.radarData.systemStatus1 >> 14) & 1;
+            var sspaPowerStatusA = gr.radarData.sspaPowerStatusAA[1];
+            var sspaModuleStatusA = gr.radarData.sspaModuleStatusAA[11];
+        }
+
+        wc[0] = rfDet;  //rfPulse detected
+        wc[1] = overDuty;  //over pulse duty
+        wc[2] = overWidth;  //over pulse width
+        wd[0] = sspaPowerErr;  //all sspaPower status
+        wd[1] = sspaModuleErr;  //all sspaModule status
         //=========================================
-        var dd = gr.syncData[preText + "SspaPowerStatusAA"];
         for (var i = 0; i < 36; i++) {
             we[i] = 0;
-            if (!dd[i][0])//connect
+            if (!sspaPowerStatusA[i] & (1 << 0))//connect
                 continue;
-            if (dd[i][3])//v32en
+            if (sspaPowerStatusA[i] & (1 << 3))//v32en
                 we[i] = 1;
-            if (dd[i][1])//error flag
+            if (sspaPowerStatusA[i] & (1 << 1))//error flag
                 we[i] = 2;
         }
         //=========================================
-        var ee = gr.syncData[preText + "SspaModuleStatusAA"];
         for (var i = 0; i < 36; i++) {
             wf[i] = 0;
-            if (!ee[i][0])//connect
+            if (!sspaModuleStatusA[i] & (1 << 0))//connect
                 continue;
-            if (dd[i][3])//v32en
+            if (sspaModuleStatusA[i] & (1 << 1))
                 wf[i] = 1;
-            if (ee[i][2] || ee[i][3] || ee[i][4] || ee[i][5] || ee[i][6])
+            if (sspaModuleStatusA[i] & 0x7c)
                 wf[i] = 2;
         }
         //=========================================
@@ -5192,14 +5219,16 @@ class CtrSspaPowerStatus {
         var op = md.opts;
         var st = md.stas;
         if (gr.appId === 3) {
-            var statusAA = gr.syncData.ctr1SspaPowerStatusAA;
+            var powerStatusA = gr.radarData.sspaPowerStatusAA[0];
+            var powerV50vAA = gr.radarData.sspaPowerV50vAA[gr.appId - 3];
             var preText = "ctr1";
         }
         if (gr.appId === 4) {
-            var statusAA = gr.syncData.ctr2SspaPowerStatusAA;
+            var powerStatusA = gr.radarData.sspaPowerStatusAA[1];
             var preText = "ctr2";
         }
         var watchAA = st.sspaPowerStatusAA = [];
+
         var prg = function (data, name, fixed) {
             var value = (data - gr.paraSet[preText + name + "Offs"]) * gr.paraSet[preText + name + "Gain"];
             if (value < gr.paraSet[preText + name + "Zero"])
@@ -5216,40 +5245,42 @@ class CtrSspaPowerStatus {
         };
         for (var i = 0; i < 36; i++) {
             //0 existCheck, 1 faultLed, 2:v50enLed, 3:v32enLed, 4:v50v, 5:v50i, 6:v50i, 7:v32v, 8:v32i, 9:v32t  
-            var va = [0, 0, 0, 0, "---", "#eef", "---", "#eef", "---", "#eef", "---", "#eef", "---", "#eef", "---", "#eef"];
+            var va = [0, "#ccc", 0, 0, 0, "---", "#eef", "---", "#eef", "---", "#eef", "---", "#eef", "---", "#eef", "---", "#eef"];
             va[0] = gr.paraSet[preText + "SspaPowerExistA"][i];
-            if (!statusAA[i][0] || !va[0]) {//connect flag
+            if (!(powerStatusA[i] & 1) || !va[0]) {//connect flag
                 watchAA.push(va);
                 continue;
             }
-            if (statusAA[i][1])
-                va[1] = 2;
-            if (statusAA[i][2])
-                va[2] = 1;
-            if (statusAA[i][3])
+            if (powerStatusA[i] & (1 << 4))
+                va[1] = "#cfc";
+            if (powerStatusA[i] & (1 << 1))
+                va[2] = 2;
+            if (powerStatusA[i] & (1 << 2))
                 va[3] = 1;
-            var obj = prg(statusAA[i][4], "SspaPowerV50v", 1);
-            va[4] = obj[0];
-            va[5] = obj[1];
-            var obj = prg(statusAA[i][5], "SspaPowerV50i", 1);
-            va[6] = obj[0];
-            va[7] = obj[1];
-            var obj = prg(statusAA[i][6], "SspaPowerV50t", 1);
-            va[8] = obj[0];
+            if (powerStatusA[i] & (1 << 3))
+                va[4] = 1;
+            var obj = prg(gr.radarData.sspaPowerV50vAA[gr.appId - 3][i], "SspaPowerV50v", 1);
+            va[5] = obj[0];
+            va[6] = obj[1];
+            var obj = prg(gr.radarData.sspaPowerV50iAA[gr.appId - 3][i], "SspaPowerV50i", 1);
+            va[7] = obj[0];
+            va[8] = obj[1];
+            var obj = prg(gr.radarData.sspaPowerV50tAA[gr.appId - 3][i], "SspaPowerV50t", 1);
+            va[9] = obj[0];
             if (!va[2])//
                 obj[1] = "#eef";
-            va[9] = obj[1];
-            var obj = prg(statusAA[i][7], "SspaPowerV32v", 1);
-            va[10] = obj[0];
-            va[11] = obj[1];
-            var obj = prg(statusAA[i][8], "SspaPowerV32i", 1);
-            va[12] = obj[0];
-            va[13] = obj[1];
-            var obj = prg(statusAA[i][9], "SspaPowerV32t", 1);
-            va[14] = obj[0];
+            va[10] = obj[1];
+            var obj = prg(gr.radarData.sspaPowerV32vAA[gr.appId - 3][i], "SspaPowerV32v", 1);
+            va[11] = obj[0];
+            va[12] = obj[1];
+            var obj = prg(gr.radarData.sspaPowerV32iAA[gr.appId - 3][i], "SspaPowerV32i", 1);
+            va[13] = obj[0];
+            va[14] = obj[1];
+            var obj = prg(gr.radarData.sspaPowerV32tAA[gr.appId - 3][i], "SspaPowerV32t", 1);
+            va[15] = obj[0];
             if (!va[3])//
                 obj[1] = "#eef";
-            va[15] = obj[1];
+            va[16] = obj[1];
             watchAA.push(va);
         }
     }
@@ -5286,11 +5317,11 @@ class CtrSspaPowerStatus {
                     opts.yc = 11;
                     opts.h = 350;
                     opts.kvTexts = [];
-                    opts.kvTexts.push("電源模組 全部關閉");
                     opts.kvTexts.push("電源模組 全部開啟");
+                    opts.kvTexts.push("電源模組 全部關閉");
                     opts.kvTexts.push("電源模組 全部重啟");
-                    opts.kvTexts.push("電源模組 全部移除");
                     opts.kvTexts.push("電源模組 全部加入");
+                    opts.kvTexts.push("電源模組 全部移除");
                     opts.actionFunc = function (iobj) {
                         console.log(iobj);
                         MdaPopWin.popOff(2);
@@ -5300,19 +5331,19 @@ class CtrSspaPowerStatus {
                             var preText = "ctr2";
                         switch (iobj.selectInx) {
                             case 0:
-                                gr.gbcs.command({'act': preText + "CloseAllSspaPower"});
+                                gr.gbcs.command({'act': preText + "SspaPowerOn", 'index': -1});
                                 break;
                             case 1:
-                                gr.gbcs.command({'act': preText + "OpenAllSspaPower"});
+                                gr.gbcs.command({'act': preText + "SspaPowerOff", 'index': -1});
                                 break;
                             case 2:
-                                gr.gbcs.command({'act': preText + "ResetAllSspaPower"});
+                                gr.gbcs.command({'act': preText + "SspaPowerReset", 'index': -1});
                                 break;
                             case 3:
-                                gr.gbcs.command({'act': preText + "RemoveAllPowerModule"});
+                                gr.gbcs.command({'act': preText + "SspaPowerInsert", 'index': -1});
                                 break;
                             case 4:
-                                gr.gbcs.command({'act': preText + "InsertAllPowerModule"});
+                                gr.gbcs.command({'act': preText + "SspaPowerRemove", 'index': -1});
                                 break;
 
                         }
@@ -5398,21 +5429,22 @@ class CtrSspaPowerStatus {
                     var noStr = (((noInx / 4) | 0) + 1) + "-" + ((noInx % 4) + 1);
                     var watch = kopt.itemWatch = {};
                     watch["c0#0"] = regName + "#" + itemInx + "#0";
-                    watch["c2#0"] = regName + "#" + itemInx + "#1";
-                    watch["c3#0"] = regName + "#" + itemInx + "#2";
-                    watch["c4#0"] = regName + "#" + itemInx + "#3";
-                    watch["c5#0"] = regName + "#" + itemInx + "#4";
-                    watch["c5#1"] = regName + "#" + itemInx + "#5";
-                    watch["c6#0"] = regName + "#" + itemInx + "#6";
-                    watch["c6#1"] = regName + "#" + itemInx + "#7";
-                    watch["c7#0"] = regName + "#" + itemInx + "#8";
-                    watch["c7#1"] = regName + "#" + itemInx + "#9";
-                    watch["c8#0"] = regName + "#" + itemInx + "#10";
-                    watch["c8#1"] = regName + "#" + itemInx + "#11";
-                    watch["c9#0"] = regName + "#" + itemInx + "#12";
-                    watch["c9#1"] = regName + "#" + itemInx + "#13";
-                    watch["c10#0"] = regName + "#" + itemInx + "#14";
-                    watch["c10#1"] = regName + "#" + itemInx + "#15";
+                    watch["c1#0"] = regName + "#" + itemInx + "#1";
+                    watch["c2#0"] = regName + "#" + itemInx + "#2";
+                    watch["c3#0"] = regName + "#" + itemInx + "#3";
+                    watch["c4#0"] = regName + "#" + itemInx + "#4";
+                    watch["c5#0"] = regName + "#" + itemInx + "#5";
+                    watch["c5#1"] = regName + "#" + itemInx + "#6";
+                    watch["c6#0"] = regName + "#" + itemInx + "#7";
+                    watch["c6#1"] = regName + "#" + itemInx + "#8";
+                    watch["c7#0"] = regName + "#" + itemInx + "#9";
+                    watch["c7#1"] = regName + "#" + itemInx + "#10";
+                    watch["c8#0"] = regName + "#" + itemInx + "#11";
+                    watch["c8#1"] = regName + "#" + itemInx + "#12";
+                    watch["c9#0"] = regName + "#" + itemInx + "#13";
+                    watch["c9#1"] = regName + "#" + itemInx + "#14";
+                    watch["c10#0"] = regName + "#" + itemInx + "#15";
+                    watch["c10#1"] = regName + "#" + itemInx + "#16";
                     noInx++;
                     itemInx++;
                 }
@@ -5436,11 +5468,11 @@ class CtrSspaPowerStatus {
                     opts.yc = 11;
                     opts.h = 350;
                     opts.kvTexts = [];
-                    opts.kvTexts.push("電源模組 關閉");
                     opts.kvTexts.push("電源模組 開啟");
+                    opts.kvTexts.push("電源模組 關閉");
                     opts.kvTexts.push("電源模組 重啟");
-                    opts.kvTexts.push("電源模組 移除");
                     opts.kvTexts.push("電源模組 加入");
+                    opts.kvTexts.push("電源模組 移除");
                     opts.actionFunc = function (iobj) {
                         console.log(iobj);
                         MdaPopWin.popOff(2);
@@ -5450,19 +5482,19 @@ class CtrSspaPowerStatus {
                             var preText = "ctr2";
                         switch (iobj.selectInx) {
                             case 0:
-                                gr.gbcs.command({'act': preText + "ClosePowerModule", "index": barInx});
+                                gr.gbcs.command({'act': preText + "SspaPowerOn", "index": barInx});
                                 break;
                             case 1:
-                                gr.gbcs.command({'act': preText + "OpenPowerModule", "index": barInx});
+                                gr.gbcs.command({'act': preText + "SspaPowerOff", "index": barInx});
                                 break;
                             case 2:
-                                gr.gbcs.command({'act': preText + "ResetPowerModule", "index": barInx});
+                                gr.gbcs.command({'act': preText + "SspaPowerReset", "index": barInx});
                                 break;
                             case 3:
-                                gr.gbcs.command({'act': preText + "RemovePowerModule", "index": barInx});
+                                gr.gbcs.command({'act': preText + "SspaPowerInsert", "index": barInx});
                                 break;
                             case 4:
-                                gr.gbcs.command({'act': preText + "InsertPowerModule", "index": barInx});
+                                gr.gbcs.command({'act': preText + "SspaPowerRemove", "index": barInx});
                                 break;
 
                         }
@@ -5507,13 +5539,14 @@ class CtrSspaModuleStatus {
         var st = md.stas;
         if (gr.appId === 3) {
             var preText = "ctr1";
+            var moduleStatus = gr.radarData.sspaModuleStatusAA[0];
         }
         if (gr.appId === 4) {
             var preText = "ctr2";
+            var moduleStatus = gr.radarData.sspaModuleStatusAA[0];
         }
         var watchAA = st["sspaModuleStatusAA"] = [];
         //0:connect, 1:致能 2 保護觸發, 3:工作比過高, 4:脈寬過高, 5:溫度過高, 6:反射過高, 7:RF輸出, 8:溫度
-        var statusAA = gr.syncData[preText + "SspaModuleStatusAA"];
         var prg = function (data, name, fixed) {
             var value = (data - gr.paraSet[preText + name + "Offs"]) * gr.paraSet[preText + name + "Gain"];
             if (value < gr.paraSet[preText + name + "Zero"])
@@ -5532,27 +5565,27 @@ class CtrSspaModuleStatus {
         for (var i = 0; i < 36; i++) {
             var arr = [0, 0, 0, 0, 0, 0, 0, "---", "#eef", "---", "#eef"];
             arr[0] = gr.paraSet[preText + "SspaModuleExistA"][i];
-            if (!statusAA[i][0] || !gr.paraSet[preText + "SspaModuleExistA"][i]) {
+            if (!(moduleStatus[i] & 1) || !gr.paraSet[preText + "SspaModuleExistA"][i]) {
                 watchAA.push(arr);
                 continue;
             }
-            if (statusAA[i][1])
+            if (moduleStatus[i] & (1 << 1))
                 arr[1] = 1;
-            if (statusAA[i][2])
+            if (moduleStatus[i] & (1 << 2))
                 arr[2] = 2;
-            if (statusAA[i][3])
+            if (moduleStatus[i] & (1 << 3))
                 arr[3] = 2;
-            if (statusAA[i][4])
+            if (moduleStatus[i] & (1 << 4))
                 arr[4] = 2;
-            if (statusAA[i][5])
+            if (moduleStatus[i] & (1 << 5))
                 arr[5] = 2;
-            if (statusAA[i][6])
+            if (moduleStatus[i] & (1 << 6))
                 arr[6] = 2;
-            var obj = prg(statusAA[i][7], "SspaModuleRfOut", 1);
+            var obj = prg(gr.radarData.sspaModuleRfOutAA[gr.appId - 3][i], "SspaModuleRfOut", 1);
             arr[7] = obj[0];
             if (arr[1])
                 arr[8] = obj[1];
-            var obj = prg(statusAA[i][8], "SspaModuleTempr", 0);
+            var obj = prg(gr.radarData.sspaModuleTemprAA[gr.appId - 3][i], "SspaModuleTempr", 0);
             arr[9] = obj[0];
             if (arr[1])
                 arr[10] = obj[1];
@@ -5592,10 +5625,10 @@ class CtrSspaModuleStatus {
                     opts.yc = 11;
                     opts.h = 350;
                     opts.kvTexts = [];
-                    opts.kvTexts.push("SSPA模組 全部除能");
                     opts.kvTexts.push("SSPA模組 全部致能");
-                    opts.kvTexts.push("SSPA模組 全部移除");
+                    opts.kvTexts.push("SSPA模組 全部除能");
                     opts.kvTexts.push("SSPA模組 全部加入");
+                    opts.kvTexts.push("SSPA模組 全部移除");
                     opts.actionFunc = function (iobj) {
                         console.log(iobj);
                         MdaPopWin.popOff(2);
@@ -5605,16 +5638,16 @@ class CtrSspaModuleStatus {
                             var preText = "ctr2";
                         switch (iobj.selectInx) {
                             case 0:
-                                gr.gbcs.command({'act': preText + "CloseAllSspaModule"});
+                                gr.gbcs.command({'act': preText + "SspaModuleOn", 'index': -1});
                                 break;
                             case 1:
-                                gr.gbcs.command({'act': preText + "OpenAllSspaModule"});
+                                gr.gbcs.command({'act': preText + "SspaModuleOff", 'index': -1});
                                 break;
                             case 2:
-                                gr.gbcs.command({'act': preText + "RemoveAllSspaModule"});
+                                gr.gbcs.command({'act': preText + "SspaModuleInsert", 'index': -1});
                                 break;
                             case 3:
-                                gr.gbcs.command({'act': preText + "InsertAllSspaModule"});
+                                gr.gbcs.command({'act': preText + "SspaModuleRemove", 'index': -1});
                                 break;
 
                         }
@@ -5733,10 +5766,10 @@ class CtrSspaModuleStatus {
                     opts.yc = 11;
                     opts.h = 350;
                     opts.kvTexts = [];
-                    opts.kvTexts.push("SSPA模組 關閉");
                     opts.kvTexts.push("SSPA模組 開啟");
-                    opts.kvTexts.push("SSPA模組 移除");
+                    opts.kvTexts.push("SSPA模組 關閉");
                     opts.kvTexts.push("SSPA模組 加入");
+                    opts.kvTexts.push("SSPA模組 移除");
                     opts.actionFunc = function (iobj) {
                         console.log(iobj);
                         MdaPopWin.popOff(2);
@@ -5746,16 +5779,16 @@ class CtrSspaModuleStatus {
                             var preText = "ctr2";
                         switch (iobj.selectInx) {
                             case 0:
-                                gr.gbcs.command({'act': preText + "CloseSspaModule", "index": barInx});
+                                gr.gbcs.command({'act': preText + "SspaModuleOn", "index": barInx});
                                 break;
                             case 1:
-                                gr.gbcs.command({'act': preText + "OpenSspaModule", "index": barInx});
+                                gr.gbcs.command({'act': preText + "SspaModuleOff", "index": barInx});
                                 break;
                             case 2:
-                                gr.gbcs.command({'act': preText + "RemoveSspaModule", "index": barInx});
+                                gr.gbcs.command({'act': preText + "SspaModuleInsert", "index": barInx});
                                 break;
                             case 3:
-                                gr.gbcs.command({'act': preText + "InsertSspaModule", "index": barInx});
+                                gr.gbcs.command({'act': preText + "SspaModuleRemove", "index": barInx});
                                 break;
 
                         }
@@ -5780,6 +5813,7 @@ class Emulate {
         //stepTime;
         this.connectTime = 0;
         this.connectCnt = 0;
+        this.actTime = 0;
         this.actionObj = {};
     }
     ctrEmu() {
@@ -5790,121 +5824,36 @@ class Emulate {
             var preText = "ctr2";
 
         //============================================
-        var ee = gr.syncData[preText + "SspaModuleStatusAA"];
         for (var i = 0; i < 36; i++) {
-            ee[i][7] = 0;//rfout
-            ee[i][8] = 25;//temperatuer
+            gr.radarData.sspaModuleRfOutAA[0][i] = 0;
+            gr.radarData.sspaModuleRfOutAA[1][i] = 0;
+            gr.radarData.sspaModuleTemprAA[0][i] = 25;
+            gr.radarData.sspaModuleTemprAA[1][i] = 25;
         }
-        var dd = gr.syncData[preText + "SystemStatusA"];
-        if (dd[1]) { //rfPulse detected
+
+        if (gr.radarData.systemStatus0 & (1 << 22)) {//rfpulse detected
             for (var i = 0; i < 36; i++) {
-                if (ee[i][0] && ee[i][1]) {
-                    ee[i][7] = 35.2;//rfout
-                    ee[i][8] = 100;//temperatuer
-                } else {
-                    ee[i][7] = 0;//rfout
-                    ee[i][8] = 25;//temperatuer
+                if (gr.radarData.sspaModuleStatusAA[0][i] & 3) {
+                    gr.radarData.sspaModuleRfOutAA[0][i] = 35.2;
+                    gr.radarData.sspaModuleTempr[0][i] = 100;
                 }
             }
         }
-        //==========================================
-        var dd = gr.syncData[preText + "SystemStatusA"];
-        if (dd[1]) { //rfPulse detected
-            dd[5] = 1;  //over pulse duty
-            dd[6] = 1;  //over pulse width
-        } else {
-            dd[5] = 0;  //over pulse duty
-            dd[6] = 0;  //over pulse width
-        }
-        //==========================================
-        var db = gr.syncData[preText + "EnvStatusA"];
-        var ledCnt = 1;
-        for (var i = 0; i < 10; i++) {
-            if (db[i] === 2) {
-                ledCnt = 2;
-                break;
-            }
-            if (db[i] === 0)
-                ledCnt = 0;
-        }
-        gr.syncData[preText + "SystemStatusA"][2] = ledCnt;//envi status
-        //==========================================
-        if (gr.paraSet[preText + "PulseSource"] === 0) {//remote
-            gr.syncData[preText + "SystemStatusA"][1] = 1;//pulse rfin rf detect
-            gr.syncData[preText + "MeterStatusA"][0] = 120;//remote rfin vlue
-            gr.syncData[preText + "MeterStatusA"][2] = 220;
-            gr.syncData[preText + "MeterStatusA"][3] = 320;
-
-        } else {
-            if (gr.syncData[preText + "SystemStatusA"][8]) {//loca pulse enable
-                gr.syncData[preText + "SystemStatusA"][1] = 1;//pulse rfin rf detect
-                gr.syncData[preText + "SystemStatusA"][7] = 1;//loca rfin flag
-                gr.syncData[preText + "MeterStatusA"][0] = 150;
-                gr.syncData[preText + "MeterStatusA"][2] = 250;
-                gr.syncData[preText + "MeterStatusA"][3] = 350;
-            } else {
-                gr.syncData[preText + "SystemStatusA"][7] = 0;//loca rfin flag
-                gr.syncData[preText + "SystemStatusA"][1] = 0;//pulse rfin rf detect
-                gr.syncData[preText + "MeterStatusA"][0] = 0;
-
+        if (gr.radarData.systemStatus0 & (1 << 27)) {//rfpulse detected
+            for (var i = 0; i < 36; i++) {
+                if (gr.radarData.sspaModuleStatusAA[1][i] & 3) {
+                    gr.radarData.sspaModuleRfOutAA[1][i] = 35.2;
+                    gr.radarData.sspaModuleTempr[1][i] = 100;
+                }
             }
         }
+
+        //==========================================
+        //==========================================
         //============================================
-        var cwV = 0;
-        var ccwV = 0;
-        var powOk_f = 0;
-        var powErr_f = 0;
-        var sspaOk_f = 0;
-        var sspaErr_f = 0;
-        if (gr.syncData[preText + "SystemStatusA"][1]) {//rfDulse detect
-            gr.syncData[preText + "MeterStatusA"][2] = gr.syncData[preText + "MeterStatusA"][0] + 100;
-            gr.syncData[preText + "MeterStatusA"][3] = gr.syncData[preText + "MeterStatusA"][0] + 200;
-        }
-        gr.syncData[preText + "MeterStatusA"][4] = 0;
-        gr.syncData[preText + "MeterStatusA"][5] = 0;
-        for (var i = 0; i < 36; i++) {
-            if (!gr.syncData[preText + "SspaPowerStatusAA"][i][3]) {//32v
-                gr.syncData[preText + "SspaPowerStatusAA"][i][8] = 0;//32v cur
-                continue;
-            }
-            powOk_f = 1;
-            sspaOk_f = 1;
-            if (gr.syncData[preText + "SspaPowerStatusAA"][i][1])//errof
-                powErr_f = 1;
-            if (gr.syncData[preText + "SspaModuleStatusAA"][i][2])//errof
-                sspaErr_f = 1;
 
-            var vv = 10;
-            if (gr.syncData[preText + "SspaModuleStatusAA"][i][1]) {
-                vv = 20;
-                if (gr.paraSet[preText + "PulseSource"] === 0) {//remote
-                    if (gr.syncData[preText + "SystemStatusA"][6]) {//remote rfin 
-                        vv = 100;
-                        cwV += 12;
-                        ccwV += 8;
-                    }
-                }
-                if (gr.paraSet[preText + "PulseSource"] === 1) {//local
-                    if (gr.syncData[preText + "SystemStatusA"][7]) {//local rfin 
-                        vv = 100;
-                        cwV += 13;
-                        ccwV += 9;
-                    }
-                }
-            }
-            gr.syncData[preText + "SspaPowerStatusAA"][i][8] = vv;
-        }
-        gr.syncData[preText + "MeterStatusA"][4] = cwV;
-        gr.syncData[preText + "MeterStatusA"][5] = ccwV;
-        if (powErr_f)
-            gr.syncData[preText + "SystemStatusA"][3] = 2;
-        else
-            gr.syncData[preText + "SystemStatusA"][3] = powOk_f;
 
-        if (sspaErr_f)
-            gr.syncData[preText + "SystemStatusA"][4] = 2;
-        else
-            gr.syncData[preText + "SystemStatusA"][4] = sspaOk_f;
+
         //============================================
         var keys = Object.keys(self.actionObj);
         for (var i = 0; i < keys.length; i++) {
@@ -5913,94 +5862,6 @@ class Emulate {
             if (obj.stepTime) {
                 obj.stepTime--;
                 continue;
-            }
-            if (strA[0] === "sspaPowerOn") {
-                switch (obj.step) {
-                    case 0:
-                        if (gr.syncData[preText + "SspaPowerStatusAA"][obj.index][2]) {   //v50eN
-                            if (gr.syncData[preText + "SspaPowerStatusAA"][obj.index][3]) {
-                                obj.step = 3;
-                                return;
-                            }
-                        }
-                        gr.syncData[preText + "SspaPowerStatusAA"][obj.index][3] = 0;   //v32en
-                        obj.stepTime = 1;
-                        obj.step++;
-                        break;
-                    case 1:
-                        gr.syncData[preText + "SspaPowerStatusAA"][obj.index][2] = 1;
-                        obj.stepTime = gr.paraSet[preText + "SspaPowerV32OnDly"] * 6;
-                        gr.syncData[preText + "SspaPowerStatusAA"][obj.index][4] = 500;   //v50v
-                        gr.syncData[preText + "SspaPowerStatusAA"][obj.index][5] = 10;   //v50i
-                        gr.syncData[preText + "SspaPowerStatusAA"][obj.index][6] = 70;   //v50t
-                        obj.step++;
-                        break;
-                    case 2:
-                        gr.syncData[preText + "SspaPowerStatusAA"][obj.index][3] = 1;
-                        gr.syncData[preText + "SspaPowerStatusAA"][obj.index][7] = 320;   //v32v
-                        gr.syncData[preText + "SspaPowerStatusAA"][obj.index][8] = 10;   //v32i
-                        gr.syncData[preText + "SspaPowerStatusAA"][obj.index][9] = 70;   //v32t
-                        obj.stepTime = 1;
-                        obj.step++;
-                        break;
-                    case 3:
-                    default:
-                        delete self.actionObj[keys[i]];
-                        break;
-
-                }
-            }
-            if (strA[0] === "sspaPowerOff") {
-                switch (obj.step) {
-                    case 0:
-                        obj.stepTime = 1;
-                        obj.step++;
-                        break;
-                    case 1:
-                        gr.syncData[preText + "SspaPowerStatusAA"][obj.index][3] = 0;
-                        obj.stepTime = gr.paraSet[preText + "SspaPowerV32OffDly"] * 6;
-                        gr.syncData[preText + "SspaPowerStatusAA"][obj.index][7] = 0;   //v50v
-                        gr.syncData[preText + "SspaPowerStatusAA"][obj.index][8] = 0;   //v50i
-                        gr.syncData[preText + "SspaPowerStatusAA"][obj.index][9] = 25;   //v50t
-                        obj.step++;
-                        break;
-                    case 2:
-                        gr.syncData[preText + "SspaPowerStatusAA"][obj.index][2] = 0;
-                        gr.syncData[preText + "SspaPowerStatusAA"][obj.index][4] = 0;   //v50v
-                        gr.syncData[preText + "SspaPowerStatusAA"][obj.index][5] = 0;   //v50i
-                        gr.syncData[preText + "SspaPowerStatusAA"][obj.index][6] = 25;   //v50t
-                        obj.stepTime = 1;
-                        obj.step++;
-                        break;
-                    case 3:
-                    default:
-                        delete self.actionObj[keys[i]];
-                        break;
-
-                }
-            }
-            if (strA[0] === "sspaPowerReset") {
-                switch (obj.step) {
-                    case 0:
-                        obj.stepTime = 1;
-                        obj.step++;
-                        break;
-                    case 1:
-                        self.setAction("sspaPowerOff", obj.index);
-                        obj.stepTime = gr.paraSet[preText + "SspaPowerV32OffDly"] * 6 + 120;
-                        obj.step++;
-                        break;
-                    case 2:
-                        self.setAction("sspaPowerOn", obj.index);
-                        obj.stepTime = gr.paraSet[preText + "SspaPowerV32OnDly"] * 6 + 1;
-                        obj.step++;
-                        break;
-                    case 3:
-                    default:
-                        delete self.actionObj[keys[i]];
-                        break;
-
-                }
             }
         }
         //============================================
@@ -6018,9 +5879,9 @@ class Emulate {
                     var buf1 = [];
                     for (var i = 0; i < 3; i++) {
                         var ran = Math.round(100 * Math.random() - 50);
-                        buf0.push(prg(gr.syncData[preText + "MeterStatusA"][4] + ran, "CwAmpOutRfpow"));
+                        //buf0.push(prg(gr.syncData[preText + "MeterStatusA"][4] + ran, "CwAmpOutRfpow"));
                         var ran = Math.round(100 * Math.random() - 50);
-                        buf1.push(prg(gr.syncData[preText + "MeterStatusA"][5] + ran, "CcwAmpOutRfpow"));
+                        //buf1.push(prg(gr.syncData[preText + "MeterStatusA"][5] + ran, "CcwAmpOutRfpow"));
                     }
                     gr.wavePageObj.mdClass.addLineBuf(buf0, 0);
                     gr.wavePageObj.mdClass.addLineBuf(buf1, 1);
@@ -6034,43 +5895,56 @@ class Emulate {
     }
     timer() {
         var self = this;
+        var rd = gr.radarData;
         if (!self.firstEntry_f) {
             self.firstEntry_f = 1;
-            if (gr.appId === 3 || gr.appId === 4) {
-                gr.syncData.slotIdA = [1, 2, 3, 4, 0, 0, 5, 6, 7, 8, 0, 0];
-                /*
-                 0 mainStatus 0:none, 1:warn up, 2:ready, 3:error
-                 1 pulse in exist flag 0:none, 1:ok
-                 2 envi status 0:none , 1:ok ,2:error 
-                 3 sspa power status 0:none , 1:ok ,2:error 
-                 4 sspa status 0:none , 1:ok ,2:error 
-                 5 pulse status 0:none , 1:ok ,2:error 
-                 6 remote pulse in detect
-                 7 local pulse in detect
-                 8 local pulse generate flag
-                 9 emergency on flag
-                 
-                 */
-                gr.syncData.ctr1SystemStatusA = [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                gr.syncData.ctr2SystemStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                gr.syncData.ctr1EnvStatusA = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0];
-                gr.syncData.ctr2EnvStatusA = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0];
+            rd.slotDataAA = [];
+            rd.slotDataAA.push([1, 0, 2, 3, 4, 0x05, 0x15, 0x06, 0x06, 0x07, 0x17, 0]);
+            rd.slotDataAA.push([1, 0, 2, 3, 4, 0x05, 0x15, 0x06, 0x00, 0x07, 0x00, 0]);
+            rd.slotDataAA.push([1, 0, 2, 3, 4, 0x05, 0x15, 0x06, 0x00, 0x07, 0x00, 0]);
+            rd.slotDataAA.push([1, 0, 2, 3, 4, 0x05, 0x15, 0x25, 0x35, 0, 0, 0]);
+            rd.slotDataAA.push([1, 0, 2, 3, 4, 0x05, 0x15, 0x25, 0x35, 0, 0, 0]);
+            rd.slotDataAA.push([2, 5, 0x08, 0x18, 0x28, 0x38, 0x48, 0x00, 0x00, 0, 0, 0]);
+            rd.slotDataAA.push([2, 5, 0x08, 0x18, 0x28, 0x38, 0x48, 0x00, 0x00, 0, 0, 0]);
+            rd.slotDataAA.push([2, 5, 0x08, 0x18, 0x28, 0x38, 0x48, 0x00, 0x00, 0, 0, 0]);
+            rd.slotDataAA.push([2, 5, 0x08, 0x18, 0x28, 0x38, 0x48, 0x00, 0x00, 0, 0, 0]);
+            for (var i = 0; i < 36; i++) {
+                rd.sspaPowerStatusAA[0][i] |= 1;
+                rd.sspaPowerStatusAA[1][i] |= 1;
+                rd.sspaModuleStatusAA[0][i] |= 1;
+                rd.sspaModuleStatusAA[1][i] |= 1;
             }
-            if (gr.appId === 0) {
-                gr.syncData.slotIdA = [1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 0, 0];
-            }
-            if (gr.appId === 1 || gr.appId === 2) {
-                gr.syncData.slotIdA = [1, 2, 3, 4, 5, 6, 9, 11, 0, 0, 0, 0];
-            }
-
-
         }
+        if (self.actTime === 10) {
+            for (var i = 0; i < 9; i++) {
+                for (var j = 0; j < 12; j++) {
+                    rd.slotDataAA[i][j] &= 0xf0ff;
+                    rd.slotDataAA[i][j] |= 0x0300;
+                }
+            }
+            rd.systemStatus0 &= 0xffc00000;
+            rd.systemStatus0 |= 0x00155555;
+        }
+
+        if (self.actTime === 50) {
+            for (var i = 0; i < 9; i++) {
+                for (var j = 0; j < 12; j++) {
+                    rd.slotDataAA[i][j] &= 0xf0ff;
+                    rd.slotDataAA[i][j] |= 0x0100;
+                }
+            }
+            rd.systemStatus0 &= 0xffc00000;
+            rd.systemStatus0 |= 0x002aaaaa;
+        }
+
+
         if (++self.connectTime >= 6) {
             self.connectTime = 0;
             self.connectCnt++;
             gr.footBarStatus0 = "Connect " + (self.connectCnt % 10);
             gr.footBarStatus1 = "Emulation";
             gr.footBarStatus2 = ani.dispFs;
+            self.actTime++;
 
         }
         if (gr.appId === 3 || gr.appId === 4)
@@ -6082,35 +5956,38 @@ class Emulate {
                 self.selfTestInx++;
                 if (self.selfTestInx >= 12) {
                     self.selfTestStartAll_f = 0;
+                    gr.logMessage.messages.push({type: "info", text: "測試完畢"});
                 }
             }
             if (self.selfTestTime === 6 * 30) {
-                gr.syncData.slotTestStatusA[self.selfTestInx] = 0;
-                var testTbl = [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2];
-                var status = testTbl[self.selfTestInx];
-                if (status === 1) {
-                    var str = "測試成功";
+                rd.slotDataAA[gr.appId][self.selfTestInx] &= 0xf3ff;
+                var status = (rd.slotDataAA[gr.appId][self.selfTestInx] >> 8) & 3;
+                if (status !== 2) {
+                    str = "測試成功";
+                    gr.logMessage.messages.push({type: "infoOk", text: str});
+                } else {
+                    str = "測試失敗";
                     gr.logMessage.messages.push({type: "infoOk", text: str});
                 }
-                if (status === 2) {
-                    var str = "測試失敗";
-                    gr.logMessage.messages.push({type: "infoErr", text: str});
-                }
-                gr.syncData.slotStatusA[self.selfTestInx] = testTbl[self.selfTestInx];
+
+
             }
             if ((self.selfTestTime === 6 * 1)) {
-                gr.syncData.slotTestStatusA[self.selfTestInx] = 2;
-                var slotId = gr.syncData.slotIdA[self.selfTestInx];
-                if (slotId === 0) {
-                    self.selfTestTime = 9999;
-                } else {
-                    var str = gr.syncSet.slotNameTbl[slotId];
-                    str = KvLib.spaceStrTo(str, 25);
-                    str += " => 測試開始";
-                    gr.logMessage.messages.push({text: ""});
-                    gr.logMessage.messages.push({text: "========================================="});
+                if (rd.slotDataAA[gr.appId][self.selfTestInx] & 0x000f) {
+                    rd.slotDataAA[gr.appId][self.selfTestInx] &= 0xf3ff;
+                    rd.slotDataAA[gr.appId][self.selfTestInx] |= 0x0800;
+                    var slotDataA = gr.radarData.slotDataAA[gr.appId];
+                    var str = gr.syncSet.slotNameTbl[slotDataA[self.selfTestInx] & 15];
+                    var slotCnt = (slotDataA[self.selfTestInx] >> 4) & 15;
+                    if ((slotDataA[self.selfTestInx] & 15) > 4) {
+                        str = str + " " + (gr.syncSet.numTbl[slotCnt]);
+                    }
+                    str = str + " ====> 開始測試";
                     gr.logMessage.messages.push({type: "info", text: str});
+                } else {
+                    self.selfTestTime = 9999;
                 }
+
             }
         }
     }
@@ -6130,14 +6007,42 @@ class Emulate {
     command(iobj) {
         console.log(iobj);
         var self = this;
+        var rd = gr.radarData;
         if (gr.appId === 1)
             var preText = "sub1";
         if (gr.appId === 2)
             var preText = "sub2";
-        if (gr.appId === 3)
+        if (gr.appId === 3) {
             var preText = "ctr1";
-        if (gr.appId === 4)
+            var preInx = 0;
+            var status0 = rd.systemStatus0 >> 22;
+            var shift = 22;
+            var powerStatusA = rd.sspaPowerStatusAA[0];
+            var moduleStatusA = rd.sspaModuleStatusAA[0];
+        }
+        if (gr.appId === 4) {
             var preText = "ctr2";
+            var preInx = 1;
+            var status0 = rd.systemStatus0 >> 27;
+            var shift = 27;
+            var powerStatusA = rd.sspaPowerStatusAA[1];
+            var moduleStatusA = rd.sspaModuleStatusAA[1];
+        }
+
+
+        var powerOn_f = 0;
+        var moduleOn_f = 0;
+        for (var i = 0; i < 36; i++) {
+            if ((powerStatusA[i] >> 4) & 1)
+                powerOn_f = 1;
+            if ((moduleStatusA[i] >> 1) & 1)
+                moduleOn_f = 1;
+
+        }
+        var emergency = gr.radarData.systemStatus0 & (1 << (shift + 4));
+        var ready_f = (rd.systemStatus0 >> (gr.appId * 2)) & 3;
+
+
         var messageId = iobj.act;
         if (iobj.act === "selfTestStartAll") {
             gr.logMessage.messages.push({type: "cmd", text: "全系統測試"});
@@ -6146,8 +6051,12 @@ class Emulate {
             self.selfTestStartAll_f = 1;
             self.selfTestTime = 0;
             self.selfTestInx = 0;
-            for (var i = 0; i < 12; i++)
-                gr.syncData.slotTestStatusA[i] = 1;
+            for (var i = 0; i < 12; i++) {
+                rd.slotDataAA[gr.appId][i] &= 0x03ff;
+                rd.slotDataAA[gr.appId][i] |= 0x0400;
+            }
+
+            //gr.syncData.slotTestStatusA[i] = 1;
             return;
             //
         }
@@ -6155,108 +6064,179 @@ class Emulate {
             gr.logMessage.messages.push({type: "cmd", text: "測試停止"});
             //
             gr.logMessage.messages.push({type: "info", text: "測試停止........"});
-            for (var i = 0; i < 12; i++)
-                gr.syncData.slotTestStatusA[i] = 0;
+            //for (var i = 0; i < 12; i++)
+            //    gr.syncData.slotTestStatusA[i] = 0;
             self.selfTestStartAll_f = 0;
             return;
         }
         if (iobj.act === "selfTestEsc") {
             self.selfTestStartAll_f = 0;
-            for (var i = 0; i < 12; i++)
-                gr.syncData.slotTestStatusA[i] = 0;
+            //for (var i = 0; i < 12; i++)
+            //    gr.syncData.slotTestStatusA[i] = 0;
             return;
         }
+
+
         if (iobj.act === preText + "AllSspaPowerOnOff") {
-            if (gr.syncData[preText + "SystemStatusA"][9])//emergency
-                return;
-            var onf = 0;
-            for (var i = 0; i < 36; i++) {
-                if (gr.syncData[preText + "SspaPowerStatusAA"][i][2])
-                    onf = 1;
-                if (gr.syncData[preText + "SspaPowerStatusAA"][i][3])
-                    onf = 1;
-            }
-            if (onf) {
-                gr.gbcs.command({'act': preText + "CloseAllSspaModule"});
-                gr.gbcs.command({'act': preText + "CloseAllSspaPower"});
-            } else {
-                gr.gbcs.command({'act': preText + "OpenAllSspaPower"});
-            }
+            if (powerOn_f)
+                gr.gbcs.command({'act': preText + "SspaPowerOff", 'index': -1});
+            else
+                gr.gbcs.command({'act': preText + "SspaPowerOn", 'index': -1});
             return;
         }
         if (iobj.act === preText + "AllSspaModuleOnOff") {
-            if (gr.syncData[preText + "SystemStatusA"][9])//emergency
-                return;
-            var onf = 0;
-            for (var i = 0; i < 36; i++) {
-                if (gr.syncData[preText + "SspaModuleStatusAA"][i][1])
-                    onf = 1;
-            }
-            if (onf)
-                gr.gbcs.command({'act': preText + "CloseAllSspaModule"});
+            if (moduleOn_f)
+                gr.gbcs.command({'act': preText + "SspaModuleOff", 'index': -1});
             else
-                gr.gbcs.command({'act': preText + "OpenAllSspaModule"});
+                gr.gbcs.command({'act': preText + "SspaModuleOn", 'index': -1});
             return;
         }
         if (iobj.act === preText + "LocalPulseOnOff") {
-            if (gr.syncData[preText + "SystemStatusA"][9])
-                return;
-            if (gr.syncData[preText + "SystemStatusA"][8]) {
-                gr.logMessage.messages.push({type: "cmd", text: "本地脈波 關閉"});
-                gr.syncData[preText + "SystemStatusA"][7] = 0;//local pulse in detect
-                gr.syncData[preText + "SystemStatusA"][8] = 0;
-            } else {
-                gr.logMessage.messages.push({type: "cmd", text: "本地脈波 開啟"});
-                gr.syncData[preText + "SystemStatusA"][7] = 1;//local pulse in detect
-                gr.syncData[preText + "SystemStatusA"][8] = 1;//local pulse generate start
-            }
+            if (status0 & 0x08)
+                gr.gbcs.command({'act': preText + "LocalPulseOff"});
+            else
+                gr.gbcs.command({'act': preText + "LocalPulseOn"});
             return;
         }
         if (iobj.act === preText + "EmergencyOnOff") {
-            if (gr.syncData[preText + "SystemStatusA"][9]) {
-                gr.logMessage.messages.push({type: "cmd", text: "緊急停止 關閉"});
-                gr.syncData[preText + "SystemStatusA"][9] = 0;
-            } else {
-                gr.logMessage.messages.push({type: "cmd", text: "緊急停止 開啟"});
-                gr.syncData[preText + "SystemStatusA"][9] = 1;
-                gr.gbcs.command({'act': preText + "CloseAllSspaModule"});
-                gr.gbcs.command({'act': preText + "CloseAllSspaPower"});
-                gr.syncData[preText + "SystemStatusA"][8] = 0;
+            if (status0 & 0x10)
+                gr.gbcs.command({'act': preText + "EmergencyOff"});
+            else
+                gr.gbcs.command({'act': preText + "EmergencyOn"});
+            return;
+        }
+        //=====================================================================
+        if (iobj.act === preText + "SspaPowerOn") {
+            if ((ready_f !== 2) || emergency)
+                return;
+            if (iobj.index >= 0) {
+                gr.logMessage.messages.push({type: "cmd", text: "開啟電源模組 " + iobj.index});
+                powerStatusA[iobj.index] |= 0x10;
+                return;
+            }
+            gr.logMessage.messages.push({type: "cmd", text: "開啟全部電源模組"});
+            for (var i = 0; i < 36; i++) {
+                powerStatusA[i] |= 0x10;
+            }
+            return;
+        }
+        if (iobj.act === preText + "SspaPowerOff") {
+            if (iobj.index >= 0) {
+                gr.logMessage.messages.push({type: "cmd", text: "關閉電源模組 " + iobj.index});
+                powerStatusA[iobj.index] &= 0x10 ^ 0xffffffff;
+                return;
+            }
+            gr.logMessage.messages.push({type: "cmd", text: "關閉全部電源模組"});
+            for (var i = 0; i < 36; i++) {
+                powerStatusA[i] &= 0x10 ^ 0xffffffff;
+            }
+            return;
+        }
+        if (iobj.act === preText + "SspaPowerInsert") {
+            if (iobj.index < 0) {
+                gr.logMessage.messages.push({type: "cmd", text: "加入全部電源模組"});
+                for (var i = 0; i < 36; i++) {
+                    gr.paraSet[preText + "SspaPowerExistA"][i] = 1;
+                }
+                mac.saveParaSet();
+                return;
+            }
+            gr.logMessage.messages.push({type: "cmd", text: "加入電源模組 " + (iobj.index + 1)});
+            gr.paraSet[preText + "SspaPowerExistA"][iobj.index] = 1;
+            mac.saveParaSet();
+            return;
+        }
+        if (iobj.act === preText + "SspaPowerRemove") {
+            if (iobj.index < 0) {
+                gr.logMessage.messages.push({type: "cmd", text: "移除全部電源模組"});
+                for (var i = 0; i < 36; i++) {
+                    gr.paraSet[preText + "SspaPowerExistA"][i] = 0;
+                }
+                mac.saveParaSet();
+                return;
+            }
+            gr.logMessage.messages.push({type: "cmd", text: "移除電源模組 " + (iobj.index + 1)});
+            gr.paraSet[preText + "SspaPowerExistA"][iobj.index] = 0;
+            mac.saveParaSet();
+            return;
+        }
+
+
+        //=====================================================================
+
+
+        if (iobj.act === preText + "SspaModuleOn") {
+            if ((ready_f !== 2) || emergency)
+                return;
+            if (iobj.index >= 0) {
+                gr.logMessage.messages.push({type: "cmd", text: "開啟SSPA模組 " + iobj.index});
+                moduleStatusA[iobj.index] |= 0x2;
+                return;
+            }
+            gr.logMessage.messages.push({type: "cmd", text: "開啟全部SSPA模組"});
+            for (var i = 0; i < 36; i++) {
+                moduleStatusA[i] |= 0x02;
+            }
+            return;
+        }
+        if (iobj.act === preText + "SspaModuleOff") {
+            if (iobj.index >= 0) {
+                gr.logMessage.messages.push({type: "cmd", text: "關閉SSPA模組 " + iobj.index});
+                moduleStatusA[iobj.index] &= 0x2 ^ 0xffffffff;
+                return;
+            }
+            gr.logMessage.messages.push({type: "cmd", text: "關閉全部SSPA模組"});
+            for (var i = 0; i < 36; i++) {
+                moduleStatusA[i] &= 0x02 ^ 0xffffffff;
             }
             return;
         }
 
 
+        if (iobj.act === preText + "LocalPulseOn") {
+            if ((ready_f !== 2) || emergency)
+                return;
+            gr.logMessage.messages.push({type: "cmd", text: "本地脈波開啟"});
+            gr.radarData.systemStatus0 |= (1 << (shift + 3));
+            return;
+        }
+        if (iobj.act === preText + "LocalPulseOff") {
+            gr.logMessage.messages.push({type: "cmd", text: "本地脈波關閉"});
+            gr.radarData.systemStatus0 &= (1 << (shift + 3)) ^ 0xffffffff;
+            return;
+        }
+        if (iobj.act === preText + "EmergencyOn") {
+            gr.logMessage.messages.push({type: "cmd", text: "緊急停止開啟"});
+            gr.radarData.systemStatus0 |= (1 << (shift + 4));
+            for (var i = 0; i < 36; i++) {
+                powerStatusA[i] &= (1 << 4) ^ 0xffffffff;
+                moduleStatusA[i] &= (1 << 1) ^ 0xffffffff;
+            }
+            gr.radarData.systemStatus0 &= (1 << (shift + 3)) ^ 0xffffffff;
+            return;
+        }
+        if (iobj.act === preText + "EmergencyOff") {
+            gr.logMessage.messages.push({type: "cmd", text: "緊急停止關閉"});
+            gr.radarData.systemStatus0 &= (1 << (shift + 4)) ^ 0xffffffff;
+            return;
+        }
+
+
+        //=========================================================================
 
 
 
-        //=====================================================================
         if (iobj.act === preText + "OpenPowerModule") {
             gr.logMessage.messages.push({type: "cmd", text: "開啟電源模組 " + (iobj.index + 1)});
             self.setAction('sspaPowerOn', iobj.index);
             return;
         }
-        if (iobj.act === preText + "OpenAllSspaPower") {
-            gr.logMessage.messages.push({type: "cmd", text: "開啟全部電源模組"});
-            for (var i = 0; i < 36; i++) {
-                if (!gr.paraSet[preText + "SspaPowerExistA"][i])
-                    continue;
-                self.setAction('sspaPowerOn', i);
-            }
-            return;
-        }
+
+
+
         if (iobj.act === preText + "ClosePowerModule") {
             gr.logMessage.messages.push({type: "cmd", text: "關閉電源模組 " + (iobj.index + 1)});
             self.setAction('sspaPowerOff', iobj.index);
-            return;
-        }
-        if (iobj.act === preText + "CloseAllSspaPower") {
-            gr.logMessage.messages.push({type: "cmd", text: "關閉全部電源模組"});
-            for (var i = 0; i < 36; i++) {
-                if (!gr.paraSet[preText + "SspaPowerExistA"][i])
-                    continue;
-                self.setAction('sspaPowerOff', i);
-            }
             return;
         }
         if (iobj.act === preText + "ResetPowerModule") {
@@ -6274,15 +6254,15 @@ class Emulate {
             return;
         }
         if (iobj.act === preText + "InsertPowerModule") {
-            gr.syncData[preText + "SspaPowerStatusAA"][iobj.index] = [1, 0, 0, 0, 0, 0, 25, 0, 0, 25];
+            //gr.syncData[preText + "SspaPowerStatusAA"][iobj.index] = [1, 0, 0, 0, 0, 0, 25, 0, 0, 25];
             gr.logMessage.messages.push({type: "cmd", text: "加入電源模組 " + (iobj.index + 1)});
             gr.paraSet[preText + "SspaPowerExistA"][iobj.index] = 1;
             mac.saveParaSet();
             return;
         }
         if (iobj.act === preText + "RemovePowerModule") {
-            if (gr.syncData[preText + "SspaPowerStatusAA"][iobj.index][2] || gr.syncData[preText + "SspaPowerStatusAA"][iobj.index][3])
-                return;
+            //if (gr.syncData[preText + "SspaPowerStatusAA"][iobj.index][2] || gr.syncData[preText + "SspaPowerStatusAA"][iobj.index][3])
+            //    return;
             gr.logMessage.messages.push({type: "cmd", text: "移除電源模組 " + (iobj.index + 1)});
             gr.paraSet[preText + "SspaPowerExistA"][iobj.index] = 0;
             mac.saveParaSet();
@@ -6308,13 +6288,13 @@ class Emulate {
             for (var i = 0; i < 36; i++) {
                 if (!gr.paraSet[preText + "SspaPowerExistA"][i])
                     continue;
-                if (!gr.syncData[preText + "SspaPowerStatusAA"][i][2])
-                    continue;
-                if (!gr.syncData[preText + "SspaPowerStatusAA"][i][3])
-                    continue;
+                //if (!gr.syncData[preText + "SspaPowerStatusAA"][i][2])
+                //    continue;
+                //if (!gr.syncData[preText + "SspaPowerStatusAA"][i][3])
+                //    continue;
                 if (!gr.paraSet[preText + "SspaModuleExistA"][i])
                     continue;
-                gr.syncData[preText + "SspaModuleStatusAA"][i][1] = 1;
+                //gr.syncData[preText + "SspaModuleStatusAA"][i][1] = 1;
             }
             return;
         }
@@ -6323,7 +6303,7 @@ class Emulate {
             for (var i = 0; i < 36; i++) {
                 if (!gr.paraSet[preText + "SspaModuleExistA"][i])
                     continue;
-                gr.syncData[preText + "SspaModuleStatusAA"][i][1] = 0;
+                //gr.syncData[preText + "SspaModuleStatusAA"][i][1] = 0;
             }
             return;
         }
@@ -6332,32 +6312,32 @@ class Emulate {
         if (iobj.act === preText + "OpenSspaModule") {
             if (!gr.paraSet[preText + "SspaModuleExistA"][iobj.index])
                 return;
-            if (!gr.syncData[preText + "SspaPowerStatusAA"][iobj.index][2])
-                return;
-            if (!gr.syncData[preText + "SspaPowerStatusAA"][iobj.index][3])
-                return;
+            //if (!gr.syncData[preText + "SspaPowerStatusAA"][iobj.index][2])
+            //    return;
+            //if (!gr.syncData[preText + "SspaPowerStatusAA"][iobj.index][3])
+            //    return;
             gr.logMessage.messages.push({type: "cmd", text: "SSPA模組 致能" + (iobj.index + 1)});
-            gr.syncData[preText + "SspaModuleStatusAA"][iobj.index][1] = 1;
+            //gr.syncData[preText + "SspaModuleStatusAA"][iobj.index][1] = 1;
             return;
         }
         if (iobj.act === preText + "CloseSspaModule") {
             if (!gr.paraSet[preText + "SspaModuleExistA"][iobj.index])
                 return;
             gr.logMessage.messages.push({type: "cmd", text: "SSPA模組 除能" + (iobj.index + 1)});
-            gr.syncData[preText + "SspaModuleStatusAA"][iobj.index][1] = 0;
+            //gr.syncData[preText + "SspaModuleStatusAA"][iobj.index][1] = 0;
             return;
         }
         if (iobj.act === preText + "InsertSspaModule") {
             gr.logMessage.messages.push({type: "cmd", text: "加入SSPA模組 " + (iobj.index + 1)});
             gr.paraSet[preText + "SspaModuleExistA"][iobj.index] = 1;
-            gr.syncData[preText + "SspaModuleStatusAA"][iobj.index] = [1, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0];
+            //gr.syncData[preText + "SspaModuleStatusAA"][iobj.index] = [1, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0];
             mac.saveParaSet();
             return;
         }
         if (iobj.act === preText + "RemoveSspaModule") {
             gr.logMessage.messages.push({type: "cmd", text: "移除SSPA模組 " + (iobj.index + 1)});
             gr.paraSet[preText + "SspaModuleExistA"][iobj.index] = 0;
-            gr.syncData[preText + "SspaModuleStatusAA"][iobj.index] = [1, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0];
+            //gr.syncData[preText + "SspaModuleStatusAA"][iobj.index] = [1, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0];
             mac.saveParaSet();
             return;
         }
@@ -6384,7 +6364,6 @@ class SyncGloble {
     constructor() {
         gr.logMessage = {inx: 0, messages: []};
         gr.syncCommand = {};
-        var syncData = gr.syncDataOld = {};
         var rd = gr.radarData = {};
         var syncSet = gr.syncSet = {};
 
@@ -6399,6 +6378,7 @@ class SyncGloble {
             "語音通信模組",
             "SSPA驅動模組"
         ];
+        syncSet.numTbl = ["１", "２", "３", "４", "５", "６", "７", "８"];
 
         rd.connectTime = 0;
         rd.connectCnt = 0;
@@ -6525,148 +6505,11 @@ class SyncGloble {
         rd.commOkRateA = [0, 0];
         rd.rfRxPowerA = [0, 0, 0, 0];//mast rx1,mast rx1,sub1 rx sub2 rx
 
-        return;
 
 
 
 
 
-        syncData.slotIdA = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-        // 0:none, 1:ready, 2:error 3:warn up
-        syncData.slotStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        //0:none, 1:PreTest,2:testing;
-        syncData.slotTestStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        /*
-         0 mainStatus 0:none, 1:warn up, 2:ready, 3:error
-         1 rfPulse detect flag      0:none 1: ok
-         2 envi status 0:none ,     1:ok ,2:error              //generate
-         3 sspa power status        0:none , 1:ok ,2:error     //generate
-         4 sspa module status       0:none , 1:ok ,2:error     //generate
-         5 rfPulsee over duty flag  0:none , 1:ok ,2:error
-         6 rfPulse over width flag  0:none , 1:ok ,2:error
-         7 
-         8 local pulse generate flag    0:none 1:ok
-         9 emergency on flag            0:none 1:emergency
-         */
-        syncData.mastSystemStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        syncData.sub1SystemStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        syncData.sub2SystemStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        syncData.ctr1SystemStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        syncData.ctr2SystemStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        syncData.drv1SystemStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        syncData.drv2SystemStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
-        /*
-         envirament status;
-         value 0:none, 1:error 
-         0 airFlow left
-         1 airFlow middle
-         2 airFlow right
-         3 waterFlow 1
-         4 waterFlow 2
-         5 waterFlow 3
-         6 waterFlow 4
-         7 waterFlow 5
-         8 waterFlow 6
-         9 waterFlow temperature
-         */
-
-        syncData.ctr1EnvStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        syncData.ctr2EnvStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
-
-
-        //===================================================================================
-        //0 connectFlag, 1 faultLed, 2:v50enLed, 3:v32enLed, 4:v50v, 5:v50i, 6:v50i, 7:v32v, 8:v32i, 9:v32t  
-        syncData.ctr1SspaPowerStatusAA = [];
-        syncData.ctr2SspaPowerStatusAA = [];
-        for (var j = 0; j < 2; j++) {
-            if (j === 0)
-                var sspaPowerStatusAA = syncData.ctr1SspaPowerStatusAA;
-            if (j === 1)
-                var sspaPowerStatusAA = syncData.ctr2SspaPowerStatusAA;
-            for (var i = 0; i < 36; i++) {
-                var va = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                sspaPowerStatusAA.push(va);
-            }
-        }
-
-        //===================================================================================
-        /*
-         0:connect, 1:致能, 2 保護觸發, 3:工作比過高, 4:脈寬過高, 5:溫度過高, 6:反射過高, 7:RF輸出, 8:溫度
-         */
-        syncData.ctr1SspaModuleStatusAA = [];
-        syncData.ctr2SspaModuleStatusAA = [];
-        for (var j = 0; j < 2; j++) {
-            if (j === 0)
-                var sspaModuleStatusAA = syncData.ctr1SspaModuleStatusAA;
-            if (j === 1)
-                var sspaModuleStatusAA = syncData.ctr2SspaModuleStatusAA;
-            for (var i = 0; i < 36; i++) {
-                var va = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                sspaModuleStatusAA.push(va);
-            }
-        }
-
-
-
-
-        var location = syncData.location = {};
-        var radarStatus = syncData.radarStatus = {};
-
-
-        /*
-         0:input rf power
-         //
-         2:pre amp output rf power
-         3:driver amp output rf power
-         4:cw output rf power
-         5:ccw output rf power
-         */
-        syncData.ctr1MeterStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        syncData.ctr2MeterStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
-
-
-
-        syncData.connectTime = 0;
-        syncData.connectCnt = 0;
-        location.mastGpsData = [22, 59, 59, 99, 122, 59, 59, 99, 123, 270, "GPS unavalible"];
-        location.sub1GpsData = [22, 59, 59, 99, 122, 59, 59, 99, 123, 270, "GPS unavalible"];
-        location.sub2GpsData = [22, 59, 59, 99, 122, 59, 59, 99, 123, 270, "GPS unavalible"];
-
-        /*
-         SP雷達信號     0.0: 無信號, 0.1: 信號備便
-         脈波來源       1.0: 主雷同步, 1.1: 本機脈波
-         與副控1連線方式  2.0: 光纖, 2.1: 無線, 2.2: 自動 
-         與副控2連線方式  2.0: 光纖, 2.1: 無線, 2.2: 自動 
-         */
-        radarStatus.mastStatus = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        /*
-         雷達狀態    0.0: 未連線, 0.1: 準備中, 0.2:本機備便, 0.3:發射備便, 0.4:發射中, 0.5:異常          
-         環控        1.0: 未連線, 1.1:良好, 1.2: 異常 
-         SSPA電源    2.0: 未連線, 2.1:良好, 2.2: 異常 
-         SSPA放大器  3.0: 未連線, 3.1:良好, 3.2: 異常 
-         SSPA功率    4.0: 未連線, 3.1:良好, 4.2: 異常 
-         戰備狀態    5.0: 未連線, 5.1:關閉, 5.2: 開啟 
-         遠端遙控    6.0: 未連線, 6.1:關閉, 6.2: 開啟 
-         脈波來源    7.0: 未連線, 7.1: 主雷同步, 7.2: 本機脈波
-         輸出裝置    8.0: 未連線, 8.1: 天線, 8.2:假負載 
-         連線方式    9.0: 未連線, 9.1: 光纖, 9.2:無線, 9.3:自動 
-         */
-        radarStatus.sub1Status = [1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        radarStatus.sub2Status = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
-        //0 光纖連線狀態 0:未連線, 1:未連線 
-        //1 RF連線狀態 0:未連線, 1:未連線 
-        //2 1588修正時間  
-        //3 封包發送數  
-        //4 正確率
-        //5 主控RF接收能量
-        //6 副控RF接收能量
-
-        syncData.sub1CommDatas = [0, 1, 3, 4, 1200, 10, 20];
-        syncData.sub2CommDatas = [1, 0, 7, 8, 1201, 11, 22];
 
 
     }
@@ -6681,198 +6524,177 @@ class SyncGloble {
             emu.command(iobj);
             return;
         }
+        var rd = gr.radarData;
         if (gr.appId === 1)
             var preText = "sub1";
         if (gr.appId === 2)
             var preText = "sub2";
-        if (gr.appId === 3)
+        if (gr.appId === 3) {
             var preText = "ctr1";
-        if (gr.appId === 4)
+            var preInx = 0;
+            var status0 = rd.systemStatus0 >> 22;
+            var shift = 22;
+            var powerStatusA = rd.sspaPowerStatusAA[0];
+            var moduleStatusA = rd.sspaModuleStatusAA[0];
+        }
+        if (gr.appId === 4) {
             var preText = "ctr2";
+            var preInx = 1;
+            var status0 = rd.systemStatus0 >> 27;
+            var shift = 27;
+            var powerStatusA = rd.sspaPowerStatusAA[1];
+            var moduleStatusA = rd.sspaModuleStatusAA[1];
+        }
+
+        var powerOn_f = 0;
+        var moduleOn_f = 0;
+        for (var i = 0; i < 36; i++) {
+            if ((powerStatusA[i] >> 4) & 1)
+                powerOn_f = 1;
+            if ((moduleStatusA[i] >> 1) & 1)
+                moduleOn_f = 1;
+
+        }
+
+        var emergency = gr.radarData.systemStatus0 & (1 << (shift + 4));
+        var ready_f = (rd.systemStatus0 >> (gr.appId * 2)) & 3;
+
+
+
         if (iobj.act === preText + "AllSspaPowerOnOff") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            var flag = 0;
-            if (gr.appId === 3)
-                flag = gr.radarData.systemStatus0 & (1 << 23);
-            if (gr.appId === 4)
-                flag = gr.radarData.systemStatus0 & (1 << 28);
-            if (flag) {
-                gr.gbcs.command({'act': preText + "CloseAllSspaModule"});
-                gr.gbcs.command({'act': preText + "CloseAllSspaPower"});
-            } else {
-                gr.gbcs.command({'act': preText + "OpenAllSspaPower"});
-            }
+            if (powerOn_f)
+                gr.gbcs.command({'act': preText + "SspaPowerOff", 'index': -1});
+            else
+                gr.gbcs.command({'act': preText + "SspaPowerOn", 'index': -1});
             return;
         }
-        if (iobj.act === preText + "OpenAllSspaPower") {
-            ws.cmd(iobj.act);
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            return;
-        }
-        if (iobj.act === preText + "CloseAllSspaPower") {
-            ws.cmd(iobj.act);
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-        }
-
-
         if (iobj.act === preText + "AllSspaModuleOnOff") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            var flag = 0;
-            if (gr.appId === 3)
-                flag = gr.radarData.systemStatus0 & (1 << 24);
-            if (gr.appId === 4)
-                flag = gr.radarData.systemStatus0 & (1 << 29);
-            if (flag) {
-                gr.gbcs.command({'act': preText + "CloseAllSspaModule"});
-            } else {
-                gr.gbcs.command({'act': preText + "OpenAllSspaModule"});
-            }
+            if (moduleOn_f)
+                gr.gbcs.command({'act': preText + "SspaModuleOff", 'index': -1});
+            else
+                gr.gbcs.command({'act': preText + "SspaModuleOn", 'index': -1});
             return;
         }
-        if (iobj.act === preText + "OpenAllSspaModule") {
-            ws.cmd(iobj.act);
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
+        if (iobj.act === preText + "LocalPulseOnOff") {
+            if (status0 & 0x08)
+                gr.gbcs.command({'act': preText + "LocalPulseOff"});
+            else
+                gr.gbcs.command({'act': preText + "LocalPulseOn"});
             return;
         }
-        if (iobj.act === preText + "CloseAllSspaModule") {
-            ws.cmd(iobj.act);
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-        }
-        if (iobj.act === preText + "LocalPulseOff") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            ws.cmd(iobj.act);
-            return;
-        }
-        if (iobj.act === preText + "LocalPulseOn") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            ws.cmd(iobj.act);
-            return;
-        }
-
         if (iobj.act === preText + "EmergencyOnOff") {
-            var flag = 0;
-            if (gr.appId === 3)
-                flag = gr.radarData.systemStatus0 & (1 << 26);
-            if (gr.appId === 4)
-                flag = gr.radarData.systemStatus0 & (1 << 31);
-            if (flag) {
-                gr.gbcs.command({'act': preText + "EmergencyRelease"});
-            } else {
-                gr.gbcs.command({'act': preText + "EmergencyStop"});
+            if (status0 & 0x10)
+                gr.gbcs.command({'act': preText + "EmergencyOff"});
+            else
+                gr.gbcs.command({'act': preText + "EmergencyOn"});
+            return;
+        }
+        //=====================================================================
+        if (iobj.act === preText + "SspaPowerOn") {
+            if ((ready_f !== 2) || emergency)
+                return;
+            if (iobj.index >= 0)
+                gr.logMessage.messages.push({type: "cmd", text: "開啟電源模組 " + iobj.index});
+            else
+                gr.logMessage.messages.push({type: "cmd", text: "開啟全部電源模組"});
+            ws.cmd(iobj.act, [iobj.index]);
+            return;
+        }
+        if (iobj.act === preText + "SspaPowerOff") {
+            if (iobj.index >= 0)
+                gr.logMessage.messages.push({type: "cmd", text: "開啟電源模組 " + iobj.index});
+            else
+                gr.logMessage.messages.push({type: "cmd", text: "開啟全部電源模組"});
+            ws.cmd(iobj.act, [iobj.index]);
+            return;
+        }
+        if (iobj.act === preText + "SspaPowerInsert") {
+            if (iobj.index < 0) {
+                gr.logMessage.messages.push({type: "cmd", text: "加入全部電源模組"});
+                for (var i = 0; i < 36; i++) {
+                    gr.paraSet[preText + "SspaPowerExistA"][i] = 1;
+                }
+                mac.saveParaSet();
+                return;
             }
+            gr.logMessage.messages.push({type: "cmd", text: "加入電源模組 " + (iobj.index + 1)});
+            gr.paraSet[preText + "SspaPowerExistA"][iobj.index] = 1;
+            mac.saveParaSet();
+            return;
+        }
+        if (iobj.act === preText + "SspaPowerRemove") {
+            if (iobj.index < 0) {
+                gr.logMessage.messages.push({type: "cmd", text: "移除全部電源模組"});
+                for (var i = 0; i < 36; i++) {
+                    gr.paraSet[preText + "SspaPowerExistA"][i] = 0;
+                }
+                mac.saveParaSet();
+                return;
+            }
+            gr.logMessage.messages.push({type: "cmd", text: "移除電源模組 " + (iobj.index + 1)});
+            gr.paraSet[preText + "SspaPowerExistA"][iobj.index] = 0;
+            mac.saveParaSet();
             return;
         }
 
-        if (iobj.act === preText + "EmergencyStop") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            ws.cmd(iobj.act);
+
+        //=====================================================================
+
+
+        if (iobj.act === preText + "SspaModuleOn") {
+            if ((ready_f !== 2) || emergency)
+                return;
+            if (iobj.index >= 0) 
+                gr.logMessage.messages.push({type: "cmd", text: "開啟SSPA模組 " + iobj.index});
+            else
+                gr.logMessage.messages.push({type: "cmd", text: "開啟全部SSPA模組"});
+            ws.cmd(iobj.act, [iobj.index]);
             return;
         }
-        if (iobj.act === preText + "EmergencyRelease") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            ws.cmd(iobj.act);
+        if (iobj.act === preText + "SspaModuleOff") {
+            if (iobj.index >= 0) 
+                gr.logMessage.messages.push({type: "cmd", text: "關閉SSPA模組 " + iobj.index});
+            else
+                gr.logMessage.messages.push({type: "cmd", text: "關閉全部SSPA模組"});
+            ws.cmd(iobj.act, [iobj.index]);
             return;
         }
-        console.log(iobj);
-        return;
-        //============================================================================================================
-        var messageId = iobj.act;
-        if (iobj.act === "selfTestStartAll") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            return;
-        }
-        if (iobj.act === "selfTestStopAll") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            return;
-        }
-        if (iobj.act === preText + "ClosePowerModule") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            return;
-        }
-        if (iobj.act === preText + "OpenPowerModule") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            return;
-        }
-        if (iobj.act === preText + "CloseAllSspaPower") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            return;
-        }
-        if (iobj.act === preText + "OpenAllSspaPower") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
+
+
+        if (iobj.act === preText + "LocalPulseOn") {
+            if ((ready_f !== 2) || emergency)
+                return;
+            gr.logMessage.messages.push({type: "cmd", text: "本地脈波開啟"});
+            ws.cmd(iobj.act, [iobj.index]);
             return;
         }
         if (iobj.act === preText + "LocalPulseOff") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
+            gr.logMessage.messages.push({type: "cmd", text: "本地脈波關閉"});
+            ws.cmd(iobj.act, [iobj.index]);
             return;
         }
-        if (iobj.act === preText + "LocalPulseOn") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
+        if (iobj.act === preText + "EmergencyOn") {
+            gr.logMessage.messages.push({type: "cmd", text: "緊急停止開啟"});
+            ws.cmd(iobj.act, [iobj.index]);
             return;
         }
-        if (iobj.act === preText + "DisableAllSspa") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
+        if (iobj.act === preText + "EmergencyOff") {
+            gr.logMessage.messages.push({type: "cmd", text: "緊急停止關閉"});
+            ws.cmd(iobj.act, [iobj.index]);
             return;
         }
-        if (iobj.act === preText + "EnableAllSspa") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            return;
-        }
-        if (iobj.act === preText + "EmergencyStop") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            return;
-        }
-        if (iobj.act === preText + "InsertPowerModule") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            gr.paraSet[preText + "PowerExistA"][iobj.index] = 1;
-            mac.saveParaSet();
-            return;
-        }
-        if (iobj.act === preText + "RemovePowerModule") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            gr.paraSet[preText + "PowerExistA"][iobj.index] = 0;
-            mac.saveParaSet();
-            return;
-        }
-        if (iobj.act === preText + "InsertSspaModule") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            gr.paraSet[preText + "SspaExistA"][iobj.index] = 1;
-            mac.saveParaSet();
-            return;
-        }
-        if (iobj.act === preText + "RemoveSspaModule") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            gr.paraSet[preText + "SspaExistA"][iobj.index] = 0;
-            mac.saveParaSet();
-            return;
-        }
-        if (iobj.act === preText + "InsertAllSspaModule") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            for (var i = 0; i < 36; i++)
-                gr.paraSet[preText + "SspaExistA"][i] = 1;
-            mac.saveParaSet();
-            return;
-        }
-        if (iobj.act === preText + "RemoveAllSspaModule") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            for (var i = 0; i < 36; i++)
-                gr.paraSet[preText + "SspaExistA"][i] = 0;
-            mac.saveParaSet();
-            return;
-        }
-        if (iobj.act === preText + "InsertAllPowerModule") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            for (var i = 0; i < 36; i++)
-                gr.paraSet[preText + "PowerExistA"][i] = 1;
-            mac.saveParaSet();
-            return;
-        }
-        if (iobj.act === preText + "RemoveAllPowerModule") {
-            gr.logMessage.messages.push({type: "cmd", text: iobj.act});
-            for (var i = 0; i < 36; i++)
-                gr.paraSet[preText + "PowerExistA"][i] = 0;
-            mac.saveParaSet();
-            return;
-        }
+
+
+
+
+
+
+
+
+        console.log(iobj);
+
+        //============================================================================================================
+
     }
 }
 gr.gbcs = new SyncGloble();
