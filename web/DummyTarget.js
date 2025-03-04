@@ -4488,7 +4488,7 @@ class DummyTargetCtrPane {
                         MdaPopWin.popOff(2);
                         if (iobj.act === "selected") {
                             if (iobj.selectText === "隨機脈波") {
-                                gr.gbcs.command({'act': preText + "LocalPulseOn", "paras": [1]});
+                                gr.gbcs.command({'act': preText + "LocalPulseOn", "paras": [255]});
                                 return;
 
                             }
@@ -4496,7 +4496,7 @@ class DummyTargetCtrPane {
                                 gr.gbcs.command({'act': preText + "LocalPulseOff"});
                                 return;
                             }
-                            gr.gbcs.command({'act': preText + "LocalPulseOn", "paras": [0, selectNo[iobj.selectInx]]});
+                            gr.gbcs.command({'act': preText + "LocalPulseOn", "paras": [selectNo[iobj.selectInx]]});
                             return;
 
 
@@ -6665,12 +6665,12 @@ class SyncGloble {
             if ((ready_f !== 2) || emergency)
                 return;
             gr.logMessage.messages.push({type: "cmd", text: "本地脈波開啟"});
-            ws.cmd(iobj.act, [iobj.index]);
+            ws.cmd(iobj.act, iobj.paras);
             return;
         }
         if (iobj.act === preText + "LocalPulseOff") {
             gr.logMessage.messages.push({type: "cmd", text: "本地脈波關閉"});
-            ws.cmd(iobj.act, [iobj.index]);
+            ws.cmd(iobj.act, iobj.paras);
             return;
         }
         if (iobj.act === preText + "EmergencyOn") {

@@ -854,13 +854,15 @@ class MyNewScope {
             var lineObj = op.lines[0];
             var totalTime = st.xScale
             var sampleTime = (totalTime * 10) / op.sampleAmt;
+            lineObj.sampleRate=1000000000/sampleTime;
             var pulseWidthDataA = [];
             var nowPulseLevel = 0;
             var nowPulseLen = 100;
             
             for (var i = 0; i < 100; i++) {
-                pulseWidthDataA.push(900000);
-                pulseWidthDataA.push(100000);
+                var pulseWidth=Math.round(300000 * Math.random() + 100000);
+                pulseWidthDataA.push(1000000-pulseWidth);
+                pulseWidthDataA.push(pulseWidth);
             }
             
             var nowTime1=pulseWidthDataA[0];
