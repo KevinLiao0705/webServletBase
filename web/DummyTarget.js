@@ -6111,12 +6111,12 @@ class Emulate {
                 return;
             if (iobj.index >= 0) {
                 gr.logMessage.messages.push({type: "cmd", text: "開啟電源模組 " + iobj.index});
-                powerStatusA[iobj.index] |= 0x10;
+                powerStatusA[iobj.index] |= 0x1d;
                 return;
             }
             gr.logMessage.messages.push({type: "cmd", text: "開啟全部電源模組"});
             for (var i = 0; i < 36; i++) {
-                powerStatusA[i] |= 0x10;
+                powerStatusA[i] |= 0x1d;
             }
             return;
         }
@@ -6226,135 +6226,6 @@ class Emulate {
 
 
 
-        if (iobj.act === preText + "OpenPowerModule") {
-            gr.logMessage.messages.push({type: "cmd", text: "開啟電源模組 " + (iobj.index + 1)});
-            self.setAction('sspaPowerOn', iobj.index);
-            return;
-        }
-
-
-
-        if (iobj.act === preText + "ClosePowerModule") {
-            gr.logMessage.messages.push({type: "cmd", text: "關閉電源模組 " + (iobj.index + 1)});
-            self.setAction('sspaPowerOff', iobj.index);
-            return;
-        }
-        if (iobj.act === preText + "ResetPowerModule") {
-            gr.logMessage.messages.push({type: "cmd", text: "重啟電源模組 " + (iobj.index + 1)});
-            self.setAction('sspaPowerReset', iobj.index);
-            return;
-        }
-        if (iobj.act === preText + "ResetAllSspaPower") {
-            gr.logMessage.messages.push({type: "cmd", text: "重啟全部電源模組"});
-            for (var i = 0; i < 36; i++) {
-                if (!gr.paraSet[preText + "SspaPowerExistA"][i])
-                    continue;
-                self.setAction('sspaPowerReset', i);
-            }
-            return;
-        }
-        if (iobj.act === preText + "InsertPowerModule") {
-            //gr.syncData[preText + "SspaPowerStatusAA"][iobj.index] = [1, 0, 0, 0, 0, 0, 25, 0, 0, 25];
-            gr.logMessage.messages.push({type: "cmd", text: "加入電源模組 " + (iobj.index + 1)});
-            gr.paraSet[preText + "SspaPowerExistA"][iobj.index] = 1;
-            mac.saveParaSet();
-            return;
-        }
-        if (iobj.act === preText + "RemovePowerModule") {
-            //if (gr.syncData[preText + "SspaPowerStatusAA"][iobj.index][2] || gr.syncData[preText + "SspaPowerStatusAA"][iobj.index][3])
-            //    return;
-            gr.logMessage.messages.push({type: "cmd", text: "移除電源模組 " + (iobj.index + 1)});
-            gr.paraSet[preText + "SspaPowerExistA"][iobj.index] = 0;
-            mac.saveParaSet();
-            return;
-        }
-        if (iobj.act === preText + "InsertAllPowerModule") {
-            gr.logMessage.messages.push({type: "cmd", text: "加入全部電源模組"});
-            for (var i = 0; i < 36; i++)
-                gr.paraSet[preText + "SspaPowerExistA"][i] = 1;
-            mac.saveParaSet();
-            return;
-        }
-        if (iobj.act === preText + "RemoveAllPowerModule") {
-            gr.logMessage.messages.push({type: "cmd", text: "移除全部電源模組"});
-            for (var i = 0; i < 36; i++)
-                gr.paraSet[preText + "SspaPowerExistA"][i] = 0;
-            mac.saveParaSet();
-            return;
-        }
-        //=====================================================================
-        if (iobj.act === preText + "OpenAllSspaModule") {
-            gr.logMessage.messages.push({type: "cmd", text: "SSPA模組 全部致能"});
-            for (var i = 0; i < 36; i++) {
-                if (!gr.paraSet[preText + "SspaPowerExistA"][i])
-                    continue;
-                //if (!gr.syncData[preText + "SspaPowerStatusAA"][i][2])
-                //    continue;
-                //if (!gr.syncData[preText + "SspaPowerStatusAA"][i][3])
-                //    continue;
-                if (!gr.paraSet[preText + "SspaModuleExistA"][i])
-                    continue;
-                //gr.syncData[preText + "SspaModuleStatusAA"][i][1] = 1;
-            }
-            return;
-        }
-        if (iobj.act === preText + "CloseAllSspaModule") {
-            gr.logMessage.messages.push({type: "cmd", text: "SSPA模組 全部除能"});
-            for (var i = 0; i < 36; i++) {
-                if (!gr.paraSet[preText + "SspaModuleExistA"][i])
-                    continue;
-                //gr.syncData[preText + "SspaModuleStatusAA"][i][1] = 0;
-            }
-            return;
-        }
-
-
-        if (iobj.act === preText + "OpenSspaModule") {
-            if (!gr.paraSet[preText + "SspaModuleExistA"][iobj.index])
-                return;
-            //if (!gr.syncData[preText + "SspaPowerStatusAA"][iobj.index][2])
-            //    return;
-            //if (!gr.syncData[preText + "SspaPowerStatusAA"][iobj.index][3])
-            //    return;
-            gr.logMessage.messages.push({type: "cmd", text: "SSPA模組 致能" + (iobj.index + 1)});
-            //gr.syncData[preText + "SspaModuleStatusAA"][iobj.index][1] = 1;
-            return;
-        }
-        if (iobj.act === preText + "CloseSspaModule") {
-            if (!gr.paraSet[preText + "SspaModuleExistA"][iobj.index])
-                return;
-            gr.logMessage.messages.push({type: "cmd", text: "SSPA模組 除能" + (iobj.index + 1)});
-            //gr.syncData[preText + "SspaModuleStatusAA"][iobj.index][1] = 0;
-            return;
-        }
-        if (iobj.act === preText + "InsertSspaModule") {
-            gr.logMessage.messages.push({type: "cmd", text: "加入SSPA模組 " + (iobj.index + 1)});
-            gr.paraSet[preText + "SspaModuleExistA"][iobj.index] = 1;
-            //gr.syncData[preText + "SspaModuleStatusAA"][iobj.index] = [1, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0];
-            mac.saveParaSet();
-            return;
-        }
-        if (iobj.act === preText + "RemoveSspaModule") {
-            gr.logMessage.messages.push({type: "cmd", text: "移除SSPA模組 " + (iobj.index + 1)});
-            gr.paraSet[preText + "SspaModuleExistA"][iobj.index] = 0;
-            //gr.syncData[preText + "SspaModuleStatusAA"][iobj.index] = [1, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0];
-            mac.saveParaSet();
-            return;
-        }
-        if (iobj.act === preText + "InsertAllSspaModule") {
-            gr.logMessage.messages.push({type: "cmd", text: "加入全部SSPA模組"});
-            for (var i = 0; i < 36; i++)
-                gr.paraSet[preText + "SspaModuleExistA"][i] = 1;
-            mac.saveParaSet();
-            return;
-        }
-        if (iobj.act === preText + "RemoveAllSspaModule") {
-            gr.logMessage.messages.push({type: "cmd", text: "移除全部SSPA模組"});
-            for (var i = 0; i < 36; i++)
-                gr.paraSet[preText + "SspaModuleExistA"][i] = 0;
-            mac.saveParaSet();
-            return;
-        }
         gr.logMessage.messages.push({type: "cmd", text: iobj.act});
 
     }

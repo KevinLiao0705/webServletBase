@@ -37,12 +37,14 @@ public class GB {
     //======================================
     //public static String paraSetPath = "e:/kevin/myCode/webServletBase/web/user-sync";
     public static String paraSetPath = "e:/kevin/myCode/syncSet";
+    //public static String paraSetPath = "/home/admintx/syncSetExe";
+    
     public static String webSrcPath = "";
     public static String rootPath = "";
     public static String webRootPath = "";
     public static String exePath = "";
     public static HashMap<String, String> requestPara;
-    public static int os = 1; //0: not defined, 1: win, 2: linux, 3: mac, 4: sunos
+    public static int os = 2; //0: not defined, 1: win, 2: linux, 3: mac, 4: sunos
     public static HashMap<String, String> paraMap = new HashMap();
     public static HashMap<String, String> userParaMap = new HashMap();
 
