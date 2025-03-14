@@ -11,7 +11,7 @@ class DummyTargetMaster {
             opts.title = "設定";
             opts.xc = 1;
             opts.yc = 11;
-            opts.h = 700;
+            opts.h = 600;
             opts.kvTexts = [];
             if (gr.appId === 0) {
                 opts.kvTexts.push("雷達信號參數設定");
@@ -398,7 +398,6 @@ class DummyTargetMaster {
 
 
                 }
-
                 box.paraEditBox(opts);
                 return;
 
@@ -3857,7 +3856,9 @@ class StatusBar {
         opts.baseColor = "#ccc";
         opts.headBar_f = 0;
         opts.itemTypes = ["check", "label", "led", "led", "led", "view", "view", "view", "view", "view", "view", "button"];
-        opts.xArr = [40, 50, 40, 40, 40, 58, 58, 58, 58, 58, 58, 9999];
+        //opts.xArr = [40, 50, 40, 40, 40, 58, 58, 58, 58, 58, 58, 9999];
+        //
+        opts.xArr = ["0.08rw", "0.08rw", "0.08rw", "0.08rw", "0.08rw", "0.08rw", "0.08rw", "0.08rw", "0.08rw", "0.08rw", "0.12rw", 9999];
         opts.itemValues = [0, "1-1", 0, 0, 0, "123", "4.6", "1.2", "30", "19", "28", '<i class="gf">&#xe8b8;</i>'];
         opts.itemTitles = ["", "編號", "故障", "50V", "32V", "50V<br>電壓", "50V<br>電流", "50V<br>溫度", "32V<br>電壓", "32V<br>電流", "32V<br>溫度", "設定"];
         opts.itemWatch = {};
@@ -3902,7 +3903,7 @@ class StatusBar {
             var opts = {};
             if (op.headBar_f) {
                 opts.innerText = op.itemTitles[i];
-                opts.fontSize = 16;
+                opts.fontSize = 14;
                 opts.tpd = 4;
                 opts.bpd = 2;
                 opts.baseColor = op.baseColor;
@@ -3922,7 +3923,7 @@ class StatusBar {
             }
             if (op.itemTypes[i] === "label") {
                 opts.innerText = op.itemValues[i];
-                opts.fontSize = "0.5rh";
+                opts.fontSize = "0.4rh";
                 opts.baseColor = op.baseColor;
                 var watchReg = op.itemWatch["c" + i + "#0"];
                 if (watchReg)
@@ -4464,7 +4465,6 @@ class DummyTargetCtrPane {
                     opts.title = iobj.buttonText;
                     opts.xc = 2;
                     opts.yc = 17;
-                    opts.h = 800;
                     opts.w = 1000;
                     opts.fontSize = "0.5rh";
                     opts.kvTexts = [];
@@ -4503,6 +4503,16 @@ class DummyTargetCtrPane {
                         }
 
                     };
+                    var len=Math.round(opts.kvTexts.length/2)+1;
+                    opts.h = len*50;
+                    
+        opts.margin = 4;
+        opts.ym = 4;
+        opts.eh = 30;
+        opts.exm = 20;
+        opts.eym = 4;
+                    
+                    
                     box.selectBox(opts);
 
 
@@ -4628,7 +4638,7 @@ class DummyTargetCtrPane {
                 continue;
             }
             if (i === inx++) {
-                opts.title = "固態放大器電源";
+                opts.title = "SSPA電源";
                 var setOpts = opts.setOpts = sopt.getOptsPara("led");
                 var watchDatas = setOpts.watchDatas = [];
                 watchDatas.push(["directReg", regName + "#3", "backgroundInx", 1]);
@@ -4637,7 +4647,7 @@ class DummyTargetCtrPane {
                 continue;
             }
             if (i === inx++) {
-                opts.title = "固態放大器狀態";
+                opts.title = "SSPA狀態";
                 var setOpts = opts.setOpts = sopt.getOptsPara("led");
                 var watchDatas = setOpts.watchDatas = [];
                 watchDatas.push(["directReg", regName + "#4", "backgroundInx", 1]);
@@ -4665,6 +4675,8 @@ class DummyTargetCtrPane {
                 opts.title = "遠端遙控";
                 setOpts.enum = para.enum;
                 setOpts.value = para.value;
+                setOpts.fontSize="0.4rh";
+                
             }
 
             if (i === inx++) {
@@ -4674,6 +4686,7 @@ class DummyTargetCtrPane {
                 setOpts.fontSize = "0.5rh";
                 setOpts.enum = para.enum;
                 setOpts.value = para.value;
+                setOpts.fontSize="0.4rh";
             }
             if (i === inx++) {
                 var setOpts = opts.setOpts = sopt.getOptsPara("buttonSelect");
@@ -4682,6 +4695,7 @@ class DummyTargetCtrPane {
                 setOpts.enum = para.enum;
                 setOpts.enumColors = ["#eef", "#ffc"];
                 setOpts.value = para.value;
+                setOpts.fontSize="0.4rh";
             }
             if (i === inx++) {
                 var setOpts = opts.setOpts = sopt.getOptsPara("buttonSelect");
@@ -4690,6 +4704,7 @@ class DummyTargetCtrPane {
                 setOpts.enum = para.enum;
                 setOpts.enumColors = ["#eef", "#ffc"];
                 setOpts.value = para.value;
+                setOpts.fontSize="0.4rh";
             }
             var regName = "self.fatherMd.fatherMd.fatherMd.stas.buttonColorA";
             if (i === inx++) {
@@ -4737,13 +4752,14 @@ class DummyTargetCtrPane {
 
         var opts = {};
         opts.buttons = ["上一頁", "下一頁", "清除"];
-        opts.buttonAmt = 6;
+        opts.buttonAmt = 4;
         opts.buttonIds = ["upPage", "downPage", "clear"];
         opts.layoutType = "collum";
         opts.margin = 4;
         opts.fontSize = "0.5rh";
         opts.xm = 4;
-        opts.ym = 10;
+        opts.ym = 4;
+        opts.ih=200;
         opts.baseColor = "#444";
         opts.actionFunc = function (iobj) {
             console.log(iobj);
@@ -4942,7 +4958,7 @@ class CtrRadarStatus {
         opts.margin = 6;
         opts.xm = 10;
         opts.ym = 4;
-        opts.yArr = [50, 120, 120, 90, 90, 9999];
+        opts.yArr = [50, 110, 110, 80, 80, 9999];
         var rw0 = (1 / 6).toFixed(3) + "rw";
         var rw1 = (1 / 4).toFixed(3) + "rw";
         var rw2 = (1 / 3).toFixed(3) + "rw";
@@ -5045,6 +5061,7 @@ class CtrRadarStatus {
                 var setOpts = opts.setOpts = sopt.getOptsPara("leds");
                 setOpts.enum = ["AF左", "AF中", "AF右"];
                 setOpts.value = [0, 0, 0];
+                setOpts.fontSize="0.4rh";
                 var watchDatas = setOpts.watchDatas = [];
                 watchDatas.push(["directReg", regName + "#0", "backgroundInx", 1]);
                 watchDatas.push(["directReg", regName + "#1", "backgroundInx", 1]);
@@ -5059,6 +5076,7 @@ class CtrRadarStatus {
                 var setOpts = opts.setOpts = sopt.getOptsPara("leds");
                 setOpts.enum = ["WF1", "WF2", "WF3", "WF4", "WF5", "WF6"];
                 setOpts.value = [0, 0, 0, 0, 0, 0];
+                setOpts.fontSize="0.4rh";
                 var watchDatas = setOpts.watchDatas = [];
                 watchDatas.push(["directReg", regName + "#3", "backgroundInx", 1]);
                 watchDatas.push(["directReg", regName + "#4", "backgroundInx", 1]);
@@ -5075,6 +5093,7 @@ class CtrRadarStatus {
                 var setOpts = opts.setOpts = sopt.getOptsPara("leds");
                 setOpts.enum = ["WT"];
                 setOpts.value = [0];
+                setOpts.fontSize="0.4rh";
                 var watchDatas = setOpts.watchDatas = [];
                 watchDatas.push(["directReg", regName + "#9", "backgroundInx", 1]);
                 opts.setOptss.push(setOpts);
@@ -5393,8 +5412,9 @@ class CtrSspaPowerStatus {
         opts.ym = 2;
         opts.ksObjWs = ["0.5rw", "0.5rw"];
         opts.etm = 4;
-        opts.eh = 44;
+        opts.eh = 40;
         opts.ebm = 4;
+        opts.rowAmt=19;
 
         opts.ksObjss = [];
         var colorInx = 1;
@@ -5448,7 +5468,9 @@ class CtrSspaPowerStatus {
                     noInx++;
                     itemInx++;
                 }
-                kopt.xArr = [32, 50, 40, 40, 40, 58, 58, 58, 58, 58, 58, 9999];
+                //kopt.xArr = [30, 35, 35, 35, 35, 42, 42, 42, 42, 42, 42, 9999];
+                kopt.xArr = ["0.06rw", "0.08rw", "0.07rw", "0.07rw", "0.07rw", "0.09rw", "0.09rw", "0.09rw", "0.09rw", "0.09rw", "0.09rw", 9999];
+
                 kopt.itemTypes = ["check", "label", "led", "led", "led", "view", "view", "view", "view", "view", "view", "button"];
                 kopt.itemValues = [0, noStr, 0, 0, 0, "123", "4.6", "1.2", "30", "19", "28", '<i class="gf">&#xe8b8;</i>'];
                 kopt.itemTitles = ["", "編號", "故障", "50V", "32V", "50V<br>電壓", "50V<br>電流", "50V<br>溫度", "32V<br>電壓", "32V<br>電流", "32V<br>溫度", "設定"];
@@ -5564,13 +5586,13 @@ class CtrSspaModuleStatus {
 
         for (var i = 0; i < 36; i++) {
             var arr = [0, 0, 0, 0, 0, 0, 0, "---", "#eef", "---", "#eef"];
+            if (moduleStatus[i] & (1 << 1))
+                arr[1] = 1;
             arr[0] = gr.paraSet[preText + "SspaModuleExistA"][i];
             if (!(moduleStatus[i] & 1) || !gr.paraSet[preText + "SspaModuleExistA"][i]) {
                 watchAA.push(arr);
                 continue;
             }
-            if (moduleStatus[i] & (1 << 1))
-                arr[1] = 1;
             if (moduleStatus[i] & (1 << 2))
                 arr[2] = 2;
             if (moduleStatus[i] & (1 << 3))
@@ -5697,7 +5719,8 @@ class CtrSspaModuleStatus {
         opts.ym = 2;
         opts.ksObjWs = ["0.5rw", "0.5rw"];
         opts.etm = 4;
-        opts.eh = 44;
+        opts.eh = 34;
+        opts.rowAmt=19;
         opts.ebm = 4;
 
         opts.ksObjss = [];
@@ -5746,7 +5769,7 @@ class CtrSspaModuleStatus {
                     noInx++;
                     itemInx++;
                 }
-                kopt.xArr = [32, 45, 54, 54, 54, 54, 54, 54, 70, 70, 9999];
+                kopt.xArr = ["0.06rw", "0.08rw", "0.08rw", "0.08rw", "0.08rw", "0.08rw", "0.08rw", "0.08rw", "0.10rw", "0.10rw", 9999];
                 kopt.itemTypes = ["check", "label", "led", "led", "led", "led", "led", "led", "view", "view", "button"];
                 kopt.itemValues = [0, noStr, 0, 0, 0, 0, 0, 0, "", "", '<i class="gf">&#xe8b8;</i>'];
                 kopt.itemTitles = ["", "編號", "致能", "保護<br>觸發", "工作比<br>過高", "脈寬<br>過高", "溫度<br>過高", "反射<br>過高", "RF<br>輸出", "溫度", "設定"];

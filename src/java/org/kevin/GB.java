@@ -21,10 +21,12 @@ public class GB {
 
     
     // Select 1 ====================================
+    public static int osInx = 0;
     public static String sourceDir = "web/";          //for debug use
     //public static String sourceDir="webapps/ROOT/";     //for deplyment use
+    public static String paraSetPath = "e:/kevin/myCode/syncSet";
+    //public static String paraSetPath = "/home/admintx/syncSetExe";
     //==============================================
-    public static int osInx = 0;
     //======================================
     public static int syssec_f = 0;
     public static int syssec_xor = 0x00;
@@ -36,8 +38,6 @@ public class GB {
     public static int loaded_f=0;
     //======================================
     //public static String paraSetPath = "e:/kevin/myCode/webServletBase/web/user-sync";
-    public static String paraSetPath = "e:/kevin/myCode/syncSet";
-    //public static String paraSetPath = "/home/admintx/syncSetExe";
     
     public static String webSrcPath = "";
     public static String rootPath = "";

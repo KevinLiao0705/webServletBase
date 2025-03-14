@@ -2029,7 +2029,7 @@ class KvBox {
     paraEditBox(_op) {
         var op = {};
         op.w = 1000;
-        op.h = 800;
+        op.h = 9999;
         op.titleWidth = 300;
         op.titleFontSize = 20;
         op.noWidth = 50;

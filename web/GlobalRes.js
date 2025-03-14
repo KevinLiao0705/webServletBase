@@ -38,8 +38,9 @@ class GlobalRes {
         this.ser = 0;
         // this.kidMap=new Map();
         //this.webSocketAddress = "127.0.0.1";
-        //this.webSocketAddress = "192.168.0.28";
-        this.webIp="127.0.0.1";
+        this.webSocketAddress = "192.168.0.28";
+        //this.webIp="127.0.0.1";
+        //this.webIp="192.168.121.10";
         this.webSocketPort = "8899";
         this.webSocketConnTime = 0;
         this.webSocketConnect_f=0;

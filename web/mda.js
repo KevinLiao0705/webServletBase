@@ -901,6 +901,7 @@ class MdaContainer {
         opts.xm = 10;
         opts.ym = 20;
         opts.eh = 40;
+        opts.rowAmt = 0;
         opts.ew = 200;
         opts.etm = 20;
         opts.ebm = 20;
@@ -1086,6 +1087,11 @@ class MdaContainer {
             var winH = posObj.h;
             var row = (winH + op.ym - op.etm - op.ebm) / (op.eh + op.ym);
             var rowCnt = Math.round(row);
+            if(op.rowAmt){
+                rowCnt = op.rowAmt;
+                op.eh=(winH + op.ym - op.etm - op.ebm)/rowCnt-op.ym;
+            }
+            
             var newEh = (winH + op.ym - op.etm - op.ebm) / rowCnt - op.ym;
             st.xc = op.ksObjWs.length;
             st.yc = rowCnt;
@@ -1447,6 +1453,9 @@ class MdaContainer {
             st.allH = listBodyH;
             var row = (listBodyH + op.ym - op.etm - op.ebm) / (op.eh + op.ym);
             var rowCnt = Math.round(row);
+            if(op.rowAmt){
+                rowCnt = op.rowAmt;
+            }
             op.eh = (listBodyH + op.ym - op.etm - op.ebm) / rowCnt - op.ym;
             if (op.ksObjss.length <= rowCnt)
                 vScrollWidth = 0;
@@ -6039,6 +6048,7 @@ class MdaButtons {
             opts.ym = op.ym;
 
             opts.wAlign = "center";
+            opts.hAlign = "top";
             opts.margin = op.margin;
             layouts[cname] = {name: cname, type: "Layout~Ly_base~array.sys0", opts: opts};
             lyMaps["buttonPanel"] = cname;
