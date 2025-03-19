@@ -16,7 +16,7 @@ class MyWebSocket {
             return;
         try {
             //gr.ws = new WebSocket('ws://' + "127.0.0.1" + ':' + gr.webSocketPort + '/websocket');
-            self.socket = new WebSocket('ws://' + gr.webIp + ':' + gr.webSocketPort + '/websocket');
+            self.socket = new WebSocket('ws://' + gr.webSocketAddress + ':' + gr.webSocketPort + '/websocket');
         } catch (ex) {
             console.log(ex);
         }
