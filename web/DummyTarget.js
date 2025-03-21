@@ -3996,7 +3996,8 @@ class DummyTargetCtr {
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
-        ws.tick();
+        if(gr.paraSet.emulate!==1)
+            ws.tick();
         return;
 
 
@@ -5838,6 +5839,17 @@ class Emulate {
         this.connectCnt = 0;
         this.actTime = 0;
         this.actionObj = {};
+        this.preNanoTime=0;
+        this.sourceFormA=[100*1000,1900*1000];
+        this.sourceFormInx=0;
+        this.sourceFormLen=0;
+        this.waveFormA=[];
+        this.waveFormLen=0;
+        this.waveFormSize=1000;
+        for(var i=0;i<this.waveFormSize;i++)
+            this.waveFormA.push(0);
+        this.waveFormInx=0;
+        
     }
     ctrEmu() {
         var self = this;
@@ -5937,6 +5949,8 @@ class Emulate {
                 rd.sspaModuleStatusAA[0][i] |= 1;
                 rd.sspaModuleStatusAA[1][i] |= 1;
             }
+            self.preNanoTime=(performance.now()*1000000)|0;
+            
         }
         if (self.actTime === 10) {
             for (var i = 0; i < 9; i++) {
@@ -5948,7 +5962,6 @@ class Emulate {
             rd.systemStatus0 &= 0xffc00000;
             rd.systemStatus0 |= 0x00155555;
         }
-
         if (self.actTime === 50) {
             for (var i = 0; i < 9; i++) {
                 for (var j = 0; j < 12; j++) {
@@ -5959,8 +5972,6 @@ class Emulate {
             rd.systemStatus0 &= 0xffc00000;
             rd.systemStatus0 |= 0x002aaaaa;
         }
-
-
         if (++self.connectTime >= 6) {
             self.connectTime = 0;
             self.connectCnt++;
@@ -6013,6 +6024,23 @@ class Emulate {
 
             }
         }
+        
+        if(true){
+            var nanoTime=(performance.now()*1000000)|0;
+            var deltaTime=nanoTime-self.preNanoTime;
+            
+            var nextLen=self.SourceFormA[self.sourceFormInx];
+            var nowLen=self.waveFormA[self.waveFormInx];
+            if(nowLen+)
+            
+            
+            
+            
+            
+            
+        }
+        
+        
     }
     setAction(name, index) {
         var self = this;
