@@ -274,10 +274,12 @@ class MyNewScopeCtr {
                         scope.opts.xScale = 18;
                         lineObj.offOn_f = 1;
                         if (i === 0) {
-                            lineObj.name = "遠端脈波";
+                            lineObj.name = "本地脈波";
+                            lineObj.offset = 10;
                         }
                         if (i === 1) {
-                            lineObj.name = "本地脈波";
+                            lineObj.name = "遠端脈波";
+                            lineObj.offset = -20;
                         }
                         lineObj.yScaleTbl = MyNewScope.yScaleVoltTbl;
                         lineObj.yScaleSet = 10;
@@ -569,22 +571,36 @@ class MyNewScopeCtr {
         watchDatas.push(["directReg", regDatas + "#2", "baseColor", 1]);
         setOptss.push(setOpts);
 
-
-        var setOpts = sopt.getOptsPara("buttonOnOffs");
-        setOpts.titleWidth = 60;
-        setOpts.title = "TYPE";
-        setOpts.enum = ['MAIN', 'ROLL'];
-        setOpts.enumId = ['dispTypeMain', 'dispTypeRoll'];
+        var setOpts = sopt.getOptsPara("buttonSelect");
+        setOpts.enum = ['1', '2', '3', '4'];
+        setOpts.enumId = ['trigCh1', 'trigCh2', 'trigCh3', 'trigCh4'];
         setOpts.value = 0;
-        var watchDatas = setOpts.watchDatas = [];
-        var regDatas = "self.fatherMd.fatherMd.stas.watchDatas";
-        watchDatas.push(["directReg", regDatas + "#3", "setOpts.value", 1]);
+        setOpts.iconWidth = 40;
+        setOpts.image = "systemResource/icons8-rising-edge-64.png";
+        setOpts.titleWidth = 0;
+        //var watchDatas = setOpts.watchDatas = [];
+        //var regDatas = "self.fatherMd.fatherMd.stas.watchDatas";
+        //watchDatas.push(["directReg", regDatas + "#3", "setOpts.value", 1]);
         setOpts.fontSize = "0.5rh";
         setOptss.push(setOpts);
 
+        /*
+         var setOpts = sopt.getOptsPara("buttonOnOffs");
+         setOpts.titleWidth = 60;
+         setOpts.title = "TYPE";
+         setOpts.enum = ['MAIN', 'ROLL'];
+         setOpts.enumId = ['dispTypeMain', 'dispTypeRoll'];
+         setOpts.value = 0;
+         var watchDatas = setOpts.watchDatas = [];
+         var regDatas = "self.fatherMd.fatherMd.stas.watchDatas";
+         watchDatas.push(["directReg", regDatas + "#3", "setOpts.value", 1]);
+         setOpts.fontSize = "0.5rh";
+         setOptss.push(setOpts);
+         */
+
         var setOpts = sopt.getOptsPara("buttonOnOffs");
-        setOpts.titleWidth = 60;
-        setOpts.title = "DISP";
+        //setOpts.titleWidth = 60;
+        //setOpts.title = '<i class="gf">&#xe034</i>';
         setOpts.enum = ['CH1', 'CH2', 'CH3', 'CH4'];
         setOpts.enumId = ['ch1', 'ch2', 'ch3', 'ch4'];
         var watchDatas = setOpts.watchDatas = [];
@@ -592,6 +608,9 @@ class MyNewScopeCtr {
         watchDatas.push(["directReg", regDatas + "#4", "setOpts.value", 1]);
         setOpts.value = 0;
         setOpts.fontSize = "fixWidth";
+        setOpts.iconWidth = 40;
+        setOpts.image = "systemResource/icons8-switch-80.png";
+        setOpts.titleWidth = 0;
         setOptss.push(setOpts);
 
 
@@ -683,6 +702,7 @@ class MyNewScope {
         opts.grid_f = 1;
         opts.run_f = 1;
         opts.trig_f = 0;
+        opts.trigInx = 0;
         opts.signalMode = 0;
         opts.signalCnt = 0;
         opts.displayType = 0;//main|roll
@@ -853,48 +873,60 @@ class MyNewScope {
             st.drawed_f = 1;
             var totalTime = st.xScale;
             var sampleTime = (totalTime * 10) / op.sampleAmt;
+
+
+
+            var lineObj = op.lines[op.trigInx];
             lineObj.sampleRate = 1000000000 / sampleTime;
             lineObj.stInx = 0;
+            var nowPinx = gr.pulseFormInxA[op.trigInx];
+            var nextLen = gr.pulseFormAA[op.trigInx][nowPinx];
+            var allTime = 0;
+            var trigRestTime = 0;
+            if (op.trig_f) {
+                var pinx = gr.pulseFormInxA[op.trigInx];
+                var helfTime = totalTime * 5;
+                while (true) {
+                    if (gr.pulseFormAA[op.trigInx][pinx] === 0)
+                        break;
+                    if (allTime < helfTime) {
+                        allTime += gr.pulseFormAA[op.trigInx][pinx];
+                        pinx--;
+                        if (pinx < 0)
+                            pinx = gr.pulseFormAA[op.trigInx].length - 1;
+                        continue;
+                    }
+                    if (!(pinx & 1)) {
+                        allTime += gr.pulseFormAA[op.trigInx][pinx];
+                    }
+                    trigRestTime = allTime - helfTime;
+                    break;
+                }
+            }
 
 
-            for (var k = 0; k < 1; k++) {
+            for (var k = 0; k < 2; k++) {
                 var lineObj = op.lines[k];
+                lineObj.sampleRate = 1000000000 / sampleTime;
+                lineObj.stInx = 0;
+
                 var nowPinx = gr.pulseFormInxA[k];
                 var nextLen = gr.pulseFormAA[k][nowPinx];
                 var allTime = 0;
-                var restTime = 0;
-                if (op.trig_f) {
-                    var pinx = gr.pulseFormInxA[k];
-                    var helfTime = totalTime * 5;
-                    while (true) {
-                        if (gr.pulseFormAA[k][pinx] === 0)
-                            break;
-                        if (allTime < helfTime) {
-                            allTime += gr.pulseFormAA[k][pinx];
-                            pinx--;
-                            if (pinx < 0)
-                                pinx = gr.pulseFormAA[k].length - 1;
-                            continue;
-                        }
-                        if (!(pinx & 1)) {
-                            allTime += gr.pulseFormAA[k][pinx];
-                        }
-                        break;
-                    }
-                    restTime = allTime - helfTime;
+                var restTime = trigRestTime;
 
-                    pinx = gr.pulseFormInxA[k];
-                    while (restTime >= gr.pulseFormAA[k][pinx]) {
-                        if (gr.pulseFormAA[k][pinx] === 0)
-                            break;
-                        restTime -= gr.pulseFormAA[k][pinx];
-                        pinx--;
-                        if (pinx < 0)
-                            pinx = gr.pulseFormAA[k].length - 1;
-                    }
-                    nowPinx = pinx;
-                    nextLen = gr.pulseFormAA[k][pinx] - restTime;
+                pinx = gr.pulseFormInxA[k];
+                while (restTime >= gr.pulseFormAA[k][pinx]) {
+                    if (gr.pulseFormAA[k][pinx] === 0)
+                        break;
+                    restTime -= gr.pulseFormAA[k][pinx];
+                    pinx--;
+                    if (pinx < 0)
+                        pinx = gr.pulseFormAA[k].length - 1;
                 }
+                nowPinx = pinx;
+                nextLen = gr.pulseFormAA[k][pinx] - restTime;
+
                 //==============================================
                 var nowTime = 0;
                 var len = 0;
@@ -1511,6 +1543,10 @@ class MyNewScope {
                     md.opts.displayType = 1;
                     return;
                 }
+                if (iobj.buttonId.includes("trigCh")) {
+                    md.opts.trigInx = iobj.buttonInx;
+                    return;
+                }
                 if (iobj.buttonId === "ch1") {
                     if (iobj.setOptsObj.opts.setOpts.value & 1)
                         op.lines[0].offOn_f = 1;
@@ -1567,6 +1603,7 @@ class MyNewScope {
         opts.run_f = op.run_f;
         opts.typeCnt = 0;
         opts.trig_f = 0;
+        opts.trigInx = 0;
         opts.dispValue = 15;
 
 

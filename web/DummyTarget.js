@@ -5855,11 +5855,11 @@ class Emulate {
         gr.emuSourceFormAA = [];
         for (var i = 0; i < 4; i++){
             gr.emuSourceFormAA.push([]);
-        }    
-            gr.emuSourceFormA[i] = [100 * 1000, 1900 * 1000];
-        gr.emuSourceFormA[1] = [100 * 1000, 900 * 1000];
-        gr.emuSourceFormInxA[0] = 0;
-        gr.emuSourceFormInxA[1] = 0;
+        }  
+        
+        gr.emuSourceFormAA[0] = [100 * 1000, 1900 * 1000];
+        gr.emuSourceFormAA[1] = [200 * 1000, 1000 * 1000];
+        gr.emuSourceFormInxA=[0,0,0,0];
     
 
     }
@@ -6043,7 +6043,7 @@ class Emulate {
             if (deltaTime < 0)
                 deltaTime = 0 - deltaTime;
             self.preNanoTime = nanoTime;
-            for (var i = 0; i < 1; i++) {
+            for (var i = 0; i < 2; i++) {
                 var nextLen = gr.emuSourceFormAA[i][gr.emuSourceFormInxA[i]];
                 var nowLen = gr.pulseFormAA[i][gr.pulseFormInxA[i]];
                 var nowTime = deltaTime + nowLen;
@@ -6063,7 +6063,7 @@ class Emulate {
 
                         nowTime = nowTime - nextLen;
                         gr.emuSourceFormInxA[i]++;
-                        if (gr.emuSourceFormInxA[i] >= gr.emuSourceFormA[i].length)
+                        if (gr.emuSourceFormInxA[i] >= gr.emuSourceFormAA[i].length)
                             gr.emuSourceFormInxA[i] = 0;
                         nextLen = gr.emuSourceFormAA[i][gr.emuSourceFormInxA[i]];
                     }
