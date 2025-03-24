@@ -778,6 +778,7 @@ class DummyTargetMaster {
                 var kvObj = new Block("scope", "Model~MyNewScope~base.sys0", opts);
                 //var mesObj = mda.popObj(0, 0, kvObj);
                 opts.kvObj = kvObj;
+                gr.scope = kvObj;
                 kvObj.opts.popStackCnt = gr.mdSystem.mdClass.stackCnt;
                 MdaPopWin.popObj(opts);
                 return;
@@ -3996,7 +3997,7 @@ class DummyTargetCtr {
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
-        if(gr.paraSet.emulate!==1)
+        if (gr.paraSet.emulate !== 1)
             ws.tick();
         return;
 
@@ -4497,6 +4498,17 @@ class DummyTargetCtrPane {
                                 gr.gbcs.command({'act': preText + "LocalPulseOff"});
                                 return;
                             }
+                            strA = iobj.selectText.split(" ");
+                            var str = strA[0].slice(0, strA[0].length - 2);
+                            var pulseWidth = KvLib.strToFloat(str, 100);
+                            var pw = Math.round(pulseWidth * 1000);
+                            var str = strA[1].slice(0, strA[1].length - 1);
+                            var duty = KvLib.strToFloat(str, 5);
+                            var pri = Math.round(pw * 100 / duty);
+                            gr.emuSourceFormAA[0] = [];
+                            gr.emuSourceFormAA[0].push(pw);
+                            gr.emuSourceFormAA[0].push(pri - pw);
+                            gr.emuSourceFormInxA[0] = gr.pulseFormInxA[0] & 1;
                             gr.gbcs.command({'act': preText + "LocalPulseOn", "paras": [selectNo[iobj.selectInx]]});
                             return;
 
@@ -4504,16 +4516,16 @@ class DummyTargetCtrPane {
                         }
 
                     };
-                    var len=Math.round(opts.kvTexts.length/2)+1;
-                    opts.h = len*50;
-                    
-        opts.margin = 4;
-        opts.ym = 4;
-        opts.eh = 30;
-        opts.exm = 20;
-        opts.eym = 4;
-                    
-                    
+                    var len = Math.round(opts.kvTexts.length / 2) + 1;
+                    opts.h = len * 50;
+
+                    opts.margin = 4;
+                    opts.ym = 4;
+                    opts.eh = 30;
+                    opts.exm = 20;
+                    opts.eym = 4;
+
+
                     box.selectBox(opts);
 
 
@@ -4676,8 +4688,8 @@ class DummyTargetCtrPane {
                 opts.title = "遠端遙控";
                 setOpts.enum = para.enum;
                 setOpts.value = para.value;
-                setOpts.fontSize="0.4rh";
-                
+                setOpts.fontSize = "0.4rh";
+
             }
 
             if (i === inx++) {
@@ -4687,7 +4699,7 @@ class DummyTargetCtrPane {
                 setOpts.fontSize = "0.5rh";
                 setOpts.enum = para.enum;
                 setOpts.value = para.value;
-                setOpts.fontSize="0.4rh";
+                setOpts.fontSize = "0.4rh";
             }
             if (i === inx++) {
                 var setOpts = opts.setOpts = sopt.getOptsPara("buttonSelect");
@@ -4696,7 +4708,7 @@ class DummyTargetCtrPane {
                 setOpts.enum = para.enum;
                 setOpts.enumColors = ["#eef", "#ffc"];
                 setOpts.value = para.value;
-                setOpts.fontSize="0.4rh";
+                setOpts.fontSize = "0.4rh";
             }
             if (i === inx++) {
                 var setOpts = opts.setOpts = sopt.getOptsPara("buttonSelect");
@@ -4705,7 +4717,7 @@ class DummyTargetCtrPane {
                 setOpts.enum = para.enum;
                 setOpts.enumColors = ["#eef", "#ffc"];
                 setOpts.value = para.value;
-                setOpts.fontSize="0.4rh";
+                setOpts.fontSize = "0.4rh";
             }
             var regName = "self.fatherMd.fatherMd.fatherMd.stas.buttonColorA";
             if (i === inx++) {
@@ -4760,7 +4772,7 @@ class DummyTargetCtrPane {
         opts.fontSize = "0.5rh";
         opts.xm = 4;
         opts.ym = 4;
-        opts.ih=200;
+        opts.ih = 200;
         opts.baseColor = "#444";
         opts.actionFunc = function (iobj) {
             console.log(iobj);
@@ -5062,7 +5074,7 @@ class CtrRadarStatus {
                 var setOpts = opts.setOpts = sopt.getOptsPara("leds");
                 setOpts.enum = ["AF左", "AF中", "AF右"];
                 setOpts.value = [0, 0, 0];
-                setOpts.fontSize="0.4rh";
+                setOpts.fontSize = "0.4rh";
                 var watchDatas = setOpts.watchDatas = [];
                 watchDatas.push(["directReg", regName + "#0", "backgroundInx", 1]);
                 watchDatas.push(["directReg", regName + "#1", "backgroundInx", 1]);
@@ -5077,7 +5089,7 @@ class CtrRadarStatus {
                 var setOpts = opts.setOpts = sopt.getOptsPara("leds");
                 setOpts.enum = ["WF1", "WF2", "WF3", "WF4", "WF5", "WF6"];
                 setOpts.value = [0, 0, 0, 0, 0, 0];
-                setOpts.fontSize="0.4rh";
+                setOpts.fontSize = "0.4rh";
                 var watchDatas = setOpts.watchDatas = [];
                 watchDatas.push(["directReg", regName + "#3", "backgroundInx", 1]);
                 watchDatas.push(["directReg", regName + "#4", "backgroundInx", 1]);
@@ -5094,7 +5106,7 @@ class CtrRadarStatus {
                 var setOpts = opts.setOpts = sopt.getOptsPara("leds");
                 setOpts.enum = ["WT"];
                 setOpts.value = [0];
-                setOpts.fontSize="0.4rh";
+                setOpts.fontSize = "0.4rh";
                 var watchDatas = setOpts.watchDatas = [];
                 watchDatas.push(["directReg", regName + "#9", "backgroundInx", 1]);
                 opts.setOptss.push(setOpts);
@@ -5415,7 +5427,7 @@ class CtrSspaPowerStatus {
         opts.etm = 4;
         opts.eh = 40;
         opts.ebm = 4;
-        opts.rowAmt=19;
+        opts.rowAmt = 19;
 
         opts.ksObjss = [];
         var colorInx = 1;
@@ -5721,7 +5733,7 @@ class CtrSspaModuleStatus {
         opts.ksObjWs = ["0.5rw", "0.5rw"];
         opts.etm = 4;
         opts.eh = 34;
-        opts.rowAmt=19;
+        opts.rowAmt = 19;
         opts.ebm = 4;
 
         opts.ksObjss = [];
@@ -5839,17 +5851,17 @@ class Emulate {
         this.connectCnt = 0;
         this.actTime = 0;
         this.actionObj = {};
-        this.preNanoTime=0;
-        this.sourceFormA=[100*1000,1900*1000];
-        this.sourceFormInx=0;
-        this.sourceFormLen=0;
-        this.waveFormA=[];
-        this.waveFormLen=0;
-        this.waveFormSize=1000;
-        for(var i=0;i<this.waveFormSize;i++)
-            this.waveFormA.push(0);
-        this.waveFormInx=0;
-        
+        this.preNanoTime = 0;
+        gr.emuSourceFormAA = [];
+        for (var i = 0; i < 4; i++){
+            gr.emuSourceFormAA.push([]);
+        }    
+            gr.emuSourceFormA[i] = [100 * 1000, 1900 * 1000];
+        gr.emuSourceFormA[1] = [100 * 1000, 900 * 1000];
+        gr.emuSourceFormInxA[0] = 0;
+        gr.emuSourceFormInxA[1] = 0;
+    
+
     }
     ctrEmu() {
         var self = this;
@@ -5949,8 +5961,8 @@ class Emulate {
                 rd.sspaModuleStatusAA[0][i] |= 1;
                 rd.sspaModuleStatusAA[1][i] |= 1;
             }
-            self.preNanoTime=(performance.now()*1000000)|0;
-            
+            self.preNanoTime = (performance.now() * 1000000) | 0;
+
         }
         if (self.actTime === 10) {
             for (var i = 0; i < 9; i++) {
@@ -6024,23 +6036,48 @@ class Emulate {
 
             }
         }
-        
-        if(true){
-            var nanoTime=(performance.now()*1000000)|0;
-            var deltaTime=nanoTime-self.preNanoTime;
-            
-            var nextLen=self.SourceFormA[self.sourceFormInx];
-            var nowLen=self.waveFormA[self.waveFormInx];
-            if(nowLen+)
-            
-            
-            
-            
-            
-            
+
+        if (true) {
+            var nanoTime = (performance.now() * 1000000) | 0;
+            var deltaTime = nanoTime - self.preNanoTime;
+            if (deltaTime < 0)
+                deltaTime = 0 - deltaTime;
+            self.preNanoTime = nanoTime;
+            for (var i = 0; i < 1; i++) {
+                var nextLen = gr.emuSourceFormAA[i][gr.emuSourceFormInxA[i]];
+                var nowLen = gr.pulseFormAA[i][gr.pulseFormInxA[i]];
+                var nowTime = deltaTime + nowLen;
+                while (true) {
+                    if (nextLen === 0)
+                        break;
+                    if (nowTime < nextLen) {
+                        gr.pulseFormAA[i][gr.pulseFormInxA[i]] = nowTime;
+                        break;
+                    } else {
+                        gr.pulseFormAA[i][gr.pulseFormInxA[i]] = nextLen;
+                        gr.pulseFormInxA[i]++;
+                        if (gr.pulseFormInxA[i] > gr.pulseFormLenA[i])
+                            gr.pulseFormLenA[i] = gr.pulseFormInxA[i];
+                        if (gr.pulseFormInxA[i] >= gr.pulseFormAA[i].length)
+                            gr.pulseFormInxA[i] = 0;
+
+                        nowTime = nowTime - nextLen;
+                        gr.emuSourceFormInxA[i]++;
+                        if (gr.emuSourceFormInxA[i] >= gr.emuSourceFormA[i].length)
+                            gr.emuSourceFormInxA[i] = 0;
+                        nextLen = gr.emuSourceFormAA[i][gr.emuSourceFormInxA[i]];
+                    }
+                }
+            }
+
+
+
+
+
+
         }
-        
-        
+
+
     }
     setAction(name, index) {
         var self = this;
@@ -6284,6 +6321,19 @@ class Emulate {
 emu = new Emulate();
 class SyncGloble {
     constructor() {
+        gr.pulseFormAA = [];
+        gr.pulseFormInxA = [];
+        gr.pulseFormLenA = [];
+        for (var i = 0; i < 4; i++) {
+            var arr = [];
+            for (var j = 0; j < 2500; j++) {
+                arr.push(0);
+            }
+            gr.pulseFormAA.push(arr);
+            gr.pulseFormInxA.push(0);
+            gr.pulseFormLenA.push(0);
+        }
+
         gr.logMessage = {inx: 0, messages: []};
         gr.syncCommand = {};
         var rd = gr.radarData = {};
@@ -6566,7 +6616,7 @@ class SyncGloble {
         if (iobj.act === preText + "SspaModuleOn") {
             if ((ready_f !== 2) || emergency)
                 return;
-            if (iobj.index >= 0) 
+            if (iobj.index >= 0)
                 gr.logMessage.messages.push({type: "cmd", text: "開啟SSPA模組 " + iobj.index});
             else
                 gr.logMessage.messages.push({type: "cmd", text: "開啟全部SSPA模組"});
@@ -6574,7 +6624,7 @@ class SyncGloble {
             return;
         }
         if (iobj.act === preText + "SspaModuleOff") {
-            if (iobj.index >= 0) 
+            if (iobj.index >= 0)
                 gr.logMessage.messages.push({type: "cmd", text: "關閉SSPA模組 " + iobj.index});
             else
                 gr.logMessage.messages.push({type: "cmd", text: "關閉全部SSPA模組"});

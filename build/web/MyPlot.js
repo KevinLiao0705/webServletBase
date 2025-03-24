@@ -851,44 +851,77 @@ class MyNewScope {
 
         if (op.signalMode === 2) {
             st.drawed_f = 1;
-            var lineObj = op.lines[0];
-            var totalTime = st.xScale
+            var totalTime = st.xScale;
             var sampleTime = (totalTime * 10) / op.sampleAmt;
-            lineObj.sampleRate=1000000000/sampleTime;
-            var pulseWidthDataA = [];
-            var nowPulseLevel = 0;
-            var nowPulseLen = 100;
-            
-            for (var i = 0; i < 100; i++) {
-                var pulseWidth=Math.round(300000 * Math.random() + 100000);
-                pulseWidthDataA.push(1000000-pulseWidth);
-                pulseWidthDataA.push(pulseWidth);
-            }
-            
-            var nowTime1=pulseWidthDataA[0];
-            var nowTime0=0;
-            var nowInx=0;
+            lineObj.sampleRate = 1000000000 / sampleTime;
             lineObj.stInx = 0;
-            if (lineObj.stInx >= op.sampleBufSize)
-                lineObj.stInx -= op.sampleBufSize;
-            for (var j = 0; j < op.sampleAmt; j++) {
-                var inx = lineObj.stInx + j;
-                if (inx >= op.sampleBufSize)
-                    inx -= op.sampleBufSize;
-                lineObj.buffer[inx] = nowPulseLevel*1000;
-                nowTime0+=sampleTime;
-                if(nowTime0>=nowTime1){
-                    nowPulseLevel^=1;
-                    nowInx++;
-                    nowTime1+=pulseWidthDataA[nowInx];
+
+
+            for (var k = 0; k < 1; k++) {
+                var lineObj = op.lines[k];
+                var nowPinx = gr.pulseFormInxA[k];
+                var nextLen = gr.pulseFormAA[k][nowPinx];
+                var allTime = 0;
+                var restTime = 0;
+                if (op.trig_f) {
+                    var pinx = gr.pulseFormInxA[k];
+                    var helfTime = totalTime * 5;
+                    while (true) {
+                        if (gr.pulseFormAA[k][pinx] === 0)
+                            break;
+                        if (allTime < helfTime) {
+                            allTime += gr.pulseFormAA[k][pinx];
+                            pinx--;
+                            if (pinx < 0)
+                                pinx = gr.pulseFormAA[k].length - 1;
+                            continue;
+                        }
+                        if (!(pinx & 1)) {
+                            allTime += gr.pulseFormAA[k][pinx];
+                        }
+                        break;
+                    }
+                    restTime = allTime - helfTime;
+
+                    pinx = gr.pulseFormInxA[k];
+                    while (restTime >= gr.pulseFormAA[k][pinx]) {
+                        if (gr.pulseFormAA[k][pinx] === 0)
+                            break;
+                        restTime -= gr.pulseFormAA[k][pinx];
+                        pinx--;
+                        if (pinx < 0)
+                            pinx = gr.pulseFormAA[k].length - 1;
+                    }
+                    nowPinx = pinx;
+                    nextLen = gr.pulseFormAA[k][pinx] - restTime;
                 }
-                
+                //==============================================
+                var nowTime = 0;
+                var len = 0;
+                for (var j = op.sampleAmt - 1; j > 0; j--) {
+                    if (nextLen === 0)
+                        break;
+                    if (len >= gr.pulseFormLenA[k])
+                        break;
+                    var level = 3300;
+                    if (nowPinx & 1)
+                        var level = 0;
+                    var inx = lineObj.stInx + j;
+                    if (inx >= op.sampleBufSize)
+                        inx -= op.sampleBufSize;
+                    lineObj.buffer[inx] = level;
+                    nowTime += sampleTime;
+                    if (nowTime < nextLen)
+                        continue;
+                    nowTime -= nextLen;
+                    nowPinx--;
+                    if (nowPinx < 0)
+                        nowPinx = gr.pulseFormAA[k].length - 1;
+                    nextLen = gr.pulseFormAA[k][nowPinx];
+                    len++;
+                }
+                lineObj.recordLen = op.sampleAmt;
             }
-            lineObj.recordLen = op.sampleAmt;
-
-
-
-
 
         }
 
@@ -931,6 +964,9 @@ class MyNewScope {
                 }
             }
         }
+
+
+
 
 
         var opts = op.lines[0];
