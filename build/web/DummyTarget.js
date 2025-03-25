@@ -41,12 +41,54 @@ class DummyTargetMaster {
                 opts.kvTexts.push("進階設定");
                 opts.kvTexts.push("下載記錄檔");
                 opts.kvTexts.push("系統重啟");
+                opts.kvTexts.push("即時資料");
             }
             opts.actionFunc = function (iobj) {
                 console.log(iobj);
 
                 if (iobj.selectText === "系統重啟") {
                     window.location.reload();
+                    return;
+                }
+                if (iobj.selectText === "即時資料") {
+                    gr.viewDatas=[];
+                    for(var i=0;i<256;i++){
+                        gr.viewDatas.push("data"+i);
+                    }
+                    var opts = {};
+                    opts.title = iobj.selectText;
+                    opts.ksObjWs = [9999];
+                    opts.rowAmt = 32;
+                    opts.eym=2;
+                    for(var i=0;i<8;i++){
+                        opts.ksObjWs.push("0.120rw");
+                    }
+                    opts.ksObjss = [];
+                    var inx=0;
+                    for(var i=0;i<32;i++){
+                        var ksObjs = [];
+                        for(var j=0;j<9;j++){
+                            var ksObj = {};
+                            ksObj.name = "" + i+"#"+j;
+                            //ksObj.type = "Component~Cp_base~label.view";
+                            ksObj.type = "Component~Cp_base~plate.none";
+                            var kopts=ksObj.opts = {};
+                            if(j===0){
+                                kopts.baseColor="#ccc";
+                                ksObj.name = ""+(i>>1)+"#"+((i&1)*8);
+                            }    
+                            else{
+                                kopts.baseColor="#cff";
+                                var watchReg = "gr.viewDatas#" + inx;
+                                Block.setInputWatch(kopts, "directReg", watchReg, "innerText", 1);
+                                inx++;
+                            }    
+                            kopts.fontSize="0.7rh";
+                            ksObjs.push(ksObj);
+                        }
+                        opts.ksObjss.push(ksObjs);    
+                    }
+                    box.containerPageBox(opts);
                     return;
                 }
 
@@ -5420,6 +5462,7 @@ class CtrSspaPowerStatus {
         mac.setHeadTitleBar(md, cname, "放大器電源狀態", actionPrg, ['set', "esc"]);
         //=====================
         var cname = lyMaps["mainBody"] + "~" + lyInx++;
+
         var opts = {};
         opts.xm = 10;
         opts.ym = 2;
@@ -5853,14 +5896,14 @@ class Emulate {
         this.actionObj = {};
         this.preNanoTime = 0;
         gr.emuSourceFormAA = [];
-        for (var i = 0; i < 4; i++){
+        for (var i = 0; i < 4; i++) {
             gr.emuSourceFormAA.push([]);
-        }  
-        
+        }
+
         gr.emuSourceFormAA[0] = [100 * 1000, 1900 * 1000];
         gr.emuSourceFormAA[1] = [200 * 1000, 1000 * 1000];
-        gr.emuSourceFormInxA=[0,0,0,0];
-    
+        gr.emuSourceFormInxA = [0, 0, 0, 0];
+
 
     }
     ctrEmu() {

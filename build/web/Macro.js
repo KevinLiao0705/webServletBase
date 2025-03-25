@@ -532,13 +532,14 @@ class Macro {
         op.title = "Container Box";
         op.titleColor = "#000";
         op.titleBaseColor = "#cce";
+        op.rowAmt=0;
         //===
         op.ksObjWs = [150, 200, 9999];
         op.rowStart = 0;
         //
-        op.margin = 10;
-        op.ym = 10;
-        op.buttonXm = 20;
+        op.margin = 4;
+        op.ym = 4;
+        op.buttonXm = 10;
         op.headButtons = ["OK", "ESC"];
         op.headButtonIds = ["ok", "ESC"];
         //
@@ -552,8 +553,8 @@ class Macro {
         op.ebm = 4;
         op.erm = 4;
         op.elm = 4;
-        op.exm = 20;
-        op.eym = 5;
+        op.exm = 4;
+        op.eym = 4;
         //===
         KvLib.deepCoverObject(op, _op);
         //=====================================
@@ -574,6 +575,7 @@ class Macro {
         ksObj.name = "mdaContainer";
         ksObj.type = op.containerType;
         kopts.eh = op.eh;
+        kopts.rowAmt=op.rowAmt;
         kopts.margin = op.eMargin;
         kopts.etm = op.etm;
         kopts.ebm = op.ebm;
@@ -1948,7 +1950,23 @@ class KvBox {
         var opts = {};
         opts.containerType = "Model~MdaContainer~base.page";
         opts.title = "Container Page Page";
-        op.ksObjWs = [150, 200, 9999];
+        opts.ksObjWs = [150, 200, 9999];
+        opts.ksObjss=[];
+        opts.rowAmt=0;
+        for (var i = 0; i < 100; i++) {
+            var ksObjs = [];
+            for (var j = 0; j < 10; j++) {
+                var ksObj = {};
+                ksObj.name = "name#" + i + "." + j;
+                ksObj.type = "Component~Cp_base~button.sys0";
+                ksObj.opts = {};
+                ksObjs.push(ksObj);
+            }
+            opts.ksObjss.push(ksObjs);
+        }
+        
+        
+        
         KvLib.deepCoverObject(opts, op);
         var obj = mac.containerBoxOpts(opts);
         var kvObj = new Block("containerPgeBox", obj.type, obj.opts);

@@ -922,8 +922,7 @@ class Block {
             opts.inputRegs = [];
         opts.inputRegs.push(ipObj);
     }
-
-    setInputWatch(opts, type, regName, optName, redraw_f) {
+    static setInputWatch(opts, type, regName, optName, redraw_f){
         var ipObj = {};
         ipObj.cnt = 0;
         ipObj.period = 1;
@@ -934,6 +933,10 @@ class Block {
         if (!opts.inputRegs)
             opts.inputRegs = [];
         opts.inputRegs.push(ipObj);
+        
+    }
+    setInputWatch(opts, type, regName, optName, redraw_f) {
+        Block.setInputWatch(opts, type, regName, optName, redraw_f);
     }
 
     chkInputWatch() {
@@ -951,7 +954,7 @@ class Block {
                 continue;
             ipObj.cnt = 0;
             var value;
-            if (ipObj.inputName === "self.fatherMd.fatherMd.stas.watchDatas#3") {
+            if (ipObj.inputName === "gr.viewDatas#0") {
                 var uu = 0;
             }
             if (ipObj.type === "directReg") {
