@@ -1340,7 +1340,7 @@ class KvLib {
     }
 
     static trsIntToHexStr(num) {
-        var ba = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var ba = [0, 0, 0, 0, 0, 0, 0, 0];
         for (var index = 0; index < ba.length; index++) {
             var byte = num & 15;
             ba [ index ] = byte;
@@ -1348,8 +1348,8 @@ class KvLib {
         }
         var first_f = 1;
         var str = "";
-        for (var i = 0; i < 16; i++) {
-            var iv = ba[15 - i];
+        for (var i = 0; i < ba.length; i++) {
+            var iv = ba[ba.length-1- i];
             if (first_f) {
                 if (iv === 0)
                     continue;

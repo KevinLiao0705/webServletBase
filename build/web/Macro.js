@@ -22,7 +22,7 @@ class Macro {
     }
 
     messageEditor(md) {
-        var st=md.stas;
+        var st = md.stas;
         if (st.messageCnt === undefined)
             st.messageCnt = gr.logMessage.messages.length;
         for (; ; ) {
@@ -30,27 +30,27 @@ class Macro {
                 break;
             var kvObj = md.blockRefs["editor"];
             var mes = gr.logMessage.messages[st.messageCnt];
-            var type="";
-            var color="";
-            if(mes.type==="cmd")
-                type="[cmd ]:";
-            if(mes.type==="info")
-                type="[info]:";
-            if(mes.type==="infoOk"){
-                color="green";
-                type="[info]:";
-            }    
-            if(mes.type==="infoErr"){
-                color="red";
-                type="[info]:";
+            var type = "";
+            var color = "";
+            if (mes.type === "cmd")
+                type = "[cmd ]:";
+            if (mes.type === "info")
+                type = "[info]:";
+            if (mes.type === "infoOk") {
+                color = "green";
+                type = "[info]:";
             }
-            var str="";
-            if(type){
-                str+=KvLib.getDateTime();
-                str+=" ";
+            if (mes.type === "infoErr") {
+                color = "red";
+                type = "[info]:";
+            }
+            var str = "";
+            if (type) {
+                str += KvLib.getDateTime();
+                str += " ";
             }
             str += type + mes.text;
-            KvLib.endInputEditor(kvObj, str,color);
+            KvLib.endInputEditor(kvObj, str, color);
             st.messageCnt++;
         }
     }
@@ -63,6 +63,42 @@ class Macro {
         var content = JSON.stringify(gr.paraSet);
         sv.saveStringToFile("responseDialogError", "null", fileName, content);
     }
+
+    saveFileToLocal(fileName, outName) {
+        let a = document.createElement('a');
+        a.href = fileName;
+        a.download = outName;
+        a.click();
+    }
+
+    readLocalTextFile(actionFunc, accept) {
+        var input = document.createElement('input');
+        input.id = "file-uploader";
+        input.dataTarget = "file-uploader";
+        input.accept = "*.json";
+        if (accept)
+            input.accept = accept;
+        input.type = 'file';
+        input.onchange = e => {
+            var files = e.target.files;
+            var reader = new FileReader()
+            reader.readAsText(input.files[0], 'utf8'); // input.files[0]为第一个文件
+            reader.onload = () => {
+                var content = reader.result;  // reader.result为获取结果
+                if (actionFunc)
+                    actionFunc(content);
+            };
+        };
+        input.click();
+    }
+
+    saveStringToLocalFile(fileName, dataStr) {
+        let a = document.createElement('a');
+        a.href = "data:application/octet-stream," + encodeURIComponent(dataStr);
+        a.download = fileName;
+        a.click();
+    }
+
     setXyArr(opts, rowCount, col) {
         var yr = (1 / rowCount).toFixed(3);
         opts.yArr = [];
@@ -262,9 +298,9 @@ class Macro {
                     gr.userName = userName;
                     gr.password = password;
                     gr.appPageCnt = 2;
-                    if(gr.paraSet.appId!==undefined){
-                        gr.appId=gr.paraSet.appId;
-                        GlobalRes.initApp(gr);                        
+                    if (gr.paraSet.appId !== undefined) {
+                        gr.appId = gr.paraSet.appId;
+                        GlobalRes.initApp(gr);
                     }
                     sys.dispWebPage();
                 }
@@ -519,7 +555,7 @@ class Macro {
                     return;
                 }
             }
-            KvLib.exe(op.actionFunc);
+            KvLib.exeFunc(op.actionFunc);
         };
         return {type: "Model~MdaBox~base.sys0", opts: opts};
     }
@@ -532,7 +568,7 @@ class Macro {
         op.title = "Container Box";
         op.titleColor = "#000";
         op.titleBaseColor = "#cce";
-        op.rowAmt=0;
+        op.rowAmt = 0;
         //===
         op.ksObjWs = [150, 200, 9999];
         op.rowStart = 0;
@@ -575,7 +611,7 @@ class Macro {
         ksObj.name = "mdaContainer";
         ksObj.type = op.containerType;
         kopts.eh = op.eh;
-        kopts.rowAmt=op.rowAmt;
+        kopts.rowAmt = op.rowAmt;
         kopts.margin = op.eMargin;
         kopts.etm = op.etm;
         kopts.ebm = op.ebm;
@@ -593,6 +629,7 @@ class Macro {
         opts.actionFunc = function (iobj) {
             if (iobj.act === "mouseClick") {
                 MdaPopWin.popOffTo(iobj.sender.opts.popStackCnt);
+                KvLib.exeFunc(op.actionFunc,iobj);
             }
         };
         return {type: "Model~MdaBox~base.sys0", opts: opts};
@@ -707,7 +744,7 @@ class KvSetOpts {
         setOpts.enum = ["button"];
         setOpts.enumId = ["0"];
         setOpts.titleWidth = 0;
-        setOpts.fontSize="0.6rh";
+        setOpts.fontSize = "0.6rh";
         if (op) {
             KvLib.deepCoverObject(setOpts, op);
         }
@@ -1513,6 +1550,8 @@ class KvBox {
         opts.headButtonIds = ["esc"];
         opts.buttons = [];
         opts.buttonIds = [];
+        opts.textAlign = "center";
+        opts.lpd = 0;
         KvLib.deepCoverObject(opts, op);
         this.selectPageBox(opts);
 
@@ -1539,6 +1578,8 @@ class KvBox {
         op.viewPage_f = 0;
         op.title = "Selector";
         op.titleBaseColor = "#004";
+        op.textAlign = "center";
+        op.lpd = 0;
         KvLib.deepCoverObject(op, _op);
         //=====================================
         var opts = {};
@@ -1564,6 +1605,8 @@ class KvBox {
         kopts.xm = op.exm;
         kopts.ym = op.eym;
         kopts.eh = op.eh;
+        kopts.textAlign = op.textAlign;
+        kopts.lpd = op.lpd;
         kopts.selectAble_f = op.selectAble_f;
         kopts.selectEsc_f = op.selectEsc_f;
         kopts.selectInx = op.selectInx;
@@ -1951,8 +1994,8 @@ class KvBox {
         opts.containerType = "Model~MdaContainer~base.page";
         opts.title = "Container Page Page";
         opts.ksObjWs = [150, 200, 9999];
-        opts.ksObjss=[];
-        opts.rowAmt=0;
+        opts.ksObjss = [];
+        opts.rowAmt = 0;
         for (var i = 0; i < 100; i++) {
             var ksObjs = [];
             for (var j = 0; j < 10; j++) {
@@ -1964,9 +2007,9 @@ class KvBox {
             }
             opts.ksObjss.push(ksObjs);
         }
-        
-        
-        
+
+
+
         KvLib.deepCoverObject(opts, op);
         var obj = mac.containerBoxOpts(opts);
         var kvObj = new Block("containerPgeBox", obj.type, obj.opts);

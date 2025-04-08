@@ -9,9 +9,12 @@ class DummyTargetMaster {
         var setPrg = function () {
             var opts = {};
             opts.title = "設定";
-            opts.xc = 1;
+            opts.xc = 2;
             opts.yc = 11;
-            opts.h = 600;
+            opts.h = 700;
+            opts.w=1000;
+            opts.textAlign="left";
+            opts.lpd=10;
             opts.kvTexts = [];
             if (gr.appId === 0) {
                 opts.kvTexts.push("雷達信號參數設定");
@@ -38,60 +41,165 @@ class DummyTargetMaster {
                 opts.kvTexts.push("功率表參數設定");
                 opts.kvTexts.push("脈波參數設定");
                 opts.kvTexts.push("測試脈波設定");
+                opts.kvTexts.push("脈波寬度設定");
                 opts.kvTexts.push("進階設定");
                 opts.kvTexts.push("下載記錄檔");
+                opts.kvTexts.push("下載設定檔");
+                opts.kvTexts.push("上傳設定檔");
                 opts.kvTexts.push("系統重啟");
                 opts.kvTexts.push("即時資料");
             }
             opts.actionFunc = function (iobj) {
                 console.log(iobj);
-
+                var opts = {};
+                opts.paraSet = gr.paraSet;
+                opts.title = iobj.selectText;
+                opts.setNames = [];
                 if (iobj.selectText === "系統重啟") {
                     window.location.reload();
                     return;
                 }
                 if (iobj.selectText === "即時資料") {
-                    gr.viewDatas=[];
-                    for(var i=0;i<256;i++){
-                        gr.viewDatas.push("data"+i);
+                    gr.viewDatas = [];
+                    for (var i = 0; i < 256; i++) {
+                        gr.viewDatas.push("");
                     }
                     var opts = {};
                     opts.title = iobj.selectText;
                     opts.ksObjWs = [9999];
                     opts.rowAmt = 32;
-                    opts.eym=2;
-                    for(var i=0;i<8;i++){
+                    opts.eym = 2;
+                    for (var i = 0; i < 8; i++) {
                         opts.ksObjWs.push("0.120rw");
                     }
                     opts.ksObjss = [];
-                    var inx=0;
-                    for(var i=0;i<32;i++){
+                    var inx = 0;
+                    for (var i = 0; i < 32; i++) {
                         var ksObjs = [];
-                        for(var j=0;j<9;j++){
+                        for (var j = 0; j < 9; j++) {
                             var ksObj = {};
-                            ksObj.name = "" + i+"#"+j;
+                            ksObj.name = "" + i + "#" + j;
                             //ksObj.type = "Component~Cp_base~label.view";
                             ksObj.type = "Component~Cp_base~plate.none";
-                            var kopts=ksObj.opts = {};
-                            if(j===0){
-                                kopts.baseColor="#ccc";
-                                ksObj.name = ""+(i>>1)+"#"+((i&1)*8);
-                            }    
-                            else{
-                                kopts.baseColor="#cff";
+                            var kopts = ksObj.opts = {};
+                            if (j === 0) {
+                                kopts.baseColor = "#ccc";
+                                ksObj.name = "" + (i >> 1) + "#" + ((i & 1) * 8);
+                            } else {
+                                kopts.baseColor = "#cff";
                                 var watchReg = "gr.viewDatas#" + inx;
+                                //var watchReg = "gr.radarData.viewDatas#" + inx;
                                 Block.setInputWatch(kopts, "directReg", watchReg, "innerText", 1);
                                 inx++;
-                            }    
-                            kopts.fontSize="0.7rh";
+                            }
+                            kopts.fontSize = "0.7rh";
                             ksObjs.push(ksObj);
                         }
-                        opts.ksObjss.push(ksObjs);    
+                        opts.ksObjss.push(ksObjs);
                     }
+                    opts.actionFunc=function(iobj){
+                        console.log(iobj);
+                        gr.viewDatas_f=0;
+                    };
+                    gr.viewDatas_f=1;
                     box.containerPageBox(opts);
                     return;
                 }
+                if (iobj.selectText === "脈波寬度設定") {
+                    var opts = {};
+                    opts.actionFunc = function (iobj) {
+                        console.log(iobj);
+                        KvLib.deepCoverObject(gr.paraSet, iobj.paraSet);
+                        var fileName = "paraSet";
+                        var content = JSON.stringify(gr.paraSet);
+                        sv.saveStringToFile("responseDialogError", "null", fileName, content);
+                    };
+                    var op = {};
+                    //======
+                    var opts = {};
+                    opts.title = iobj.selectText;
+                    var pulsePara = gr.paraSet["localPulseWidthParas"];
+                    opts.ksObjWs = ["0.5rw", 9999];
+                    opts.ksObjss = [];
+                    opts.xm = 20;
+                    opts.eh = 50;
+                    opts.etm = 0;
+                    opts.headTitles = ["名稱", "波寬(us)"];
+                    opts.headTitleXArr = [200, 9999];
+                    opts.headTitleHeight = 24;
+                    var ksObjs = [];
+                    for (var i = 0; i < pulsePara.length; i++) {
+                        if ((i % 2) === 0) {
+                            var ksObjs = [];
+                        }
+                        var ksObj = {};
+                        ksObj.name = "setLine#" + ((i / 2) | 0) + "." + (i % 2);
+                        ksObj.type = "Model~MdaSetLine~base.sys0";
+                        var kopts = ksObj.opts = {};
+                        var setOpts = kopts.setOpts = sopt.getButtonActs();
+                        setOpts.enum = [pulsePara[i]];
+                        setOpts.value = 0;
+                        setOpts.id = "" + i;
+                        setOpts.titleWidth = 200;
+                        setOpts.titleFontSize = 20;
+                        setOpts.title = "脈波 " + (i);
+                        setOpts.xArr = [9999];
+                        setOpts.fontSize = 24;
+                        ksObjs.push(ksObj);
+                        if (i % 2)
+                            opts.ksObjss.push(ksObjs);
+                    }
 
+
+                    opts.actionFunc = function (iobj) {
+                        console.log(iobj);
+                        if (iobj.act === "actButtonClick") {
+                            var setLineObj = iobj.kvObj;
+                            if (iobj.buttonInx === 0) {
+                                var setOpts = sopt.getOptsFloat();
+                                setOpts.min = gr.paraSet.pulseWidthMin;
+                                setOpts.max = gr.paraSet.pulseWidthMax;
+                            }
+                            var butInx = iobj.buttonInx;
+                            setOpts.value = KvLib.toNumber(setLineObj.opts.setOpts.enum[iobj.buttonInx], 0);
+                            var opts = {};
+                            opts.setOpts = setOpts;
+                            opts.actionFunc = function (iobj) {
+                                console.log(iobj);
+                                if (iobj.act === "padEnter") {
+                                    setLineObj.opts.setOpts.enum[butInx] = iobj.inputText;
+                                    setLineObj.reCreate();
+                                }
+                            };
+                            box.intPadBox(opts);
+                            return;
+                        }
+
+
+                        if (iobj.act === "mouseClick" && iobj.buttonId === "ok") {
+                            console.log(iobj);
+                            var mdaBox = iobj.sender;
+                            var container = mdaBox.blockRefs["mainMd"];
+                            var ksObjss = container.opts.ksObjss;
+                            var inx = 0;
+                            var strA = [];
+                            for (var i = 0; i < ksObjss.length; i++) {
+                                var ksObjs = ksObjss[i];
+                                for (var j = 0; j < ksObjs.length; j++) {
+                                    var setOpts = ksObjs[j].opts.setOpts;
+                                    var str = setOpts.enum[0];
+                                    strA.push(str);
+                                }
+                            }
+                            gr.paraSet["localPulseWidthParas"] = strA;
+                            var fileName = "paraSet";
+                            var content = JSON.stringify(gr.paraSet);
+                            sv.saveStringToFile("responseDialogError", "null", fileName, content);
+                        }
+                    };
+                    box.setLineBox(opts);
+                    return;
+                }
                 if (iobj.selectText === "測試脈波設定") {
                     var opts = {};
                     opts.actionFunc = function (iobj) {
@@ -127,7 +235,9 @@ class DummyTargetMaster {
                         var setOpts = kopts.setOpts = sopt.getButtonActs();
                         if (strA[0] === "1")
                             setOpts.checked_f = 1;
-                        setOpts.enum = [strA[1], strA[2], strA[3], strA[4]];
+                        var pulseWidthInx = KvLib.toInt(strA[1], 0);
+                        var pulseWidthStr = gr.paraSet["localPulseWidthParas"][pulseWidthInx];
+                        setOpts.enum = [pulseWidthStr, strA[2], strA[3], strA[4]];
                         setOpts.value = 0;
                         setOpts.id = "" + i;
                         setOpts.titleWidth = 200;
@@ -147,11 +257,53 @@ class DummyTargetMaster {
                         if (iobj.act === "actButtonClick") {
                             var setLineObj = iobj.kvObj;
                             if (iobj.buttonInx === 0) {
+                                var widthStr = iobj.setOptsObj.opts.setOpts.enum[0];
+                                var widthInx = 0;
+                                for (var i = 0; i < 32; i++) {
+                                    if (widthStr === gr.paraSet["localPulseWidthParas"][i]) {
+                                        widthInx = i;
+                                        break;
+                                    }
+                                }
+
+                                var opts = {};
+                                opts.paraSet = gr.paraSet;
+                                opts.title = "脈波寬度 (us)";
+                                opts.xc = 4;
+                                opts.yc = 8;
+                                opts.eh = 60;
+                                opts.eym = 10;
+                                opts.w = 1000;
+                                opts.h = 800;
+
+                                opts.selectInx = widthInx;
+                                opts.textAlign = "left";
+                                opts.lpd = 10;
+                                opts.kvTexts = [];
+                                for (var i = 0; i < 32; i++)
+                                    opts.kvTexts.push(i + ": " + gr.paraSet["localPulseWidthParas"][i]);
+                                opts.actionFunc = function (iobj) {
+                                    console.log(iobj);
+                                    if (iobj.act === "selected") {
+                                        setLineObj.opts.setOpts.enum[0] = gr.paraSet["localPulseWidthParas"][iobj.selectInx];
+                                        setLineObj.reCreate();
+                                    }
+                                    MdaPopWin.popOff(2);
+                                };
+                                box.selectBox(opts);
+                                return;
+
+
+
                                 var setOpts = sopt.getOptsFloat();
                                 setOpts.min = gr.paraSet.pulseWidthMin;
                                 setOpts.max = gr.paraSet.pulseWidthMax;
                             }
                             if (iobj.buttonInx === 1) {
+
+
+
+
                                 var setOpts = sopt.getOptsFloat();
                                 setOpts.min = gr.paraSet.pulseDutyMin;
                                 setOpts.max = gr.paraSet.pulseDutyMax;
@@ -200,7 +352,18 @@ class DummyTargetMaster {
                                         str += "0";
                                     for (var k = 0; k < setOpts.enum.length; k++) {
                                         str += " ";
-                                        str += setOpts.enum[k];
+                                        if (k === 0) {
+                                            var widthStr = setOpts.enum[0];
+                                            var widthInx = 0;
+                                            for (var m = 0; m < 32; m++) {
+                                                if (widthStr === gr.paraSet["localPulseWidthParas"][m]) {
+                                                    widthInx = m;
+                                                    break;
+                                                }
+                                            }
+                                            str += widthInx;
+                                        } else
+                                            str += setOpts.enum[k];
                                     }
                                     strA.push(str);
                                 }
@@ -214,20 +377,6 @@ class DummyTargetMaster {
                     box.setLineBox(opts);
                     return;
                 }
-
-
-
-                var opts = {};
-                opts.paraSet = gr.paraSet;
-                opts.title = iobj.selectText;
-                opts.actionFunc = function (iobj) {
-                    console.log(iobj);
-                    KvLib.deepCoverObject(gr.paraSet, iobj.paraSet);
-                    var fileName = "paraSet";
-                    var content = JSON.stringify(gr.paraSet);
-                    sv.saveStringToFile("responseDialogError", "null", fileName, content);
-                };
-                opts.setNames = [];
                 if (iobj.selectText === "進階設定") {
                     if (gr.appId >= 0) {
                         opts.setNames.push("version");
@@ -377,7 +526,6 @@ class DummyTargetMaster {
                     opts.setNames.push("pulseFreqMin");
                     opts.setNames.push("pulseFreqMax");
                 }
-
                 if (iobj.selectText === "同步參數設定") {
                     if (gr.appId === 0) {
                         opts.setNames.push("commTestPacks");
@@ -440,6 +588,34 @@ class DummyTargetMaster {
 
 
                 }
+                if (iobj.selectText === "下載記錄檔") {
+                    var fileName = "user-" + gr.systemName + "/paraSet.json";
+                    var fileName = "log/syncSet.log";
+                    mac.saveFileToLocal(fileName, "syncSet.log");
+                    return;
+                }
+                if (iobj.selectText === "下載設定檔") {
+                    var fileName = "paraSet.json";
+                    var dataStr = JSON.stringify(gr.paraSet);
+                    mac.saveStringToLocalFile(fileName,dataStr);
+                    return;
+                }
+                if (iobj.selectText === "上傳設定檔") {
+                    var actionFunc=function(content){
+                        gr.paraSet=JSON.parse(content);
+                    };
+                    mac.readLocalTextFile(actionFunc,".json");
+                    return;
+                }
+
+
+                opts.actionFunc = function (iobj) {
+                    console.log(iobj);
+                    KvLib.deepCoverObject(gr.paraSet, iobj.paraSet);
+                    var fileName = "paraSet";
+                    var content = JSON.stringify(gr.paraSet);
+                    sv.saveStringToFile("responseDialogError", "null", fileName, content);
+                };
                 box.paraEditBox(opts);
                 return;
 
@@ -4022,6 +4198,11 @@ class DummyTargetCtr {
                     var inx0 = KvLib.toInt(strA[1], 0);
                     gr.radarData[strA[0]][inx0] = radarData[keys[i]];
                     continue;
+                }
+            }
+            if(gr.viewDatas_f){
+                for(var i=0;i<8;i++){
+                    gr.viewDatas[i]=KvLib.trsIntToHexStr(gr.radarData.viewDatas[i]);
                 }
             }
             console.log("radarData");

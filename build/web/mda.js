@@ -3094,7 +3094,8 @@ class MdaSelector {
         opts.bm = 0;
         opts.eh = 50;
         opts.margin = 0;
-
+        opts.textAlign="center";
+        opts.lpd=0;
         opts.kvTexts = [];
         opts.startInx = 0;
         opts.selectInx = -1;
@@ -3173,6 +3174,8 @@ class MdaSelector {
                 break;
             var cname = lyMaps["main"] + "~" + i;
             var opts = {};
+            opts.textAlign=op.textAlign;
+            opts.lpd=op.lpd;
             opts.innerText = op.kvTexts[inx];
             if (opts.innerText === null) {
                 inx++;

@@ -17,6 +17,7 @@ class GlobalRes {
     }
     constructor() {
         //this.appName="webBuilder";
+        this.systemName="sync";
         this.appName="sync";
         this.appId=3;
         this.appType="Model~DummyTargetCtr~base.sys0";
@@ -104,8 +105,7 @@ class GlobalRes {
         
         //this.systemName="webFrame";
         //this.systemName="future";
-        //this.systemName="sync";
-        this.systemName="keyboardOled";
+        //this.systemName="keyboardOled";
         //this.systemName="webIcs";
         
         

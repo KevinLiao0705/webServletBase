@@ -954,7 +954,7 @@ class Block {
                 continue;
             ipObj.cnt = 0;
             var value;
-            if (ipObj.inputName === "gr.viewDatas#0") {
+            if (ipObj.inputName === "gr.radarData.viewDatas#0") {
                 var uu = 0;
             }
             if (ipObj.type === "directReg") {
