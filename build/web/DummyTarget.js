@@ -12,9 +12,9 @@ class DummyTargetMaster {
             opts.xc = 2;
             opts.yc = 11;
             opts.h = 700;
-            opts.w=1000;
-            opts.textAlign="left";
-            opts.lpd=10;
+            opts.w = 1000;
+            opts.textAlign = "left";
+            opts.lpd = 10;
             opts.kvTexts = [];
             if (gr.appId === 0) {
                 opts.kvTexts.push("雷達信號參數設定");
@@ -97,11 +97,11 @@ class DummyTargetMaster {
                         }
                         opts.ksObjss.push(ksObjs);
                     }
-                    opts.actionFunc=function(iobj){
+                    opts.actionFunc = function (iobj) {
                         console.log(iobj);
-                        gr.viewDatas_f=0;
+                        gr.viewDatas_f = 0;
                     };
-                    gr.viewDatas_f=1;
+                    gr.viewDatas_f = 1;
                     box.containerPageBox(opts);
                     return;
                 }
@@ -597,14 +597,14 @@ class DummyTargetMaster {
                 if (iobj.selectText === "下載設定檔") {
                     var fileName = "paraSet.json";
                     var dataStr = JSON.stringify(gr.paraSet);
-                    mac.saveStringToLocalFile(fileName,dataStr);
+                    mac.saveStringToLocalFile(fileName, dataStr);
                     return;
                 }
                 if (iobj.selectText === "上傳設定檔") {
-                    var actionFunc=function(content){
-                        gr.paraSet=JSON.parse(content);
+                    var actionFunc = function (content) {
+                        gr.paraSet = JSON.parse(content);
                     };
-                    mac.readLocalTextFile(actionFunc,".json");
+                    mac.readLocalTextFile(actionFunc, ".json");
                     return;
                 }
 
@@ -1730,6 +1730,30 @@ class MasterRadarPane {
 }
 class DummyTargetSub {
     constructor() {
+        gr.hideWavePageElem = null;
+        gr.socketRetPrgTbl["tick"] = function (radarData) {
+            var keys = Object.keys(radarData);
+            for (var i = 0; i < keys.length; i++) {
+                var strA = keys[i].split("#");
+                if (strA.length === 1) {
+                    gr.radarData[keys[i]] = radarData[keys[i]];
+                    continue;
+                }
+                if (strA.length === 2) {
+                    var inx0 = KvLib.toInt(strA[1], 0);
+                    gr.radarData[strA[0]][inx0] = radarData[keys[i]];
+                    continue;
+                }
+            }
+            if (gr.viewDatas_f) {
+                for (var i = 0; i < 8; i++) {
+                    gr.viewDatas[i] = KvLib.trsIntToHexStr(gr.radarData.viewDatas[i]);
+                }
+            }
+            console.log("radarData");
+
+        };
+        
     }
     static globleTime() {
         gr.radarData.connectTime++;
@@ -1750,17 +1774,9 @@ class DummyTargetSub {
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
+        if (gr.paraSet.emulate !== 1)
+            ws.tick();
         return;
-        st.radarStatusText = [];
-        st.radarStatusColor = [];
-
-        /*
-         SP雷達信號     0.0: 無信號, 0.1: 信號備便
-         脈波來源       1.0: 主雷同步, 1.1: 本機脈波
-         與副控1連線方式  2.0: 光纖, 2.1: 無線, 2.2: 自動 
-         與副控2連線方式  2.0: 光纖, 2.1: 無線, 2.2: 自動 
-         */
-
 
 
     }
@@ -4200,9 +4216,9 @@ class DummyTargetCtr {
                     continue;
                 }
             }
-            if(gr.viewDatas_f){
-                for(var i=0;i<8;i++){
-                    gr.viewDatas[i]=KvLib.trsIntToHexStr(gr.radarData.viewDatas[i]);
+            if (gr.viewDatas_f) {
+                for (var i = 0; i < 8; i++) {
+                    gr.viewDatas[i] = KvLib.trsIntToHexStr(gr.radarData.viewDatas[i]);
                 }
             }
             console.log("radarData");
@@ -6219,47 +6235,11 @@ class Emulate {
         }
         if (gr.appId === 3 || gr.appId === 4)
             self.ctrEmu();
-        if (self.selfTestStartAll_f) {
-            self.selfTestTime++;
-            if (self.selfTestTime > 6 * 40) {
-                self.selfTestTime = 0;
-                self.selfTestInx++;
-                if (self.selfTestInx >= 12) {
-                    self.selfTestStartAll_f = 0;
-                    gr.logMessage.messages.push({type: "info", text: "測試完畢"});
-                }
-            }
-            if (self.selfTestTime === 6 * 30) {
-                rd.slotDataAA[gr.appId][self.selfTestInx] &= 0xf3ff;
-                var status = (rd.slotDataAA[gr.appId][self.selfTestInx] >> 8) & 3;
-                if (status !== 2) {
-                    str = "測試成功";
-                    gr.logMessage.messages.push({type: "infoOk", text: str});
-                } else {
-                    str = "測試失敗";
-                    gr.logMessage.messages.push({type: "infoOk", text: str});
-                }
 
 
-            }
-            if ((self.selfTestTime === 6 * 1)) {
-                if (rd.slotDataAA[gr.appId][self.selfTestInx] & 0x000f) {
-                    rd.slotDataAA[gr.appId][self.selfTestInx] &= 0xf3ff;
-                    rd.slotDataAA[gr.appId][self.selfTestInx] |= 0x0800;
-                    var slotDataA = gr.radarData.slotDataAA[gr.appId];
-                    var str = gr.syncSet.slotNameTbl[slotDataA[self.selfTestInx] & 15];
-                    var slotCnt = (slotDataA[self.selfTestInx] >> 4) & 15;
-                    if ((slotDataA[self.selfTestInx] & 15) > 4) {
-                        str = str + " " + (gr.syncSet.numTbl[slotCnt]);
-                    }
-                    str = str + " ====> 開始測試";
-                    gr.logMessage.messages.push({type: "info", text: str});
-                } else {
-                    self.selfTestTime = 9999;
-                }
 
-            }
-        }
+
+
 
         if (true) {
             var nanoTime = (performance.now() * 1000000) | 0;
@@ -6712,12 +6692,80 @@ class SyncGloble {
     timer() {
         if (gr.paraSet.emulate === 1) {
             emu.timer();
-            return;
+        }
+        var rd = gr.radarData;
+        var testEndTime = 200;//unit 0.1s
+        if (gr.selfTestStartAll_f) {
+            gr.selfTestTime++;
+            if ((gr.selfTestTime === 6 * 1)) {
+                var slotId = rd.slotDataAA[gr.appId][gr.selfTestInx] &= 0x0f;
+                if (slotId === 0) {
+                    gr.selfTestTime = 9999;
+                    return;
+                }
+                if (rd.slotDataAA[gr.appId][gr.selfTestInx] & 0x000f) {
+                    if (gr.paraSet.emulate === 1) {
+                        rd.slotDataAA[gr.appId][gr.selfTestInx] &= 0xf3ff;
+                        rd.slotDataAA[gr.appId][gr.selfTestInx] |= 0x0800;
+                    }
+                    var slotDataA = gr.radarData.slotDataAA[gr.appId];
+                    var str = gr.syncSet.slotNameTbl[slotDataA[gr.selfTestInx] & 15];
+                    var slotCnt = (slotDataA[gr.selfTestInx] >> 4) & 15;
+                    if ((slotDataA[gr.selfTestInx] & 15) > 4) {
+                        str = str + " " + (gr.syncSet.numTbl[slotCnt]);
+                    }
+                    str = str + " ====> 開始測試";
+                    gr.logMessage.messages.push({type: "info", text: str});
+                    ws.cmd("selfTestSlot", [gr.selfTestInx]);
+
+                } else {
+                    self.selfTestTime = 9999;
+                }
+                return;
+            }
+            if (gr.selfTestTime < 6 * (testEndTime - 10)) {
+                if (gr.selfTestTime > 6 * 10) {
+                    var status = (rd.slotDataAA[gr.appId][gr.selfTestInx] >> 10) & 3;
+                    if (status === 0) {
+                        gr.selfTestTime = 6 * (testEndTime - 10);
+                    }
+                }
+            }
+
+            if (gr.selfTestTime === 6 * (testEndTime - 10)) {
+                rd.slotDataAA[gr.appId][gr.selfTestInx] &= 0xf3ff;
+                var status = (rd.slotDataAA[gr.appId][gr.selfTestInx] >> 8) & 3;
+                if (status !== 2) {
+                    str = "測試成功";
+                    gr.logMessage.messages.push({type: "infoOk", text: str});
+                } else {
+                    str = "測試失敗";
+                    gr.logMessage.messages.push({type: "infoOk", text: str});
+                }
+                return;
+            }
+            if (gr.selfTestTime > 6 * testEndTime) {
+                gr.selfTestTime = 0;
+                gr.selfTestInx++;
+
+                if (gr.selfTestInx >= 12) {
+                    gr.selfTestStartAll_f = 0;
+                    gr.logMessage.messages.push({type: "info", text: "測試完畢"});
+                }
+                return;
+            }
+
+
+
         }
     }
     command(iobj) {
         if (gr.paraSet.emulate === 1) {
             emu.command(iobj);
+
+
+
+
             return;
         }
         var rd = gr.radarData;
@@ -6742,18 +6790,47 @@ class SyncGloble {
             var moduleStatusA = rd.sspaModuleStatusAA[1];
         }
 
-        var powerOn_f = 0;
-        var moduleOn_f = 0;
-        for (var i = 0; i < 36; i++) {
-            if ((powerStatusA[i] >> 4) & 1)
-                powerOn_f = 1;
-            if ((moduleStatusA[i] >> 1) & 1)
-                moduleOn_f = 1;
+        if (gr.appId === 3 || gr.appId === 4) {
+            var powerOn_f = 0;
+            var moduleOn_f = 0;
+            for (var i = 0; i < 36; i++) {
+                if ((powerStatusA[i] >> 4) & 1)
+                    powerOn_f = 1;
+                if ((moduleStatusA[i] >> 1) & 1)
+                    moduleOn_f = 1;
 
+            }
         }
 
         var emergency = gr.radarData.systemStatus0 & (1 << (shift + 4));
         var ready_f = (rd.systemStatus0 >> (gr.appId * 2)) & 3;
+
+
+        if (iobj.act === "selfTestStartAll") {
+            gr.logMessage.messages.push({type: "cmd", text: "全系統測試"});
+            ws.cmd(iobj.act);
+            //
+            gr.logMessage.messages.push({type: "info", text: "測試開始........"});
+            gr.selfTestStartAll_f = 1;
+            gr.selfTestTime = 0;
+            gr.selfTestInx = 0;
+            if (gr.paraSet.emulate === 1) {
+                for (var i = 0; i < 12; i++) {
+                    rd.slotDataAA[gr.appId][i] &= 0x03ff;
+                    rd.slotDataAA[gr.appId][i] |= 0x0400;
+                }
+            }
+            return;
+        }
+
+
+        if (iobj.act === "selfTestStopAll") {
+            gr.logMessage.messages.push({type: "cmd", text: "測試停止"});
+            ws.cmd(iobj.act);
+            //
+            gr.selfTestStartAll_f = 0;
+            return;
+        }
 
 
 

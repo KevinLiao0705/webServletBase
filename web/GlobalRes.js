@@ -34,6 +34,10 @@ class GlobalRes {
         this.defaultUserPassword = "16020039";
         this.clearCookie_f = 0;
         this.appFirstEntry_f=0;
+        this.selfTestStartAll_f=0;
+        this.selfTestTime=0;
+        this.selfTestInx=0;
+        
         //==============================
         this.kid = 0;
         this.ser = 0;
