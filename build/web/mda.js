@@ -4099,9 +4099,6 @@ class MdaSetLine {
             }
             return;
         }
-
-
-
         if (setOpts.setType === "ledView") {
             var opts = {};
             if (setOpts.lm)
@@ -4115,7 +4112,6 @@ class MdaSetLine {
             md.newBlock(cname, opts, "Component~Cp_base~label.led", "labelMain#" + i);
             return;
         }
-
         if (setOpts.setType === "led") {
             var opts = {};
             opts.backgroundInx = setOpts.value;
@@ -4128,7 +4124,6 @@ class MdaSetLine {
             md.newBlock(cname, opts, "Component~Cp_base~icons.led", "labelMain#" + i);
             return;
         }
-
         if (setOpts.setType === "leds") {
             var opts = {};
             opts.xm = setOpts.xm;
@@ -4171,10 +4166,6 @@ class MdaSetLine {
             }
             return;
         }
-
-
-
-
         if (setOpts.setType === "lcdView") {
             var opts = {};
             if (setOpts.lm)
@@ -4197,8 +4188,6 @@ class MdaSetLine {
             md.newBlock(cname, opts, "Component~Cp_base~images.lcd", "labelMain#" + i);
             return;
         }
-
-
         if (setOpts.setType === "buttonActs") {
             var opts = {};
             opts.xm = setOpts.xm;
@@ -4246,13 +4235,6 @@ class MdaSetLine {
             }
             return;
         }
-
-
-
-
-
-
-
         if (setOpts.setType === "button") {
             var opts = {};
             opts.xm = setOpts.xm;
@@ -4285,8 +4267,6 @@ class MdaSetLine {
             md.newBlock(cname, opts, "Component~Cp_base~button.sys0", "buttonMain#" + 0);
             return;
         }
-
-
         if (setOpts.setType === "buttonChecks") {
             var opts = {};
             opts.xc = setOpts.enum.length;
@@ -4412,16 +4392,19 @@ class MdaSetLine {
             md.newLayout(cname, opts, "Layout~Ly_base~array.sys0", "mainBody");
             var buttonFunc = function (iobj) {
                 console.log(iobj);
-                var strA = iobj.kvObj.name.split("#");
-                var inx = KvLib.toInt(strA[1], -1);
-                op.setOpts.value = inx;
-                md.mdClass.reNew();
+                if(!setOpts.actViewNone_f){
+                    var strA = iobj.kvObj.name.split("#");
+                    var inx = KvLib.toInt(strA[1], -1);
+                    op.setOpts.value = inx;
+                    md.mdClass.reNew();
+                }
 
                 iobj.buttonInx = KvLib.toInt(iobj.kvObj.name.split("#")[1], -1);
                 iobj.buttonText = iobj.kvObj.opts.innerText;
                 if (md.opts.setOpts.enumId) {
                     iobj.buttonId = md.opts.setOpts.enumId[iobj.buttonInx];
                 }
+                iobj.setId=md.opts.setOpts.id;
                 iobj.setOptsObj = md;
                 iobj.sender = md;
                 KvLib.exe(op.actionFunc, iobj);

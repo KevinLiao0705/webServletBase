@@ -1008,6 +1008,16 @@ class KvLib {
         }
     }
 
+    static  bytes2String(bytes) {
+        var str="";
+        for(var i=0;i<bytes.length;i++){
+            if(bytes[i]===0)
+                break;
+            str+=String.fromCharCode(bytes[i]);
+        }
+        return str;
+    }
+
     static evalPrgB(evalStr, errorKey, ioValue) {
         try {
             eval(evalStr);
@@ -1349,7 +1359,7 @@ class KvLib {
         var first_f = 1;
         var str = "";
         for (var i = 0; i < ba.length; i++) {
-            var iv = ba[ba.length-1- i];
+            var iv = ba[ba.length - 1 - i];
             if (first_f) {
                 if (iv === 0)
                     continue;

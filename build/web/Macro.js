@@ -409,13 +409,15 @@ class Macro {
         op.eBorderColor = "#ccc";
         op.eBorderWidth = 0;
         op.eBaseColor = "#222";
+        op.headButtons = ["SAVE", "ESC"];
+        op.headButtonIds = ["ok", "esc"];
         KvLib.deepCoverObject(op, _op);
         //=======================================================
         var opts = {};
         opts.title = op.title;
         opts.titleBaseColor = "#004";
-        opts.headButtons = ["SAVE", "ESC"];
-        opts.headButtonIds = ["ok", "esc"];
+        opts.headButtons = op.headButtons;
+        opts.headButtonIds = op.headButtonIds;
         opts.buttons = op.buttons;
         opts.margin = 4;
         opts.ym = 4;
@@ -629,7 +631,7 @@ class Macro {
         opts.actionFunc = function (iobj) {
             if (iobj.act === "mouseClick") {
                 MdaPopWin.popOffTo(iobj.sender.opts.popStackCnt);
-                KvLib.exeFunc(op.actionFunc,iobj);
+                KvLib.exeFunc(op.actionFunc, iobj);
             }
         };
         return {type: "Model~MdaBox~base.sys0", opts: opts};
@@ -1018,7 +1020,6 @@ class KvSetOpts {
         setOpts.xm = 10;
         setOpts.lm = 0;
         setOpts.fontSize = "0.6rh";
-        ;
         setOpts.titleFontSize = "0.4rh";
         setOpts.titleWidth = 200;
         setOpts.title = "buttonActs";
@@ -1034,7 +1035,6 @@ class KvSetOpts {
         setOpts.enum = ["button1", "button2", "button3"];
         setOpts.onColor = "#fff";
         setOpts.offColor = "#666";
-        setOpts.baseColor = "#002";
         setOpts.xm = 10;
         setOpts.lm = 0;
         setOpts.fontSize = "0.6rh";
@@ -2186,6 +2186,57 @@ class KvBox {
 
         };
         box.setLineBox(opts);
+    }
+
+    testSetLineBox(_opts) {
+        var opts = {};
+        opts.w = 1000;
+        opts.h = 800;
+        opts.title = "title";
+        opts.headButtons = ["ESC"];
+        opts.headButtonIds = ["esc"];
+        opts.eh = 50;
+        opts.ym = 10;
+        opts.setOptsA=[];
+        var setOpts = sopt.getOptsPara("buttonActs");
+        setOpts.enum = ["脈波啟動", "脈波停止"];
+        //setOpts.borderWidth = 1;
+        //setOpts.fontSize = "0.6rh";
+        //setOpts.titleFontSize = "0.9rh";
+        setOpts.titleWidth=200;
+        setOpts.title="Title";
+        //setOpts.baseColor="#222";
+        opts.setOptsA.push(setOpts);
+        
+        var setOpts = sopt.getOptsPara("buttonSelect");
+        setOpts.enum = ["脈波啟動", "脈波停止"];
+        opts.setOptsA.push(setOpts);
+        KvLib.deepCoverObject(opts, _opts);
+
+
+        opts.ksObjss = [];
+        for (var i = 0; i < opts.setOptsA.length; i++) {
+            var ksObjs = [];
+            for (var j = 0; j < 1; j++) {
+                var ksObj = {};
+                ksObj.name = "setLine#" + i + "." + j;
+                ksObj.type = "Model~MdaSetLine~base.sys0";
+                var kopts = ksObj.opts = {};
+                //kopts.baseColor="rgba(0,0,0,0)";
+                kopts.setOpts = opts.setOptsA[i];
+                ksObjs.push(ksObj);
+            }
+            opts.ksObjss.push(ksObjs);
+        }
+        opts.actionFunc = function (iobj) {
+            if (iobj.act === "mouseClick" && iobj.buttonId === "ok") {
+                console.log(iobj);
+                KvLib.exeFunc(_opts.actionFunc,iobj);
+            }
+        };
+        box.setLineBox(opts);
+        return;
+
 
     }
 }
