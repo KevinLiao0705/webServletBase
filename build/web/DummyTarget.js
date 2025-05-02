@@ -2083,10 +2083,98 @@ class SubRadarPane {
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
-
-        var wa = md.stas.ledStatusA = [1, 2, 3, 4, 0, 1, 2, 3, 0, 0];
-        var wb = md.stas.buttonInxA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var sh=0;
+        var wa = md.stas.ledStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var wb = md.stas.buttonInxA = [-1, -1, -1, -1, -1, 0, 0, 0, 0, 0];
         var wc = md.stas.buttonColorA = ["#888", "#888", "#888", "#888"];
+        var rd=gr.radarData;
+        var sta=(rd.systemStatus0>>(gr.appId*2))&3;
+        if(sta===1)
+            wa[0]=3;
+        if(sta===2)
+            wa[0]=1;
+        if(sta===3)
+            wa[0]=2;
+        //==================
+        sh=0;
+        if(gr.appId===2)
+            sh=2;
+        if((rd.systemStatus1>>sh)&3){
+            wa[1]=1;
+            sh=24;
+            if(gr.appId===2)
+                sh=25;
+            if((rd.systemStatus1>>sh)&1)
+                wa[2]=1;
+        }    
+        
+            var commType=gr.paraSet["sub1CommType"];
+            if(gr.appId===2)
+                var commType=gr.paraSet["sub2CommType"];
+            wb[0]=commType;
+        
+        
+        sh=22;
+        if(gr.appId===2)
+            sh=23;
+        if((rd.systemStatus1>>sh)&1){
+            sh=7;
+            if(gr.appId===2)
+                sh=12;
+            wa[3]=((rd.systemStatus1>>sh)&1)+1;
+            sh++;
+            wa[4]=((rd.systemStatus1>>sh)&1)+1;
+            sh++;
+            wa[5]=((rd.systemStatus1>>sh)&1)+1;
+            sh++;
+            wa[6]=1;
+            if((rd.systemStatus1>>sh)&3)
+                wa[6]=2;
+            sh=17;
+            if(gr.appId===2)
+                sh=18;
+            wa[7]=((rd.systemStatus1>>sh)&1)+1;
+            
+            sh=7;
+            if(gr.appId===2)
+                sh=8;
+            wb[1]=(rd.systemStatus1>>sh)&1;
+            
+            sh=11;
+            if(gr.appId===2)
+                sh=12;
+            wb[2]=(rd.systemStatus1>>sh)&1;
+            
+            sh=9;
+            if(gr.appId===2)
+                sh=10;
+            wb[3]=(rd.systemStatus1>>sh)&1;
+            
+            sh=23;
+            if(gr.appId===2)
+                sh=28;
+            wc[0]="#ccc";
+            if((rd.systemStatus0>>sh)&1)
+                wc[0]="#ffc";
+            sh++;    
+            wc[1]="#ccc";
+            if((rd.systemStatus0>>sh)&1)
+                wc[1]="#ffc";
+            sh++;    
+            wc[2]="#ccc";
+            if((rd.systemStatus0>>sh)&1)
+                wc[2]="#ffc";
+            sh++;    
+            wc[3]="#ccc";
+            if((rd.systemStatus0>>sh)&1)
+                wc[3]="#ffc";
+            
+            
+            
+        }
+        
+            
+        
 
         mac.messageEditor(md);
 
@@ -2178,7 +2266,7 @@ class SubRadarPane {
                 return;
             }
             if (iobj.setId === preText + "PulseSource") {
-                mac.saveParaSet(iobj.setId, iobj.buttonInx);
+                gr.gbcs.command({'act': preText + "PulseSource", "paras": [iobj.buttonInx]});
                 return;
             }
             if (iobj.setId === preText + "TxLoad") {
@@ -2199,7 +2287,68 @@ class SubRadarPane {
                     return;
                 }
                 if (iobj.buttonText === "輻射輸出") {
-                    gr.gbcs.command({'act': preText + "RadiationOnOff"});
+                    //gr.gbcs.command({'act': preText + "RadiationOnOff"});
+                    var opts = {};
+                    opts.title = iobj.buttonText;
+                    opts.xc = 2;
+                    opts.yc = 17;
+                    opts.w = 1000;
+                    opts.fontSize = "0.5rh";
+                    opts.kvTexts = [];
+                    var selectNo = [];
+
+                    for (var i = 0; i < gr.paraSet.localPulseGenParas.length; i++) {
+                        var strA = gr.paraSet.localPulseGenParas[i].split(" ");
+                        if (strA[0] === "0")
+                            continue;
+                        var str = strA[1] + "us ";
+                        str += strA[2] + "% ";
+                        str += strA[3] + "GHz ";
+                        str += "X" + strA[4];
+                        selectNo.push(i);
+                        opts.kvTexts.push(str);
+                    }
+                    opts.kvTexts.push("隨機脈波");
+                    opts.kvTexts.push("停止");
+                    opts.actionFunc = function (iobj) {
+                        console.log(iobj);
+                        MdaPopWin.popOff(2);
+                        if (iobj.act === "selected") {
+                            if (iobj.selectText === "隨機脈波") {
+                                gr.gbcs.command({'act': preText + "RadiationOn", "paras": [255]});
+                                return;
+
+                            }
+                            if (iobj.selectText === "停止") {
+                                gr.gbcs.command({'act': preText + "RadiationOff"});
+                                return;
+                            }
+                            strA = iobj.selectText.split(" ");
+                            var str = strA[0].slice(0, strA[0].length - 2);
+                            var pulseWidth = KvLib.strToFloat(str, 100);
+                            var pw = Math.round(pulseWidth * 1000);
+                            var str = strA[1].slice(0, strA[1].length - 1);
+                            var duty = KvLib.strToFloat(str, 5);
+                            var pri = Math.round(pw * 100 / duty);
+                            gr.emuSourceFormAA[0] = [];
+                            gr.emuSourceFormAA[0].push(pw);
+                            gr.emuSourceFormAA[0].push(pri - pw);
+                            gr.emuSourceFormInxA[0] = gr.pulseFormInxA[0] & 1;
+                            gr.gbcs.command({'act': preText + "RadiationOn", "paras": [selectNo[iobj.selectInx]]});
+                            return;
+
+
+                        }
+
+                    };
+                    var len = Math.round(opts.kvTexts.length / 2) + 1;
+                    opts.h = len * 50;
+                    opts.margin = 4;
+                    opts.ym = 4;
+                    opts.eh = 30;
+                    opts.exm = 20;
+                    opts.eym = 4;
+                    box.selectBox(opts);
                     return;
                 }
                 if (iobj.buttonText === "緊急停止") {
@@ -2299,14 +2448,18 @@ class SubRadarPane {
                 setOpts.enum = para.enum;
                 setOpts.id = preText + "CommType";
                 setOpts.value = para.value;
+                var watchDatas = setOpts.watchDatas = [];
+                watchDatas.push(["directReg", regName1 + "#0", "setOpts.value", 1]);
             }
             if (i === inx++) {
                 var setOpts = opts.setOpts = sopt.getOptsPara("buttonSelect");
-                var para = sopt.getParaSetOpts({paraSetName: preText + "PulseSource", titleWidth: 0, titleFontSize: "0.5rh"});
                 opts.title = "脈波來源";
                 setOpts.enum = ["遙控脈波", "本機脈波"];
                 setOpts.id = preText + "PulseSource";
                 setOpts.value = para.value;
+                var watchDatas = setOpts.watchDatas = [];
+                watchDatas.push(["directReg", regName1 + "#1", "setOpts.value", 1]);
+                setOpts.actViewNone_f = 1;
             }
             if (i === inx++) {
                 var setOpts = opts.setOpts = sopt.getOptsPara("buttonSelect");
@@ -2317,7 +2470,7 @@ class SubRadarPane {
                 setOpts.value = para.value;
                 setOpts.id = preText + "TxLoad";
                 var watchDatas = setOpts.watchDatas = [];
-                watchDatas.push(["directReg", regName1 + "#0", "setOpts.value", 1]);
+                watchDatas.push(["directReg", regName1 + "#2", "setOpts.value", 1]);
                 setOpts.actViewNone_f = 1;
             }
             if (i === inx++) {
@@ -2329,7 +2482,7 @@ class SubRadarPane {
                 setOpts.value = para.value;
                 setOpts.id = preText + "BatShort";
                 var watchDatas = setOpts.watchDatas = [];
-                watchDatas.push(["directReg", regName1 + "#1", "setOpts.value", 1]);
+                watchDatas.push(["directReg", regName1 + "#3", "setOpts.value", 1]);
                 setOpts.actViewNone_f = 1;
             }
             var regName = "self.fatherMd.fatherMd.fatherMd.stas.buttonColorA";
@@ -7989,6 +8142,11 @@ class SyncGloble {
             return;
         }
         //=====================================================================
+        if (iobj.act === preText + "PulseSource") {
+            gr.logMessage.messages.push({type: "cmd", text: "脈波來源 "+iobj.paras[0]});
+            ws.cmd(iobj.act, iobj.paras);
+            return;
+        }
         if (iobj.act === preText + "TxLoad") {
             gr.logMessage.messages.push({type: "cmd", text: "輸出裝置 "+iobj.paras[0]});
             ws.cmd(iobj.act, iobj.paras);
