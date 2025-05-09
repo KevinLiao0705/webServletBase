@@ -70,6 +70,7 @@ class DummyTargetMaster {
                 opts.kvTexts.push("上傳設定檔");
                 opts.kvTexts.push("系統重啟");
                 opts.kvTexts.push("即時資料");
+                opts.kvTexts.push("數位波形群組");
             }
             opts.actionFunc = function (iobj) {
                 console.log(iobj);
@@ -77,6 +78,38 @@ class DummyTargetMaster {
                 opts.paraSet = gr.paraSet;
                 opts.title = iobj.selectText;
                 opts.setNames = [];
+
+                if (iobj.selectText === "數位波形群組") {
+
+                    var opts = {};
+                    opts.paraSet = gr.paraSet;
+                    opts.title = "數位波形群組";
+                    opts.xc = 2;
+                    opts.yc = 4;
+                    opts.eh = 60;
+                    opts.eym = 10;
+                    opts.w = 600;
+                    opts.h = 400;
+                    opts.selectInx = gr.paraSet.laGroupCh;
+                    opts.textAlign = "left";
+                    opts.lpd = 10;
+                    opts.kvTexts = [];
+                    for (var i = 0; i < 8; i++)
+                        opts.kvTexts.push("CH" + i);
+                    opts.actionFunc = function (iobj) {
+                        console.log(iobj);
+                        gr.paraSet.laGroupCh=iobj.selectInx;
+                        MdaPopWin.popOff(2);
+                        var fileName = "paraSet";
+                        var content = JSON.stringify(gr.paraSet);
+                        sv.saveStringToFile("responseDialogError", "null", fileName, content);
+                    };
+                    box.selectBox(opts);
+
+                    return;
+                }
+
+
                 if (iobj.selectText === "系統重啟") {
                     window.location.reload();
                     return;
@@ -2083,98 +2116,98 @@ class SubRadarPane {
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
-        var sh=0;
+        var sh = 0;
         var wa = md.stas.ledStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         var wb = md.stas.buttonInxA = [-1, -1, -1, -1, -1, 0, 0, 0, 0, 0];
         var wc = md.stas.buttonColorA = ["#888", "#888", "#888", "#888"];
-        var rd=gr.radarData;
-        var sta=(rd.systemStatus0>>(gr.appId*2))&3;
-        if(sta===1)
-            wa[0]=3;
-        if(sta===2)
-            wa[0]=1;
-        if(sta===3)
-            wa[0]=2;
+        var rd = gr.radarData;
+        var sta = (rd.systemStatus0 >> (gr.appId * 2)) & 3;
+        if (sta === 1)
+            wa[0] = 3;
+        if (sta === 2)
+            wa[0] = 1;
+        if (sta === 3)
+            wa[0] = 2;
         //==================
-        sh=0;
-        if(gr.appId===2)
-            sh=2;
-        if((rd.systemStatus1>>sh)&3){
-            wa[1]=1;
-            sh=24;
-            if(gr.appId===2)
-                sh=25;
-            if((rd.systemStatus1>>sh)&1)
-                wa[2]=1;
-        }    
-        
-            var commType=gr.paraSet["sub1CommType"];
-            if(gr.appId===2)
-                var commType=gr.paraSet["sub2CommType"];
-            wb[0]=commType;
-        
-        
-        sh=22;
-        if(gr.appId===2)
-            sh=23;
-        if((rd.systemStatus1>>sh)&1){
-            sh=7;
-            if(gr.appId===2)
-                sh=12;
-            wa[3]=((rd.systemStatus1>>sh)&1)+1;
-            sh++;
-            wa[4]=((rd.systemStatus1>>sh)&1)+1;
-            sh++;
-            wa[5]=((rd.systemStatus1>>sh)&1)+1;
-            sh++;
-            wa[6]=1;
-            if((rd.systemStatus1>>sh)&3)
-                wa[6]=2;
-            sh=17;
-            if(gr.appId===2)
-                sh=18;
-            wa[7]=((rd.systemStatus1>>sh)&1)+1;
-            
-            sh=7;
-            if(gr.appId===2)
-                sh=8;
-            wb[1]=(rd.systemStatus1>>sh)&1;
-            
-            sh=11;
-            if(gr.appId===2)
-                sh=12;
-            wb[2]=(rd.systemStatus1>>sh)&1;
-            
-            sh=9;
-            if(gr.appId===2)
-                sh=10;
-            wb[3]=(rd.systemStatus1>>sh)&1;
-            
-            sh=23;
-            if(gr.appId===2)
-                sh=28;
-            wc[0]="#ccc";
-            if((rd.systemStatus0>>sh)&1)
-                wc[0]="#ffc";
-            sh++;    
-            wc[1]="#ccc";
-            if((rd.systemStatus0>>sh)&1)
-                wc[1]="#ffc";
-            sh++;    
-            wc[2]="#ccc";
-            if((rd.systemStatus0>>sh)&1)
-                wc[2]="#ffc";
-            sh++;    
-            wc[3]="#ccc";
-            if((rd.systemStatus0>>sh)&1)
-                wc[3]="#ffc";
-            
-            
-            
+        sh = 0;
+        if (gr.appId === 2)
+            sh = 2;
+        if ((rd.systemStatus1 >> sh) & 3) {
+            wa[1] = 1;
+            sh = 24;
+            if (gr.appId === 2)
+                sh = 25;
+            if ((rd.systemStatus1 >> sh) & 1)
+                wa[2] = 1;
         }
-        
-            
-        
+
+        var commType = gr.paraSet["sub1CommType"];
+        if (gr.appId === 2)
+            var commType = gr.paraSet["sub2CommType"];
+        wb[0] = commType;
+
+
+        sh = 22;
+        if (gr.appId === 2)
+            sh = 23;
+        if ((rd.systemStatus1 >> sh) & 1) {
+            sh = 7;
+            if (gr.appId === 2)
+                sh = 12;
+            wa[3] = ((rd.systemStatus1 >> sh) & 1) + 1;
+            sh++;
+            wa[4] = ((rd.systemStatus1 >> sh) & 1) + 1;
+            sh++;
+            wa[5] = ((rd.systemStatus1 >> sh) & 1) + 1;
+            sh++;
+            wa[6] = 1;
+            if ((rd.systemStatus1 >> sh) & 3)
+                wa[6] = 2;
+            sh = 17;
+            if (gr.appId === 2)
+                sh = 18;
+            wa[7] = ((rd.systemStatus1 >> sh) & 1) + 1;
+
+            sh = 7;
+            if (gr.appId === 2)
+                sh = 8;
+            wb[1] = (rd.systemStatus1 >> sh) & 1;
+
+            sh = 11;
+            if (gr.appId === 2)
+                sh = 12;
+            wb[2] = (rd.systemStatus1 >> sh) & 1;
+
+            sh = 9;
+            if (gr.appId === 2)
+                sh = 10;
+            wb[3] = (rd.systemStatus1 >> sh) & 1;
+
+            sh = 23;
+            if (gr.appId === 2)
+                sh = 28;
+            wc[0] = "#ccc";
+            if ((rd.systemStatus0 >> sh) & 1)
+                wc[0] = "#ffc";
+            sh++;
+            wc[1] = "#ccc";
+            if ((rd.systemStatus0 >> sh) & 1)
+                wc[1] = "#ffc";
+            sh++;
+            wc[2] = "#ccc";
+            if ((rd.systemStatus0 >> sh) & 1)
+                wc[2] = "#ffc";
+            sh++;
+            wc[3] = "#ccc";
+            if ((rd.systemStatus0 >> sh) & 1)
+                wc[3] = "#ffc";
+
+
+
+        }
+
+
+
 
         mac.messageEditor(md);
 
@@ -2301,7 +2334,9 @@ class SubRadarPane {
                         var strA = gr.paraSet.localPulseGenParas[i].split(" ");
                         if (strA[0] === "0")
                             continue;
-                        var str = strA[1] + "us ";
+                        var inx=KvLib.toInt(strA[1],0);
+                        var pw=gr.paraSet.localPulseWidthParas[inx];
+                        var str = pw + "us ";
                         str += strA[2] + "% ";
                         str += strA[3] + "GHz ";
                         str += "X" + strA[4];
@@ -2355,8 +2390,8 @@ class SubRadarPane {
                     gr.gbcs.command({'act': preText + "EmergencyOnOff"});
                     return;
                 }
-                
-                
+
+
             }
         };
 
@@ -4446,13 +4481,12 @@ class SelfTest {
             if (status === 1)
                 inx = 1;
             if (status === 2)
-                inx = 2;
-            if (status === 3) {
                 if (gr.flash_f)
                     inx = 0;
                 else
                     inx = 1;
-
+            if (status === 3) {
+                inx = 2;
             }
             if (testStatus) {
                 inx = 4;
@@ -5813,7 +5847,9 @@ class DummyTargetCtrPane {
                         var strA = gr.paraSet.localPulseGenParas[i].split(" ");
                         if (strA[0] === "0")
                             continue;
-                        var str = strA[1] + "us ";
+                        var inx=KvLib.toInt(strA[1],0);
+                        var pw=gr.paraSet.localPulseWidthParas[inx];
+                        var str = pw + "us ";
                         str += strA[2] + "% ";
                         str += strA[3] + "GHz ";
                         str += "X" + strA[4];
@@ -6688,7 +6724,6 @@ class CtrSspaPowerStatus {
                     opts.kvTexts = [];
                     opts.kvTexts.push("電源模組 全部開啟");
                     opts.kvTexts.push("電源模組 全部關閉");
-                    opts.kvTexts.push("電源模組 全部重啟");
                     opts.kvTexts.push("電源模組 全部加入");
                     opts.kvTexts.push("電源模組 全部移除");
                     opts.actionFunc = function (iobj) {
@@ -6706,12 +6741,9 @@ class CtrSspaPowerStatus {
                                 gr.gbcs.command({'act': preText + "SspaPowerOff", 'index': -1});
                                 break;
                             case 2:
-                                gr.gbcs.command({'act': preText + "SspaPowerReset", 'index': -1});
-                                break;
-                            case 3:
                                 gr.gbcs.command({'act': preText + "SspaPowerInsert", 'index': -1});
                                 break;
-                            case 4:
+                            case 3:
                                 gr.gbcs.command({'act': preText + "SspaPowerRemove", 'index': -1});
                                 break;
 
@@ -6843,7 +6875,6 @@ class CtrSspaPowerStatus {
                     opts.kvTexts = [];
                     opts.kvTexts.push("電源模組 開啟");
                     opts.kvTexts.push("電源模組 關閉");
-                    opts.kvTexts.push("電源模組 重啟");
                     opts.kvTexts.push("電源模組 加入");
                     opts.kvTexts.push("電源模組 移除");
                     opts.actionFunc = function (iobj) {
@@ -6861,12 +6892,9 @@ class CtrSspaPowerStatus {
                                 gr.gbcs.command({'act': preText + "SspaPowerOff", "index": barInx});
                                 break;
                             case 2:
-                                gr.gbcs.command({'act': preText + "SspaPowerReset", "index": barInx});
-                                break;
-                            case 3:
                                 gr.gbcs.command({'act': preText + "SspaPowerInsert", "index": barInx});
                                 break;
-                            case 4:
+                            case 3:
                                 gr.gbcs.command({'act': preText + "SspaPowerRemove", "index": barInx});
                                 break;
 
@@ -7833,7 +7861,7 @@ class SyncGloble {
             if (gr.selfTestTime === 6 * (testEndTime - 10)) {
                 rd.slotDataAA[gr.appId][gr.selfTestInx] &= 0xf3ff;
                 var status = (rd.slotDataAA[gr.appId][gr.selfTestInx] >> 8) & 3;
-                if (status !== 2) {
+                if (status === 2) {
                     str = "測試成功";
                     gr.logMessage.messages.push({type: "infoOk", text: str});
                 } else {
@@ -7914,7 +7942,7 @@ class SyncGloble {
 
         var emergency = gr.radarData.systemStatus0 & (1 << (shift + 4));
         var ready_f = (rd.systemStatus0 >> (gr.appId * 2)) & 3;
-        
+
         if (iobj.act === "selfTestStartAll") {
             gr.logMessage.messages.push({type: "cmd", text: "全系統測試"});
             ws.cmd(iobj.act);
@@ -7937,8 +7965,8 @@ class SyncGloble {
             gr.selfTestStartAll_f = 0;
             return;
         }
-        
-        
+
+
         if (gr.appId === 0) {
             if (iobj.act === "mastCtr1RadarSet") {
                 var str = "副控1參數設定";
@@ -8143,17 +8171,17 @@ class SyncGloble {
         }
         //=====================================================================
         if (iobj.act === preText + "PulseSource") {
-            gr.logMessage.messages.push({type: "cmd", text: "脈波來源 "+iobj.paras[0]});
+            gr.logMessage.messages.push({type: "cmd", text: "脈波來源 " + iobj.paras[0]});
             ws.cmd(iobj.act, iobj.paras);
             return;
         }
         if (iobj.act === preText + "TxLoad") {
-            gr.logMessage.messages.push({type: "cmd", text: "輸出裝置 "+iobj.paras[0]});
+            gr.logMessage.messages.push({type: "cmd", text: "輸出裝置 " + iobj.paras[0]});
             ws.cmd(iobj.act, iobj.paras);
             return;
         }
         if (iobj.act === preText + "BatShort") {
-            gr.logMessage.messages.push({type: "cmd", text: "戰備短路 "+iobj.paras[0]});
+            gr.logMessage.messages.push({type: "cmd", text: "戰備短路 " + iobj.paras[0]});
             ws.cmd(iobj.act, iobj.paras);
             return;
         }

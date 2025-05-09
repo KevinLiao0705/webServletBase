@@ -6,7 +6,7 @@ class MyWebSocket {
         this.webSocketConnectCnt = 0;
         this.webSocketConnTime = 0;
         this.tickTime = 0;
-        this.tickTimeK = 10;
+        this.tickTimeK = 2;
 
     }
 
