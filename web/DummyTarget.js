@@ -84,17 +84,17 @@ class DummyTargetMaster {
                     var opts = {};
                     opts.paraSet = gr.paraSet;
                     opts.title = "數位波形群組";
-                    opts.xc = 2;
+                    opts.xc = 4;
                     opts.yc = 4;
                     opts.eh = 60;
                     opts.eym = 10;
-                    opts.w = 600;
+                    opts.w = 800;
                     opts.h = 400;
                     opts.selectInx = gr.paraSet.laGroupCh;
                     opts.textAlign = "left";
                     opts.lpd = 10;
                     opts.kvTexts = [];
-                    for (var i = 0; i < 8; i++)
+                    for (var i = 0; i < 16; i++)
                         opts.kvTexts.push("CH" + i);
                     opts.actionFunc = function (iobj) {
                         console.log(iobj);
@@ -5827,13 +5827,28 @@ class DummyTargetCtrPane {
 
         var actionPrg = function (iobj) {
             console.log(iobj);
-            if (gr.appId === 3)
+            if (gr.appId === 3){
                 var preText = "ctr1";
-            if (gr.appId === 4)
+                var radiationOn = (gr.radarData.systemStatus0 >> 25) & 1;
+            }
+            if (gr.appId === 4){
                 var preText = "ctr2";
+                var radiationOn = (gr.radarData.systemStatus0 >> 30) & 1;
+            }    
             if (iobj.act === "actButtonClick") {
                 var inx = KvLib.toInt(iobj.sender.name.split('#')[1], -1);
                 if (inx === 16) {
+                    if(gr.paraSet[preText+"PulseSource"]===0){
+                        if(radiationOn)
+                            gr.gbcs.command({'act': preText + "RadiationOff"});
+                        else{    
+                            if(gr.paraSet["emuSpSignal"]===1)
+                                gr.gbcs.command({'act': preText + "RadiationOn", "paras": [253]});
+                            else    
+                                gr.gbcs.command({'act': preText + "RadiationOn", "paras": [254]});
+                        }
+                        return;
+                    }
                     var opts = {};
                     opts.title = iobj.buttonText;
                     opts.xc = 2;
@@ -5882,6 +5897,8 @@ class DummyTargetCtrPane {
                             gr.emuSourceFormAA[0].push(pw);
                             gr.emuSourceFormAA[0].push(pri - pw);
                             gr.emuSourceFormInxA[0] = gr.pulseFormInxA[0] & 1;
+                            
+                            
                             gr.gbcs.command({'act': preText + "RadiationOn", "paras": [selectNo[iobj.selectInx]]});
                             return;
 
@@ -8154,6 +8171,7 @@ class SyncGloble {
             ws.cmd(iobj.act, iobj.paras);
             return;
         }
+        
         if (iobj.act === preText + "RadiationOff") {
             gr.logMessage.messages.push({type: "cmd", text: "輻射關閉"});
             ws.cmd(iobj.act, iobj.paras);
