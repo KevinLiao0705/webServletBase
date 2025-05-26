@@ -4455,7 +4455,7 @@ class SelfTest {
         var md = self.md;
         var op = md.opts;
         var st = md.stas;
-        var slotDataA = gr.radarData.slotDataAA[gr.appId];
+        var slotDataA = gr.radarData.slotDataAA;
         st.slotNames = [];
         for (var i = 0; i < 12; i++) {
             var str = gr.syncSet.slotNameTbl[slotDataA[i] & 15];
@@ -7328,16 +7328,7 @@ class Emulate {
         var rd = gr.radarData;
         if (!self.firstEntry_f) {
             self.firstEntry_f = 1;
-            rd.slotDataAA = [];
-            rd.slotDataAA.push([1, 0, 2, 3, 4, 0x05, 0x15, 0x06, 0x06, 0x07, 0x17, 0]);
-            rd.slotDataAA.push([1, 0, 2, 3, 4, 0x05, 0x15, 0x06, 0x00, 0x07, 0x00, 0]);
-            rd.slotDataAA.push([1, 0, 2, 3, 4, 0x05, 0x15, 0x06, 0x00, 0x07, 0x00, 0]);
-            rd.slotDataAA.push([1, 0, 2, 3, 4, 0x05, 0x15, 0x25, 0x35, 0, 0, 0]);
-            rd.slotDataAA.push([1, 0, 2, 3, 4, 0x05, 0x15, 0x25, 0x35, 0, 0, 0]);
-            rd.slotDataAA.push([2, 5, 0x08, 0x18, 0x28, 0x38, 0x48, 0x00, 0x00, 0, 0, 0]);
-            rd.slotDataAA.push([2, 5, 0x08, 0x18, 0x28, 0x38, 0x48, 0x00, 0x00, 0, 0, 0]);
-            rd.slotDataAA.push([2, 5, 0x08, 0x18, 0x28, 0x38, 0x48, 0x00, 0x00, 0, 0, 0]);
-            rd.slotDataAA.push([2, 5, 0x08, 0x18, 0x28, 0x38, 0x48, 0x00, 0x00, 0, 0, 0]);
+            rd.slotDataAA = [0,0,0,0,0,0,0,0,0,0,0,0];
             for (var i = 0; i < 36; i++) {
                 rd.sspaPowerStatusAA[0][i] |= 1;
                 rd.sspaPowerStatusAA[1][i] |= 1;
@@ -7348,22 +7339,18 @@ class Emulate {
 
         }
         if (self.actTime === 10) {
-            for (var i = 0; i < 9; i++) {
                 for (var j = 0; j < 12; j++) {
-                    rd.slotDataAA[i][j] &= 0xf0ff;
-                    rd.slotDataAA[i][j] |= 0x0300;
+                    rd.slotDataAA[j] &= 0xf0ff;
+                    rd.slotDataAA[j] |= 0x0300;
                 }
-            }
             rd.systemStatus0 &= 0xffc00000;
             rd.systemStatus0 |= 0x00155555;
         }
         if (self.actTime === 50) {
-            for (var i = 0; i < 9; i++) {
                 for (var j = 0; j < 12; j++) {
-                    rd.slotDataAA[i][j] &= 0xf0ff;
-                    rd.slotDataAA[i][j] |= 0x0100;
+                    rd.slotDataAA[j] &= 0xf0ff;
+                    rd.slotDataAA[j] |= 0x0100;
                 }
-            }
             rd.systemStatus0 &= 0xffc00000;
             rd.systemStatus0 |= 0x002aaaaa;
         }
@@ -7487,8 +7474,8 @@ class Emulate {
             self.selfTestTime = 0;
             self.selfTestInx = 0;
             for (var i = 0; i < 12; i++) {
-                rd.slotDataAA[gr.appId][i] &= 0x03ff;
-                rd.slotDataAA[gr.appId][i] |= 0x0400;
+                rd.slotDataAA[i] &= 0x03ff;
+                rd.slotDataAA[i] |= 0x0400;
             }
 
             //gr.syncData.slotTestStatusA[i] = 1;
@@ -7718,10 +7705,7 @@ class SyncGloble {
          *** slotStatus	9:8 ==> 0:none, 1:ready, 2:error 3:warn up
          *** slotTestStatus 11:10 ==> 0:none, 1:PreTest, 2:testing;
          */
-        rd.slotDataAA = [];
-        for (var i = 0; i < 9; i++) {
-            rd.slotDataAA.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-        }
+        rd.slotDataAA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
         /*=================================================
          mast mainStatus[1:0] 		==> 0:none, 1:warn up, 2:ready, 3:error
@@ -7841,17 +7825,17 @@ class SyncGloble {
         if (gr.selfTestStartAll_f) {
             gr.selfTestTime++;
             if ((gr.selfTestTime === 6 * 1)) {
-                var slotId = rd.slotDataAA[gr.appId][gr.selfTestInx] &= 0x0f;
+                var slotId = rd.slotDataAA[gr.selfTestInx] &= 0x0f;
                 if (slotId === 0) {
                     gr.selfTestTime = 9999;
                     return;
                 }
-                if (rd.slotDataAA[gr.appId][gr.selfTestInx] & 0x000f) {
+                if (rd.slotDataAA[gr.selfTestInx] & 0x000f) {
                     if (gr.paraSet.emulate === 1) {
-                        rd.slotDataAA[gr.appId][gr.selfTestInx] &= 0xf3ff;
-                        rd.slotDataAA[gr.appId][gr.selfTestInx] |= 0x0800;
+                        rd.slotDataAA[gr.selfTestInx] &= 0xf3ff;
+                        rd.slotDataAA[gr.selfTestInx] |= 0x0800;
                     }
-                    var slotDataA = gr.radarData.slotDataAA[gr.appId];
+                    var slotDataA = gr.radarData.slotDataAA;
                     var str = gr.syncSet.slotNameTbl[slotDataA[gr.selfTestInx] & 15];
                     var slotCnt = (slotDataA[gr.selfTestInx] >> 4) & 15;
                     if ((slotDataA[gr.selfTestInx] & 15) > 4) {
@@ -7868,7 +7852,7 @@ class SyncGloble {
             }
             if (gr.selfTestTime < 6 * (testEndTime - 10)) {
                 if (gr.selfTestTime > 6 * 10) {
-                    var status = (rd.slotDataAA[gr.appId][gr.selfTestInx] >> 10) & 3;
+                    var status = (rd.slotDataAA[gr.selfTestInx] >> 10) & 3;
                     if (status === 0) {
                         gr.selfTestTime = 6 * (testEndTime - 10);
                     }
@@ -7876,8 +7860,8 @@ class SyncGloble {
             }
 
             if (gr.selfTestTime === 6 * (testEndTime - 10)) {
-                rd.slotDataAA[gr.appId][gr.selfTestInx] &= 0xf3ff;
-                var status = (rd.slotDataAA[gr.appId][gr.selfTestInx] >> 8) & 3;
+                rd.slotDataAA[gr.selfTestInx] &= 0xf3ff;
+                var status = (rd.slotDataAA[gr.selfTestInx] >> 8) & 3;
                 if (status === 2) {
                     str = "測試成功";
                     gr.logMessage.messages.push({type: "infoOk", text: str});
@@ -7970,8 +7954,8 @@ class SyncGloble {
             gr.selfTestInx = 0;
             if (gr.paraSet.emulate === 1) {
                 for (var i = 0; i < 12; i++) {
-                    rd.slotDataAA[gr.appId][i] &= 0x03ff;
-                    rd.slotDataAA[gr.appId][i] |= 0x0400;
+                    rd.slotDataAA[i] &= 0x03ff;
+                    rd.slotDataAA[i] |= 0x0400;
                 }
             }
             return;
