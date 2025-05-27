@@ -98,7 +98,7 @@ class DummyTargetMaster {
                         opts.kvTexts.push("CH" + i);
                     opts.actionFunc = function (iobj) {
                         console.log(iobj);
-                        gr.paraSet.laGroupCh=iobj.selectInx;
+                        gr.paraSet.laGroupCh = iobj.selectInx;
                         MdaPopWin.popOff(2);
                         var fileName = "paraSet";
                         var content = JSON.stringify(gr.paraSet);
@@ -2121,7 +2121,7 @@ class SubRadarPane {
         var wb = md.stas.buttonInxA = [-1, -1, -1, -1, -1, 0, 0, 0, 0, 0];
         var wc = md.stas.buttonColorA = ["#888", "#888", "#888", "#888"];
         var rd = gr.radarData;
-        var sta = (rd.systemStatus0 >> (gr.appId * 2)) & 3;
+        var sta = rd.systemStatus0 & 3;
         if (sta === 1)
             wa[0] = 3;
         if (sta === 2)
@@ -2334,8 +2334,8 @@ class SubRadarPane {
                         var strA = gr.paraSet.localPulseGenParas[i].split(" ");
                         if (strA[0] === "0")
                             continue;
-                        var inx=KvLib.toInt(strA[1],0);
-                        var pw=gr.paraSet.localPulseWidthParas[inx];
+                        var inx = KvLib.toInt(strA[1], 0);
+                        var pw = gr.paraSet.localPulseWidthParas[inx];
                         var str = pw + "us ";
                         str += strA[2] + "% ";
                         str += strA[3] + "GHz ";
@@ -2638,15 +2638,8 @@ class SubRadarPane1 {
     }
     static getMeterStatus(wa, wac) {
         var daInx = 0;
-        if (gr.appId === 3) {
-            var preText = "ctr1";
-            var da = gr.radarData.meterStatusAA[0];
-        }
-        if (gr.appId === 4) {
-            var daInx = 1;
-            var preText = "ctr2";
-            var da = gr.radarData.meterStatusAA[1];
-        }
+        var preText = "ctr1";
+        var da = gr.radarData.meterStatusAA;
         //======================================
         var prg = function (data, name, fixed) {
             var value = (data - gr.paraSet[preText + name + "Offs"]) * gr.paraSet[preText + name + "Gain"];
@@ -2686,7 +2679,7 @@ class SubRadarPane1 {
         //======================================
         var cur = 0;
         for (var i = 0; i < 36; i++) {
-            var value = gr.radarData["sspaPowerV32iAA"][daInx][i];
+            var value = gr.radarData["sspaPowerV32iAA"][i];
             value -= gr.paraSet[preText + "SspaPowerV32iOffs"];
             value *= gr.paraSet[preText + "SspaPowerV32iGain"];
             cur += value;
@@ -2713,7 +2706,7 @@ class SubRadarPane1 {
             var preText = "ctr2";
         DummyTargetCtrPane.getMeterStatus(wa, wac);
 
-        var sysStatus = (gr.radarData.systemStatus0 >> (gr.appId * 2)) & 3;
+        var sysStatus = gr.radarData.systemStatus0 & 3;
         wb[0] = 0;
         if (sysStatus === 1) {//system warn up
             if (gr.flash_f)
@@ -2746,8 +2739,8 @@ class SubRadarPane1 {
             var pulseWidthErr = (gr.radarData.systemStatus1 >> 15) & 1;
             var pulseDutyErr = (gr.radarData.systemStatus1 >> 16) & 1;
         }
-        var sspaPowerStatusA = gr.radarData.sspaPowerStatusAA[gr.appId - 3];
-        var sspaModuleStatusA = gr.radarData.sspaModuleStatusAA[gr.appId - 3];
+        var sspaPowerStatusA = gr.radarData.sspaPowerStatusAA;
+        var sspaModuleStatusA = gr.radarData.sspaModuleStatusAA;
         var powerOn_f = 0;
         for (var i = 0; i < 36; i++) {
             if ((sspaPowerStatusA[i] >> 4) & 1)
@@ -5593,15 +5586,8 @@ class DummyTargetCtrPane {
     }
     static getMeterStatus(wa, wac) {
         var daInx = 0;
-        if (gr.appId === 3) {
-            var preText = "ctr1";
-            var da = gr.radarData.meterStatusAA[0];
-        }
-        if (gr.appId === 4) {
-            var daInx = 1;
-            var preText = "ctr2";
-            var da = gr.radarData.meterStatusAA[1];
-        }
+        var preText = "ctr1";
+        var da = gr.radarData.meterStatusAA;
         //======================================
         var prg = function (data, name, fixed) {
             var value = (data - gr.paraSet[preText + name + "Offs"]) * gr.paraSet[preText + name + "Gain"];
@@ -5641,7 +5627,7 @@ class DummyTargetCtrPane {
         //======================================
         var cur = 0;
         for (var i = 0; i < 36; i++) {
-            var value = gr.radarData["sspaPowerV32iAA"][daInx][i];
+            var value = gr.radarData["sspaPowerV32iAA"][i];
             value -= gr.paraSet[preText + "SspaPowerV32iOffs"];
             value *= gr.paraSet[preText + "SspaPowerV32iGain"];
             cur += value;
@@ -5668,7 +5654,7 @@ class DummyTargetCtrPane {
             var preText = "ctr2";
         DummyTargetCtrPane.getMeterStatus(wa, wac);
 
-        var sysStatus = (gr.radarData.systemStatus0 >> (gr.appId * 2)) & 3;
+        var sysStatus = gr.radarData.systemStatus0 & 3;
         wb[0] = 0;
         if (sysStatus === 1) {//system warn up
             if (gr.flash_f)
@@ -5701,8 +5687,8 @@ class DummyTargetCtrPane {
             var pulseWidthErr = (gr.radarData.systemStatus1 >> 15) & 1;
             var pulseDutyErr = (gr.radarData.systemStatus1 >> 16) & 1;
         }
-        var sspaPowerStatusA = gr.radarData.sspaPowerStatusAA[gr.appId - 3];
-        var sspaModuleStatusA = gr.radarData.sspaModuleStatusAA[gr.appId - 3];
+        var sspaPowerStatusA = gr.radarData.sspaPowerStatusAA;
+        var sspaModuleStatusA = gr.radarData.sspaModuleStatusAA;
         var powerOn_f = 0;
         for (var i = 0; i < 36; i++) {
             if ((sspaPowerStatusA[i] >> 4) & 1)
@@ -5827,24 +5813,24 @@ class DummyTargetCtrPane {
 
         var actionPrg = function (iobj) {
             console.log(iobj);
-            if (gr.appId === 3){
+            if (gr.appId === 3) {
                 var preText = "ctr1";
                 var radiationOn = (gr.radarData.systemStatus0 >> 25) & 1;
             }
-            if (gr.appId === 4){
+            if (gr.appId === 4) {
                 var preText = "ctr2";
                 var radiationOn = (gr.radarData.systemStatus0 >> 30) & 1;
-            }    
+            }
             if (iobj.act === "actButtonClick") {
                 var inx = KvLib.toInt(iobj.sender.name.split('#')[1], -1);
                 if (inx === 16) {
-                    if(gr.paraSet[preText+"PulseSource"]===0){
-                        if(radiationOn)
+                    if (gr.paraSet[preText + "PulseSource"] === 0) {
+                        if (radiationOn)
                             gr.gbcs.command({'act': preText + "RadiationOff"});
-                        else{    
-                            if(gr.paraSet["emuSpSignal"]===1)
+                        else {
+                            if (gr.paraSet["emuSpSignal"] === 1)
                                 gr.gbcs.command({'act': preText + "RadiationOn", "paras": [253]});
-                            else    
+                            else
                                 gr.gbcs.command({'act': preText + "RadiationOn", "paras": [254]});
                         }
                         return;
@@ -5862,8 +5848,8 @@ class DummyTargetCtrPane {
                         var strA = gr.paraSet.localPulseGenParas[i].split(" ");
                         if (strA[0] === "0")
                             continue;
-                        var inx=KvLib.toInt(strA[1],0);
-                        var pw=gr.paraSet.localPulseWidthParas[inx];
+                        var inx = KvLib.toInt(strA[1], 0);
+                        var pw = gr.paraSet.localPulseWidthParas[inx];
                         var str = pw + "us ";
                         str += strA[2] + "% ";
                         str += strA[3] + "GHz ";
@@ -5897,8 +5883,8 @@ class DummyTargetCtrPane {
                             gr.emuSourceFormAA[0].push(pw);
                             gr.emuSourceFormAA[0].push(pri - pw);
                             gr.emuSourceFormInxA[0] = gr.pulseFormInxA[0] & 1;
-                            
-                            
+
+
                             gr.gbcs.command({'act': preText + "RadiationOn", "paras": [selectNo[iobj.selectInx]]});
                             return;
 
@@ -6251,14 +6237,14 @@ class CtrRadarStatus {
             wb[i] = (gr.radarData["enviStatusA"][inx] >> i) & 1;
         }
         //=========================================
+            var sspaPowerStatusA = gr.radarData.sspaPowerStatusAA;
+            var sspaModuleStatusA = gr.radarData.sspaModuleStatusAA;
         if (gr.appId === 3) {
             var rfDet = (gr.radarData.systemStatus0 >> 22) & 1;
             var overDuty = (gr.radarData.systemStatus1 >> 11) & 1;
             var overWidth = (gr.radarData.systemStatus1 >> 10) & 1;
             var sspaPowerErr = (gr.radarData.systemStatus1 >> 8) & 1;
             var sspaModuleErr = (gr.radarData.systemStatus1 >> 9) & 1;
-            var sspaPowerStatusA = gr.radarData.sspaPowerStatusAA[0];
-            var sspaModuleStatusA = gr.radarData.sspaModuleStatusAA[0];
         }
         if (gr.appId === 4) {
             var rfDet = (gr.radarData.systemStatus0 >> 27) & 1;
@@ -6266,8 +6252,6 @@ class CtrRadarStatus {
             var overWidth = (gr.radarData.systemStatus1 >> 15) & 1;
             var sspaPowerErr = (gr.radarData.systemStatus1 >> 13) & 1;
             var sspaModuleErr = (gr.radarData.systemStatus1 >> 14) & 1;
-            var sspaPowerStatusA = gr.radarData.sspaPowerStatusAA[1];
-            var sspaModuleStatusA = gr.radarData.sspaModuleStatusAA[11];
         }
 
         wc[0] = rfDet;  //rfPulse detected
@@ -6640,13 +6624,12 @@ class CtrSspaPowerStatus {
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
+        var powerStatusA = gr.radarData.sspaPowerStatusAA;
+        var powerV50vAA = gr.radarData.sspaPowerV50vAA;
         if (gr.appId === 3) {
-            var powerStatusA = gr.radarData.sspaPowerStatusAA[0];
-            var powerV50vAA = gr.radarData.sspaPowerV50vAA[gr.appId - 3];
             var preText = "ctr1";
         }
         if (gr.appId === 4) {
-            var powerStatusA = gr.radarData.sspaPowerStatusAA[1];
             var preText = "ctr2";
         }
         var watchAA = st.sspaPowerStatusAA = [];
@@ -6681,24 +6664,24 @@ class CtrSspaPowerStatus {
                 va[3] = 1;
             if (powerStatusA[i] & (1 << 3))
                 va[4] = 1;
-            var obj = prg(gr.radarData.sspaPowerV50vAA[gr.appId - 3][i], "SspaPowerV50v", 1);
+            var obj = prg(gr.radarData.sspaPowerV50vAA[i], "SspaPowerV50v", 1);
             va[5] = obj[0];
             va[6] = obj[1];
-            var obj = prg(gr.radarData.sspaPowerV50iAA[gr.appId - 3][i], "SspaPowerV50i", 1);
+            var obj = prg(gr.radarData.sspaPowerV50iAA[i], "SspaPowerV50i", 1);
             va[7] = obj[0];
             va[8] = obj[1];
-            var obj = prg(gr.radarData.sspaPowerV50tAA[gr.appId - 3][i], "SspaPowerV50t", 1);
+            var obj = prg(gr.radarData.sspaPowerV50tAA[i], "SspaPowerV50t", 1);
             va[9] = obj[0];
             if (!va[2])//
                 obj[1] = "#eef";
             va[10] = obj[1];
-            var obj = prg(gr.radarData.sspaPowerV32vAA[gr.appId - 3][i], "SspaPowerV32v", 1);
+            var obj = prg(gr.radarData.sspaPowerV32vAA[i], "SspaPowerV32v", 1);
             va[11] = obj[0];
             va[12] = obj[1];
-            var obj = prg(gr.radarData.sspaPowerV32iAA[gr.appId - 3][i], "SspaPowerV32i", 1);
+            var obj = prg(gr.radarData.sspaPowerV32iAA[i], "SspaPowerV32i", 1);
             va[13] = obj[0];
             va[14] = obj[1];
-            var obj = prg(gr.radarData.sspaPowerV32tAA[gr.appId - 3][i], "SspaPowerV32t", 1);
+            var obj = prg(gr.radarData.sspaPowerV32tAA[i], "SspaPowerV32t", 1);
             va[15] = obj[0];
             if (!va[3])//
                 obj[1] = "#eef";
@@ -6957,11 +6940,11 @@ class CtrSspaModuleStatus {
         var st = md.stas;
         if (gr.appId === 3) {
             var preText = "ctr1";
-            var moduleStatus = gr.radarData.sspaModuleStatusAA[0];
+            var moduleStatus = gr.radarData.sspaModuleStatusAA;
         }
         if (gr.appId === 4) {
             var preText = "ctr2";
-            var moduleStatus = gr.radarData.sspaModuleStatusAA[0];
+            var moduleStatus = gr.radarData.sspaModuleStatusAA;
         }
         var watchAA = st["sspaModuleStatusAA"] = [];
         //0:connect, 1:致能 2 保護觸發, 3:工作比過高, 4:脈寬過高, 5:溫度過高, 6:反射過高, 7:RF輸出, 8:溫度
@@ -6999,11 +6982,11 @@ class CtrSspaModuleStatus {
                 arr[5] = 2;
             if (moduleStatus[i] & (1 << 6))
                 arr[6] = 2;
-            var obj = prg(gr.radarData.sspaModuleRfOutAA[gr.appId - 3][i], "SspaModuleRfOut", 1);
+            var obj = prg(gr.radarData.sspaModuleRfOutAA[i], "SspaModuleRfOut", 1);
             arr[7] = obj[0];
             if (arr[1])
                 arr[8] = obj[1];
-            var obj = prg(gr.radarData.sspaModuleTemprAA[gr.appId - 3][i], "SspaModuleTempr", 0);
+            var obj = prg(gr.radarData.sspaModuleTemprAA[i], "SspaModuleTempr", 0);
             arr[9] = obj[0];
             if (arr[1])
                 arr[10] = obj[1];
@@ -7255,25 +7238,23 @@ class Emulate {
 
         //============================================
         for (var i = 0; i < 36; i++) {
-            gr.radarData.sspaModuleRfOutAA[0][i] = 0;
-            gr.radarData.sspaModuleRfOutAA[1][i] = 0;
-            gr.radarData.sspaModuleTemprAA[0][i] = 25;
-            gr.radarData.sspaModuleTemprAA[1][i] = 25;
+            gr.radarData.sspaModuleRfOutAA[i] = 0;
+            gr.radarData.sspaModuleTemprAA[i] = 25;
         }
 
         if (gr.radarData.systemStatus0 & (1 << 22)) {//rfpulse detected
             for (var i = 0; i < 36; i++) {
-                if (gr.radarData.sspaModuleStatusAA[0][i] & 3) {
-                    gr.radarData.sspaModuleRfOutAA[0][i] = 35.2;
-                    gr.radarData.sspaModuleTempr[0][i] = 100;
+                if (gr.radarData.sspaModuleStatusAA[i] & 3) {
+                    gr.radarData.sspaModuleRfOutAA[i] = 35.2;
+                    gr.radarData.sspaModuleTempr[i] = 100;
                 }
             }
         }
         if (gr.radarData.systemStatus0 & (1 << 27)) {//rfpulse detected
             for (var i = 0; i < 36; i++) {
-                if (gr.radarData.sspaModuleStatusAA[1][i] & 3) {
-                    gr.radarData.sspaModuleRfOutAA[1][i] = 35.2;
-                    gr.radarData.sspaModuleTempr[1][i] = 100;
+                if (gr.radarData.sspaModuleStatusAA[i] & 3) {
+                    gr.radarData.sspaModuleRfOutAA[i] = 35.2;
+                    gr.radarData.sspaModuleTempr[i] = 100;
                 }
             }
         }
@@ -7328,29 +7309,27 @@ class Emulate {
         var rd = gr.radarData;
         if (!self.firstEntry_f) {
             self.firstEntry_f = 1;
-            rd.slotDataAA = [0,0,0,0,0,0,0,0,0,0,0,0];
+            rd.slotDataAA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
             for (var i = 0; i < 36; i++) {
-                rd.sspaPowerStatusAA[0][i] |= 1;
-                rd.sspaPowerStatusAA[1][i] |= 1;
-                rd.sspaModuleStatusAA[0][i] |= 1;
-                rd.sspaModuleStatusAA[1][i] |= 1;
+                rd.sspaPowerStatusAA[i] |= 1;
+                rd.sspaModuleStatusAA[i] |= 1;
             }
             self.preNanoTime = (performance.now() * 1000000) | 0;
 
         }
         if (self.actTime === 10) {
-                for (var j = 0; j < 12; j++) {
-                    rd.slotDataAA[j] &= 0xf0ff;
-                    rd.slotDataAA[j] |= 0x0300;
-                }
+            for (var j = 0; j < 12; j++) {
+                rd.slotDataAA[j] &= 0xf0ff;
+                rd.slotDataAA[j] |= 0x0300;
+            }
             rd.systemStatus0 &= 0xffc00000;
             rd.systemStatus0 |= 0x00155555;
         }
         if (self.actTime === 50) {
-                for (var j = 0; j < 12; j++) {
-                    rd.slotDataAA[j] &= 0xf0ff;
-                    rd.slotDataAA[j] |= 0x0100;
-                }
+            for (var j = 0; j < 12; j++) {
+                rd.slotDataAA[j] &= 0xf0ff;
+                rd.slotDataAA[j] |= 0x0100;
+            }
             rd.systemStatus0 &= 0xffc00000;
             rd.systemStatus0 |= 0x002aaaaa;
         }
@@ -7462,7 +7441,7 @@ class Emulate {
 
         }
         var emergency = gr.radarData.systemStatus0 & (1 << (shift + 4));
-        var ready_f = (rd.systemStatus0 >> (gr.appId * 2)) & 3;
+        var ready_f = rd.systemStatus0 & 3;
 
 
         var messageId = iobj.act;
@@ -7766,40 +7745,27 @@ class SyncGloble {
          4:cw output rf power
          5:ccw output rf power
          */
-        rd.meterStatusAA = [];
         //=====================
         //0 connectFlag, 1 faultLed, 2:v50enLed, 3:v32enLed, 4:v50v, 5:v50i, 6:v50t, 7:v32v, 8:v32i, 9:v32t
-        rd.sspaPowerStatusAA = [];
-        rd.sspaPowerV50vAA = [];
-        rd.sspaPowerV50iAA = [];
-        rd.sspaPowerV50tAA = [];
-        rd.sspaPowerV32vAA = [];
-        rd.sspaPowerV32iAA = [];
-        rd.sspaPowerV32tAA = [];
         //===========================
         //0:connect, 1:致能, 2 保護觸發, 3:工作比過高, 4:脈寬過高, 5:溫度過高, 6:反射過高, 7:RF輸出, 8:溫度
-        rd.sspaModuleStatusAA = [];
-        rd.sspaModuleRfOutAA = [];
-        rd.sspaModuleTemprAA = [];
         //===========================
         var va36 = [];
         for (var i = 0; i < 36; i++) {
             va36.push(0);
         }
-        for (var i = 0; i < 2; i++) {
-            rd.meterStatusAA.push([0, 0, 0, 0, 0, 0]);
-            rd.sspaPowerStatusAA.push(KvLib.copyObj(va36));
-            rd.sspaPowerV50vAA.push(KvLib.copyObj(va36));
-            rd.sspaPowerV50iAA.push(KvLib.copyObj(va36));
-            rd.sspaPowerV50tAA.push(KvLib.copyObj(va36));
-            rd.sspaPowerV32vAA.push(KvLib.copyObj(va36));
-            rd.sspaPowerV32iAA.push(KvLib.copyObj(va36));
-            rd.sspaPowerV32tAA.push(KvLib.copyObj(va36));
-            rd.sspaModuleStatusAA.push(KvLib.copyObj(va36));
-            rd.sspaModuleRfOutAA.push(KvLib.copyObj(va36));
-            rd.sspaModuleTemprAA.push(KvLib.copyObj(va36));
+        rd.meterStatusAA = [0, 0, 0, 0, 0, 0];
+        rd.sspaPowerStatusAA = KvLib.copyObj(va36);
+        rd.sspaPowerV50vAA = KvLib.copyObj(va36);
+        rd.sspaPowerV50iAA = KvLib.copyObj(va36);
+        rd.sspaPowerV50tAA = KvLib.copyObj(va36);
+        rd.sspaPowerV32vAA = KvLib.copyObj(va36);
+        rd.sspaPowerV32iAA = KvLib.copyObj(va36);
+        rd.sspaPowerV32tAA = KvLib.copyObj(va36);
+        rd.sspaModuleStatusAA = KvLib.copyObj(va36);
+        rd.sspaModuleRfOutAA = KvLib.copyObj(va36);
+        rd.sspaModuleTemprAA = KvLib.copyObj(va36);
 
-        }
         rd.gpsDataAA = [];//0:mast, 1sub1, 2sub2
         for (var i = 0; i < 3; i++)
             rd.gpsDataAA.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
@@ -7896,37 +7862,31 @@ class SyncGloble {
             return;
         }
         var rd = gr.radarData;
+        var powerStatusA = rd.sspaPowerStatusAA;
+        var moduleStatusA = rd.sspaModuleStatusAA;
         if (gr.appId === 1) {
             var preText = "sub1";
             var preInx = 0;
             var status0 = rd.systemStatus0 >> 22;
             var shift = 22;
-            var powerStatusA = rd.sspaPowerStatusAA[0];
-            var moduleStatusA = rd.sspaModuleStatusAA[0];
         }
         if (gr.appId === 2) {
             var preText = "sub2";
             var preInx = 1;
             var status0 = rd.systemStatus0 >> 27;
             var shift = 27;
-            var powerStatusA = rd.sspaPowerStatusAA[1];
-            var moduleStatusA = rd.sspaModuleStatusAA[1];
         }
         if (gr.appId === 3) {
             var preText = "ctr1";
             var preInx = 0;
             var status0 = rd.systemStatus0 >> 22;
             var shift = 22;
-            var powerStatusA = rd.sspaPowerStatusAA[0];
-            var moduleStatusA = rd.sspaModuleStatusAA[0];
         }
         if (gr.appId === 4) {
             var preText = "ctr2";
             var preInx = 1;
             var status0 = rd.systemStatus0 >> 27;
             var shift = 27;
-            var powerStatusA = rd.sspaPowerStatusAA[1];
-            var moduleStatusA = rd.sspaModuleStatusAA[1];
         }
 
         if (gr.appId >= 1 && gr.appId <= 4) {
@@ -7942,7 +7902,7 @@ class SyncGloble {
         }
 
         var emergency = gr.radarData.systemStatus0 & (1 << (shift + 4));
-        var ready_f = (rd.systemStatus0 >> (gr.appId * 2)) & 3;
+        var ready_f = rd.systemStatus0 & 3;
 
         if (iobj.act === "selfTestStartAll") {
             gr.logMessage.messages.push({type: "cmd", text: "全系統測試"});
@@ -8155,7 +8115,7 @@ class SyncGloble {
             ws.cmd(iobj.act, iobj.paras);
             return;
         }
-        
+
         if (iobj.act === preText + "RadiationOff") {
             gr.logMessage.messages.push({type: "cmd", text: "輻射關閉"});
             ws.cmd(iobj.act, iobj.paras);
