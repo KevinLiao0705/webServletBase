@@ -568,6 +568,7 @@ class DummyTargetMaster {
                     opts.setNames.push(preText + "CcwAmpOutRfpowLimU");
                     //
                     opts.setNames.push(preText + "Attenuator");
+                    opts.setNames.push("sp4tCnt");
 
 
 
@@ -5590,6 +5591,8 @@ class DummyTargetCtrPane {
         var da = gr.radarData.meterStatusAA;
         //======================================
         var prg = function (data, name, fixed) {
+            if(data<0)
+                return["","#ddd",0];
             var value = (data - gr.paraSet[preText + name + "Offs"]) * gr.paraSet[preText + name + "Gain"];
             if (value < gr.paraSet[preText + name + "Zero"])
                 value = 0;
@@ -6223,6 +6226,9 @@ class CtrRadarStatus {
             0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0
         ];
+
+        DummyTargetCtrPane.getMeterStatus(wa, wac);
+
 
         if (gr.appId === 3) {
             var preText = "ctr1";
