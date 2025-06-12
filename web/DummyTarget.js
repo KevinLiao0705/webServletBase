@@ -5591,8 +5591,9 @@ class DummyTargetCtrPane {
         var da = gr.radarData.meterStatusAA;
         //======================================
         var prg = function (data, name, fixed) {
-            if(data<0)
+            if(data<=0)
                 return["","#ddd",0];
+            data=1000-data;
             var value = (data - gr.paraSet[preText + name + "Offs"]) * gr.paraSet[preText + name + "Gain"];
             if (value < gr.paraSet[preText + name + "Zero"])
                 value = 0;
@@ -6676,7 +6677,7 @@ class CtrSspaPowerStatus {
             var obj = prg(gr.radarData.sspaPowerV50iAA[i], "SspaPowerV50i", 1);
             va[7] = obj[0];
             va[8] = obj[1];
-            var obj = prg(gr.radarData.sspaPowerV50tAA[i], "SspaPowerV50t", 1);
+            var obj = prg(gr.radarData.sspaPowerV50tAA[i], "SspaPowerV50t", 0);
             va[9] = obj[0];
             if (!va[2])//
                 obj[1] = "#eef";
@@ -6687,7 +6688,7 @@ class CtrSspaPowerStatus {
             var obj = prg(gr.radarData.sspaPowerV32iAA[i], "SspaPowerV32i", 1);
             va[13] = obj[0];
             va[14] = obj[1];
-            var obj = prg(gr.radarData.sspaPowerV32tAA[i], "SspaPowerV32t", 1);
+            var obj = prg(gr.radarData.sspaPowerV32tAA[i], "SspaPowerV32t", 0);
             va[15] = obj[0];
             if (!va[3])//
                 obj[1] = "#eef";
