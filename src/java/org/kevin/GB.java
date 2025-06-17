@@ -24,7 +24,7 @@ public class GB {
     public static int osInx = 0;
     public static String sourceDir = "web/";          //for debug use
     //public static String sourceDir="webapps/ROOT/";     //for deplyment use
-    public static String paraSetPath = "d:/kevin/myCode/syncSet";
+    public static String paraSetPath = "e:/kevin/myCode/syncSet";
     //public static String paraSetPath = "/home/admintx/syncSetExe";
     //==============================================
     //======================================

@@ -513,7 +513,7 @@ class DummyTargetMaster {
                     opts.setNames.push(preText + "SspaPowerV32tLimU");
                     //
                     opts.setNames.push(preText + "SspaPowerV32OnDly");
-                    opts.setNames.push(preText + "SspaPowerV32OffDly");
+                    opts.setNames.push(preText + "SspaPowerV50OffDly");
 
                 }
                 if (iobj.selectText === "固態放大器參數設定") {
