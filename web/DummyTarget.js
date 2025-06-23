@@ -5346,7 +5346,13 @@ class DummyTargetCtr {
                     gr.viewDatas[i] = KvLib.trsIntToHexStr(gr.radarData.viewDatas[i]);
                 }
             }
-
+            var rd=gr.radarData;
+            if(rd.pulseFormAddBufA0){
+                for(var i=0;i<rd.pulseFormAddBufA0.length;i++){
+                    gr.pulseFormAddBufAA[0].push(rd.pulseFormAddBufA0[i]);
+                }
+            }
+            rd.pulseFormAddBufA0=null;
             console.log("radarData");
 
         };
@@ -5591,9 +5597,9 @@ class DummyTargetCtrPane {
         var da = gr.radarData.meterStatusAA;
         //======================================
         var prg = function (data, name, fixed) {
-            if(data<=0)
-                return["","#ddd",0];
-            data=1000-data;
+            if (data <= 0)
+                return["", "#ddd", 0];
+            data = 1000 - data;
             var value = (data - gr.paraSet[preText + name + "Offs"]) * gr.paraSet[preText + name + "Gain"];
             if (value < gr.paraSet[preText + name + "Zero"])
                 value = 0;
@@ -6244,8 +6250,8 @@ class CtrRadarStatus {
             wb[i] = (gr.radarData["enviStatusA"][inx] >> i) & 1;
         }
         //=========================================
-            var sspaPowerStatusA = gr.radarData.sspaPowerStatusAA;
-            var sspaModuleStatusA = gr.radarData.sspaModuleStatusAA;
+        var sspaPowerStatusA = gr.radarData.sspaPowerStatusAA;
+        var sspaModuleStatusA = gr.radarData.sspaModuleStatusAA;
         if (gr.appId === 3) {
             var rfDet = (gr.radarData.systemStatus0 >> 22) & 1;
             var overDuty = (gr.radarData.systemStatus1 >> 11) & 1;
@@ -7314,63 +7320,135 @@ class Emulate {
     timer() {
         var self = this;
         var rd = gr.radarData;
-        if (!self.firstEntry_f) {
-            self.firstEntry_f = 1;
-            rd.slotDataAA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-            for (var i = 0; i < 36; i++) {
-                rd.sspaPowerStatusAA[i] |= 1;
-                rd.sspaModuleStatusAA[i] |= 1;
+
+        /*
+         if (!self.firstEntry_f) {
+         self.firstEntry_f = 1;
+         rd.slotDataAA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+         for (var i = 0; i < 36; i++) {
+         rd.sspaPowerStatusAA[i] |= 1;
+         rd.sspaModuleStatusAA[i] |= 1;
+         }
+         self.preNanoTime = (performance.now() * 1000000) | 0;
+         
+         }
+         if (self.actTime === 10) {
+         for (var j = 0; j < 12; j++) {
+         rd.slotDataAA[j] &= 0xf0ff;
+         rd.slotDataAA[j] |= 0x0300;
+         }
+         rd.systemStatus0 &= 0xffc00000;
+         rd.systemStatus0 |= 0x00155555;
+         }
+         if (self.actTime === 50) {
+         for (var j = 0; j < 12; j++) {
+         rd.slotDataAA[j] &= 0xf0ff;
+         rd.slotDataAA[j] |= 0x0100;
+         }
+         rd.systemStatus0 &= 0xffc00000;
+         rd.systemStatus0 |= 0x002aaaaa;
+         }
+         if (++self.connectTime >= 6) {
+         self.connectTime = 0;
+         self.connectCnt++;
+         gr.footBarStatus0 = "Connect " + (self.connectCnt % 10);
+         gr.footBarStatus1 = "Emulation";
+         gr.footBarStatus2 = ani.dispFs;
+         self.actTime++;
+         
+         }
+         if (gr.appId === 3 || gr.appId === 4)
+         self.ctrEmu();
+         */
+
+
+
+        if (false) {
+            if (gr.addDebug === undefined) {
+                gr.addDebug = 0;
             }
-            self.preNanoTime = (performance.now() * 1000000) | 0;
-
-        }
-        if (self.actTime === 10) {
-            for (var j = 0; j < 12; j++) {
-                rd.slotDataAA[j] &= 0xf0ff;
-                rd.slotDataAA[j] |= 0x0300;
+            gr.addDebug++;
+            var mod2 = gr.addDebug % 4;
+            if (mod2 === 0) {
+                var bufA=gr.pulseFormAddBufAA[0]=[];
+                bufA.push(100000 * 2 + 1);
             }
-            rd.systemStatus0 &= 0xffc00000;
-            rd.systemStatus0 |= 0x00155555;
-        }
-        if (self.actTime === 50) {
-            for (var j = 0; j < 12; j++) {
-                rd.slotDataAA[j] &= 0xf0ff;
-                rd.slotDataAA[j] |= 0x0100;
+            if (mod2 === 1) {
+                var bufA=gr.pulseFormAddBufAA[0]=[];
+                bufA.push(900000 * 2 + 0);
             }
-            rd.systemStatus0 &= 0xffc00000;
-            rd.systemStatus0 |= 0x002aaaaa;
+            if (mod2 === 2) {
+                var bufA=gr.pulseFormAddBufAA[0]=[];
+                bufA.push(310000 * 2 + 1);
+            }
+            if (mod2 === 3) {
+                var bufA=gr.pulseFormAddBufAA[0]=[];
+                bufA.push(690000 * 2 + 0);
+            }
         }
-        if (++self.connectTime >= 6) {
-            self.connectTime = 0;
-            self.connectCnt++;
-            gr.footBarStatus0 = "Connect " + (self.connectCnt % 10);
-            gr.footBarStatus1 = "Emulation";
-            gr.footBarStatus2 = ani.dispFs;
-            self.actTime++;
-
-        }
-        if (gr.appId === 3 || gr.appId === 4)
-            self.ctrEmu();
-
-
-
-
-
 
         if (true) {
+            gr.pulseFormAddInxA[0]+=gr.pulseFormAddBufAA[0].length;
+            var addInx=gr.pulseFormAddInxA[0];
+            var addBufA=gr.pulseFormAddBufAA[0];
+            if (gr.pulseFormAddPreInxA[0] !== addInx) {
+                if (!gr.pulseFormAddPreInxA[0]) {
+                    gr.pulseFormAddPreInxA[0] = addInx;
+                    return;
+                }
+                var deltaCnt = addInx - gr.pulseFormAddPreInxA[0];
+                gr.pulseFormAddPreInxA[0] = addInx;
+                for (var i = 0; i < deltaCnt; i++) {
+                    if(i>=addBufA.length)
+                        return;
+                    if ((addBufA[i] & 1)^gr.prePulse_f) {
+                        gr.pulseFormInxA[0]++;
+                        if (gr.pulseFormInxA[0] > gr.pulseFormLenA[0])
+                            gr.pulseFormLenA[0] = gr.pulseFormInxA[0];
+                        if (gr.pulseFormInxA[0] >= gr.pulseFormAA[0].length)
+                            gr.pulseFormInxA[0] = 0;
+                        gr.pulseFormAA[0][gr.pulseFormInxA[0]] = addBufA[i] >> 1;
+                        gr.pulseLevelAA[0][gr.pulseFormInxA[0]] = (addBufA[i] & 1) * 3300;
+                        gr.prePulse_f=addBufA[i] & 1;
+                    } else {
+                        gr.pulseFormAA[0][gr.pulseFormInxA[0]] += addBufA[i] >> 1;
+                    }
+                }
+            }
+            gr.pulseFormAddBufAA[0]=[];
+        }
+
+
+        if (false) {
+            gr.pulseFormInxA[0]++;
+            if (gr.pulseFormInxA[0] > gr.pulseFormLenA[i])
+                gr.pulseFormLenA[0] = gr.pulseFormInxA[i];
+            if (gr.pulseFormInxA[0] >= gr.pulseFormAA[0].length)
+                gr.pulseFormInxA[0] = 0;
+            if (gr.pulseFormInxA[0] & 1) {
+                gr.pulseFormAA[0][gr.pulseFormInxA[0]] = 900000;
+                gr.pulseLevelAA[0][gr.pulseFormInxA[0]] = 0;
+            } else {
+                gr.pulseFormAA[0][gr.pulseFormInxA[0]] = 100000;
+                gr.pulseLevelAA[0][gr.pulseFormInxA[0]] = 3300;
+            }
+            if (gr.pulseFormInxA[0] > gr.pulseFormLenA[0])
+                gr.pulseFormLenA[0] = gr.pulseFormInxA[0];
+        }
+
+
+        if (false) {
             var nanoTime = (performance.now() * 1000000) | 0;
             var deltaTime = nanoTime - self.preNanoTime;
             if (deltaTime < 0)
                 deltaTime = 0 - deltaTime;
             self.preNanoTime = nanoTime;
-            for (var i = 0; i < 2; i++) {
+            for (var i = 0; i < 1; i++) {
                 var nextLen = gr.emuSourceFormAA[i][gr.emuSourceFormInxA[i]];
                 var nowLen = gr.pulseFormAA[i][gr.pulseFormInxA[i]];
                 var nowTime = deltaTime + nowLen;
                 while (true) {
-                    if (nextLen === 0)
-                        break;
-                    if (nowTime < nextLen) {
+                    if (nextLen === 0 || nowTime < nextLen) {
                         gr.pulseFormAA[i][gr.pulseFormInxA[i]] = nowTime;
                         break;
                     } else {
@@ -7642,16 +7720,31 @@ emu = new Emulate();
 class SyncGloble {
     constructor() {
         gr.pulseFormAA = [];
+        gr.pulseLevelAA = [];
         gr.pulseFormInxA = [];
         gr.pulseFormLenA = [];
+        gr.pulseFormAddInxA = [0, 0, 0, 0];
+        gr.pulseFormAddPreInxA = [0, 0, 0, 0];
+        gr.pulseFormAddBufAA = [];
+        gr.prePulse_f=0;
+
+
+
+
         for (var i = 0; i < 4; i++) {
             var arr = [];
-            for (var j = 0; j < 2500; j++) {
+            var levels = [];
+            var bufs = [];
+            for (var j = 0; j < 10000; j++) {
                 arr.push(0);
+                levels.push(0);
+                bufs.push(0);
             }
             gr.pulseFormAA.push(arr);
+            gr.pulseLevelAA.push(levels);
             gr.pulseFormInxA.push(0);
             gr.pulseFormLenA.push(0);
+            gr.pulseFormAddBufAA.push(bufs);
         }
 
         gr.logMessage = {inx: 0, messages: []};
@@ -7780,19 +7873,12 @@ class SyncGloble {
         rd.commPackageCntA = [0, 0];
         rd.commOkRateA = [0, 0];
         rd.rfRxPowerA = [0, 0, 0, 0];//mast rx1,mast rx1,sub1 rx sub2 rx
-
-
-
-
-
-
-
-
+        rd.pulseFormAddBufA0=[];    
     }
     timer() {
-        if (gr.paraSet.emulate === 1) {
-            emu.timer();
-        }
+        //if (gr.paraSet.emulate === 1) {
+        emu.timer();
+        //}
         var rd = gr.radarData;
         var testEndTime = 200;//unit 0.1s
         if (gr.selfTestStartAll_f) {

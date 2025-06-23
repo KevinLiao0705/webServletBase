@@ -179,6 +179,10 @@ class MyNewScopeCtr {
                     var tuner = md.blockRefs["tuner"];
                     tuner.opts.addAngleMul = 0.1;
                 }
+                if (op.tunerSetInx === 5) {
+                    var tuner = md.blockRefs["tuner"];
+                    tuner.opts.addAngleMul = 0.1;
+                }
                 return;
             }
 
@@ -268,14 +272,14 @@ class MyNewScopeCtr {
                     }
                 }
                 if (op.signalMode === 2) {
-                    for (var i = 0; i < 2; i++) {
+                    for (var i = 0; i < 1; i++) {
                         var lineObj = scope.opts.lines[i];
                         lineObj.sampleRate = 1000000;
                         scope.opts.xScale = 18;
                         lineObj.offOn_f = 1;
                         if (i === 0) {
-                            lineObj.name = "本地脈波";
-                            lineObj.offset = 10;
+                            lineObj.name = "雷達脈波";
+                            lineObj.offset = -10;
                         }
                         if (i === 1) {
                             lineObj.name = "遠端脈波";
@@ -283,6 +287,7 @@ class MyNewScopeCtr {
                         }
                         lineObj.yScaleTbl = MyNewScope.yScaleVoltTbl;
                         lineObj.yScaleSet = 10;
+                        lineObj.digit_f = 1;
                     }
                     md = md.reCreate();
                 }
@@ -769,12 +774,15 @@ class MyNewScope {
             lineObj.color = colorTbl[i];
             lineObj.offset = -10 + 10 * i;
             lineObj.offOn_f = 0;
+            lineObj.digit_f = 0;
             lineObj.yScaleSet = 4;//
             lineObj.yScaleTbl = MyNewScope.yScaleVoltTbl;
             lineObj.stInx = 0;
             lineObj.recordLen = 0;
             lineObj.buffer = buffer;
             lineObj.sampleRate = 200000000;
+            lineObj.lineWidth = 1.5;
+
             opts.lines.push(lineObj);
         }
     }
@@ -874,13 +882,12 @@ class MyNewScope {
             var totalTime = st.xScale;
             var sampleTime = (totalTime * 10) / op.sampleAmt;
 
-
-
             var lineObj = op.lines[op.trigInx];
             lineObj.sampleRate = 1000000000 / sampleTime;
             lineObj.stInx = 0;
             var nowPinx = gr.pulseFormInxA[op.trigInx];
             var nextLen = gr.pulseFormAA[op.trigInx][nowPinx];
+            var level = gr.pulseLevelAA[op.trigInx][nowPinx];
             var allTime = 0;
             var trigRestTime = 0;
             if (op.trig_f) {
@@ -896,7 +903,7 @@ class MyNewScope {
                             pinx = gr.pulseFormAA[op.trigInx].length - 1;
                         continue;
                     }
-                    if (!(pinx & 1)) {
+                    if (gr.pulseLevelAA[op.trigInx][pinx] > 0) {
                         allTime += gr.pulseFormAA[op.trigInx][pinx];
                     }
                     trigRestTime = allTime - helfTime;
@@ -905,7 +912,7 @@ class MyNewScope {
             }
 
 
-            for (var k = 0; k < 2; k++) {
+            for (var k = 0; k < 1; k++) {
                 var lineObj = op.lines[k];
                 lineObj.sampleRate = 1000000000 / sampleTime;
                 lineObj.stInx = 0;
@@ -935,9 +942,7 @@ class MyNewScope {
                         break;
                     if (len >= gr.pulseFormLenA[k])
                         break;
-                    var level = 3300;
-                    if (nowPinx & 1)
-                        var level = 0;
+                    var level = gr.pulseLevelAA[k][nowPinx];
                     var inx = lineObj.stInx + j;
                     if (inx >= op.sampleBufSize)
                         inx -= op.sampleBufSize;
@@ -1082,6 +1087,7 @@ class MyNewScope {
         if (!opts.offOn_f)
             return;
         ctx.strokeStyle = opts.color;
+        ctx.lineWidth = opts.lineWidth;
         ctx.beginPath();
         var xzero = st.xyOffx;
         var ycen = st.containerHeight - st.xyOffy - st.yAxeLen / 2;
@@ -1110,6 +1116,12 @@ class MyNewScope {
         var vvBuf = 0;
         if (viewSize > 2000)
             loopLim = (viewSize / 2000) | 0;
+        var maxV = 0;
+        var minV = 0;
+        var preV = 0;
+        var chgCnt = 0;
+        var preLevel = 0;
+
 
         for (var i = 0; i < viewSize; i++) {
             if (inx < opts.stInx) {
@@ -1151,11 +1163,33 @@ class MyNewScope {
                 break;
             }
 
-
+            if (i >= 4999)
+                var uu = 0;
 
             var vv = opts.buffer[rinx];
+            if (opts.digit_f) {
+                if (preV !== vv)
+                    chgCnt++;
+                preV = vv;
+                if (vv >= maxV)
+                    maxV = vv;
+            }
+
             if ((rinx % loopLim) === 0) {
+                if (opts.digit_f) {
+                    if (chgCnt !== 0) {
+                        if (preLevel == 0)
+                            vv = maxV
+                        else
+                            vv = 0;
+                        preLevel = vv;
+                    }
+                    chgCnt = 0;
+                    maxV = 0;
+                    minV = 0;
+                }
                 var ylen = vv * yGridLen / opts.yScale;
+
                 var realY = ycen - ylen - yOffset;
                 if (realY > maxY)
                     realY = maxY;
@@ -1168,6 +1202,7 @@ class MyNewScope {
                         ctx.lineTo(xzero + xlen, realY);
                     first_f = 1;
                 }
+
             }
             inx++;
             xlen += stepLenPerSamp;
