@@ -68,10 +68,10 @@ class GlobalRes {
         //============================
         this.footBarMessageText="";
         this.footBarMessageColor="#000";
+        this.footBarMessageTime=0;
         this.footBarStatus0="";
         this.footBarStatus1="";
         this.footBarStatus2="";
-        this.footBarMessageTime=0;
         /*
         this.message = "";
         this.messageKobj = null;

@@ -537,30 +537,35 @@ class DummyTargetMaster {
                         var preText = "ctr1";
                     if (gr.appId === 4)
                         var preText = "ctr2";
+                    opts.setNames.push(preText + "InRfpowFilter");
                     opts.setNames.push(preText + "InRfpowOffs");
                     opts.setNames.push(preText + "InRfpowGain");
                     opts.setNames.push(preText + "InRfpowZero");
                     opts.setNames.push(preText + "InRfpowLimD");
                     opts.setNames.push(preText + "InRfpowLimU");
                     //
+                    opts.setNames.push(preText + "PreAmpOutRfpowFilter");
                     opts.setNames.push(preText + "PreAmpOutRfpowOffs");
                     opts.setNames.push(preText + "PreAmpOutRfpowGain");
                     opts.setNames.push(preText + "PreAmpOutRfpowZero");
                     opts.setNames.push(preText + "PreAmpOutRfpowLimD");
                     opts.setNames.push(preText + "PreAmpOutRfpowLimU");
                     //
+                    opts.setNames.push(preText + "DriverAmpOutRfpowFilter");
                     opts.setNames.push(preText + "DriverAmpOutRfpowOffs");
                     opts.setNames.push(preText + "DriverAmpOutRfpowGain");
                     opts.setNames.push(preText + "DriverAmpOutRfpowZero");
                     opts.setNames.push(preText + "DriverAmpOutRfpowLimD");
                     opts.setNames.push(preText + "DriverAmpOutRfpowLimU");
                     //
+                    opts.setNames.push(preText + "CwAmpOutRfpowFilter");
                     opts.setNames.push(preText + "CwAmpOutRfpowOffs");
                     opts.setNames.push(preText + "CwAmpOutRfpowGain");
                     opts.setNames.push(preText + "CwAmpOutRfpowZero");
                     opts.setNames.push(preText + "CwAmpOutRfpowLimD");
                     opts.setNames.push(preText + "CwAmpOutRfpowLimU");
                     //
+                    opts.setNames.push(preText + "CcwAmpOutRfpowFilter");
                     opts.setNames.push(preText + "CcwAmpOutRfpowOffs");
                     opts.setNames.push(preText + "CcwAmpOutRfpowGain");
                     opts.setNames.push(preText + "CcwAmpOutRfpowZero");
@@ -2366,10 +2371,6 @@ class SubRadarPane {
                             var str = strA[1].slice(0, strA[1].length - 1);
                             var duty = KvLib.strToFloat(str, 5);
                             var pri = Math.round(pw * 100 / duty);
-                            gr.emuSourceFormAA[0] = [];
-                            gr.emuSourceFormAA[0].push(pw);
-                            gr.emuSourceFormAA[0].push(pri - pw);
-                            gr.emuSourceFormInxA[0] = gr.pulseFormInxA[0] & 1;
                             gr.gbcs.command({'act': preText + "RadiationOn", "paras": [selectNo[iobj.selectInx]]});
                             return;
 
@@ -2915,10 +2916,6 @@ class SubRadarPane1 {
                             var str = strA[1].slice(0, strA[1].length - 1);
                             var duty = KvLib.strToFloat(str, 5);
                             var pri = Math.round(pw * 100 / duty);
-                            gr.emuSourceFormAA[0] = [];
-                            gr.emuSourceFormAA[0].push(pw);
-                            gr.emuSourceFormAA[0].push(pri - pw);
-                            gr.emuSourceFormInxA[0] = gr.pulseFormInxA[0] & 1;
                             gr.gbcs.command({'act': preText + "RadiationOn", "paras": [selectNo[iobj.selectInx]]});
                             return;
 
@@ -5346,13 +5343,50 @@ class DummyTargetCtr {
                     gr.viewDatas[i] = KvLib.trsIntToHexStr(gr.radarData.viewDatas[i]);
                 }
             }
-            var rd=gr.radarData;
-            if(rd.pulseFormAddBufA0){
-                for(var i=0;i<rd.pulseFormAddBufA0.length;i++){
-                    gr.pulseFormAddBufAA[0].push(rd.pulseFormAddBufA0[i]);
+            var rd = gr.radarData;
+            //rd.pulseFormAddBufA0=[160*250*2+1,160*37*2+1,160*13*2+1,160*250*2+0,160*150*2+0,160*300*2+0];
+            if (rd.pulseFormAddBufA0) {
+                for (var i = 0; i < rd.pulseFormAddBufA0.length; i++) {
+                    gr.pulseFormInxA[0]++;
+                    if (gr.pulseFormInxA[0] > gr.pulseFormLenA[0])
+                        gr.pulseFormLenA[0] = gr.pulseFormInxA[0];
+                    if (gr.pulseFormInxA[0] >= gr.pulseFormAA[0].length)
+                        gr.pulseFormInxA[0] = 0;
+                    gr.pulseFormAA[0][gr.pulseFormInxA[0]] = (rd.pulseFormAddBufA0[i] >> 1) * 1000 / 160;
+                    gr.pulseLevelAA[0][gr.pulseFormInxA[0]] = (rd.pulseFormAddBufA0[i] & 1) * 3300;
                 }
             }
-            rd.pulseFormAddBufA0=null;
+
+
+
+            rd.pulseFormAddBufA0 = null;
+            if (rd.pulseFormInf) {
+                var plow = rd.pulseFormInf[0];
+                var phigh = rd.pulseFormInf[1];
+                var freq = rd.pulseFormInf[2];
+                if (plow & phigh) {
+                    var duty = phigh * 100 / (plow + phigh);
+                    phigh = (phigh / 160).toFixed(1);
+                    duty = duty.toFixed(1);
+                    freq = ((freq + 290) / 100).toFixed(2);
+                    gr.footBarMessageText = "Width:" + phigh + " us, Duty:" + duty + "%, Freq:" + freq + " GHz";
+                    gr.footBarMessageColor = "#00f";
+                    gr.footBarMessageTime = 10;
+                }
+            }
+
+            if (gr.signalMode === 3) {
+                var rand = Math.round(10 * Math.random() - 5);
+                rd.meterStatusAA[0] = 855 + rand;
+                var wa = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"];
+                var wac = ["#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd"];
+                var da = gr.radarData.meterStatusAA;
+                DummyTargetCtrPane.getMeterStatus(wa, wac);
+                gr.plotValue[0] = wa[0];
+                gr.plotValue[1] = wa[4];
+                gr.plotValue[2] = wa[5];
+                gr.plotValue[3] = wa[9];
+            }
             console.log("radarData");
 
         };
@@ -5594,15 +5628,39 @@ class DummyTargetCtrPane {
     static getMeterStatus(wa, wac) {
         var daInx = 0;
         var preText = "ctr1";
+        var rd = gr.radarData;
         var da = gr.radarData.meterStatusAA;
+        var daa = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+
         //======================================
-        var prg = function (data, name, fixed) {
+
+        var prg = function (data, name, fixed, dinx) {
             if (data <= 0)
                 return["", "#ddd", 0];
             data = 1000 - data;
             var value = (data - gr.paraSet[preText + name + "Offs"]) * gr.paraSet[preText + name + "Gain"];
             if (value < gr.paraSet[preText + name + "Zero"])
                 value = 0;
+            //========================================
+            if (dinx!==undefined) {
+                var rd = gr.radarData;
+                rd.meterFiterAA[dinx][rd.meterFiterInxA[dinx]] = value;
+                var inx = rd.meterFiterInxA[dinx];
+                rd.meterFiterInxA[dinx] += 1;
+                if (rd.meterFiterInxA[dinx] >= 256)
+                    rd.meterFiterInxA[dinx] = 0;
+                var filterLen = gr.paraSet[preText + name + "Filter"];
+                var sum = 0;
+                for (var i = 0; i < filterLen; i++) {
+                    inx &= 255;
+                    sum += rd.meterFiterAA[dinx][inx];
+                    inx--;
+                }
+                value = sum / filterLen;
+            }
+
+
+            //========================================
             var valueStr = "" + value.toFixed(fixed);
             var valueColor = "#ddd";
             if (value < gr.paraSet[preText + name + "LimD"] && value !== 0)
@@ -5614,7 +5672,7 @@ class DummyTargetCtrPane {
             return [valueStr, valueColor, value];
         };
         //======================================
-        var va = prg(da[0], "InRfpow", 1);
+        var va = prg(da[0], "InRfpow", 1,0);
         wa[0] = va[0];
         wac[0] = va[1];
         //======================================
@@ -5889,12 +5947,6 @@ class DummyTargetCtrPane {
                             var str = strA[1].slice(0, strA[1].length - 1);
                             var duty = KvLib.strToFloat(str, 5);
                             var pri = Math.round(pw * 100 / duty);
-                            gr.emuSourceFormAA[0] = [];
-                            gr.emuSourceFormAA[0].push(pw);
-                            gr.emuSourceFormAA[0].push(pri - pw);
-                            gr.emuSourceFormInxA[0] = gr.pulseFormInxA[0] & 1;
-
-
                             gr.gbcs.command({'act': preText + "RadiationOn", "paras": [selectNo[iobj.selectInx]]});
                             return;
 
@@ -7231,14 +7283,6 @@ class Emulate {
         this.actTime = 0;
         this.actionObj = {};
         this.preNanoTime = 0;
-        gr.emuSourceFormAA = [];
-        for (var i = 0; i < 4; i++) {
-            gr.emuSourceFormAA.push([]);
-        }
-
-        gr.emuSourceFormAA[0] = [100 * 1000, 1900 * 1000];
-        gr.emuSourceFormAA[1] = [200 * 1000, 1000 * 1000];
-        gr.emuSourceFormInxA = [0, 0, 0, 0];
 
 
     }
@@ -7363,117 +7407,11 @@ class Emulate {
 
 
 
-        if (false) {
-            if (gr.addDebug === undefined) {
-                gr.addDebug = 0;
-            }
-            gr.addDebug++;
-            var mod2 = gr.addDebug % 4;
-            if (mod2 === 0) {
-                var bufA=gr.pulseFormAddBufAA[0]=[];
-                bufA.push(100000 * 2 + 1);
-            }
-            if (mod2 === 1) {
-                var bufA=gr.pulseFormAddBufAA[0]=[];
-                bufA.push(900000 * 2 + 0);
-            }
-            if (mod2 === 2) {
-                var bufA=gr.pulseFormAddBufAA[0]=[];
-                bufA.push(310000 * 2 + 1);
-            }
-            if (mod2 === 3) {
-                var bufA=gr.pulseFormAddBufAA[0]=[];
-                bufA.push(690000 * 2 + 0);
-            }
-        }
-
-        if (true) {
-            gr.pulseFormAddInxA[0]+=gr.pulseFormAddBufAA[0].length;
-            var addInx=gr.pulseFormAddInxA[0];
-            var addBufA=gr.pulseFormAddBufAA[0];
-            if (gr.pulseFormAddPreInxA[0] !== addInx) {
-                if (!gr.pulseFormAddPreInxA[0]) {
-                    gr.pulseFormAddPreInxA[0] = addInx;
-                    return;
-                }
-                var deltaCnt = addInx - gr.pulseFormAddPreInxA[0];
-                gr.pulseFormAddPreInxA[0] = addInx;
-                for (var i = 0; i < deltaCnt; i++) {
-                    if(i>=addBufA.length)
-                        return;
-                    if ((addBufA[i] & 1)^gr.prePulse_f) {
-                        gr.pulseFormInxA[0]++;
-                        if (gr.pulseFormInxA[0] > gr.pulseFormLenA[0])
-                            gr.pulseFormLenA[0] = gr.pulseFormInxA[0];
-                        if (gr.pulseFormInxA[0] >= gr.pulseFormAA[0].length)
-                            gr.pulseFormInxA[0] = 0;
-                        gr.pulseFormAA[0][gr.pulseFormInxA[0]] = addBufA[i] >> 1;
-                        gr.pulseLevelAA[0][gr.pulseFormInxA[0]] = (addBufA[i] & 1) * 3300;
-                        gr.prePulse_f=addBufA[i] & 1;
-                    } else {
-                        gr.pulseFormAA[0][gr.pulseFormInxA[0]] += addBufA[i] >> 1;
-                    }
-                }
-            }
-            gr.pulseFormAddBufAA[0]=[];
-        }
-
-
-        if (false) {
-            gr.pulseFormInxA[0]++;
-            if (gr.pulseFormInxA[0] > gr.pulseFormLenA[i])
-                gr.pulseFormLenA[0] = gr.pulseFormInxA[i];
-            if (gr.pulseFormInxA[0] >= gr.pulseFormAA[0].length)
-                gr.pulseFormInxA[0] = 0;
-            if (gr.pulseFormInxA[0] & 1) {
-                gr.pulseFormAA[0][gr.pulseFormInxA[0]] = 900000;
-                gr.pulseLevelAA[0][gr.pulseFormInxA[0]] = 0;
-            } else {
-                gr.pulseFormAA[0][gr.pulseFormInxA[0]] = 100000;
-                gr.pulseLevelAA[0][gr.pulseFormInxA[0]] = 3300;
-            }
-            if (gr.pulseFormInxA[0] > gr.pulseFormLenA[0])
-                gr.pulseFormLenA[0] = gr.pulseFormInxA[0];
-        }
-
-
-        if (false) {
-            var nanoTime = (performance.now() * 1000000) | 0;
-            var deltaTime = nanoTime - self.preNanoTime;
-            if (deltaTime < 0)
-                deltaTime = 0 - deltaTime;
-            self.preNanoTime = nanoTime;
-            for (var i = 0; i < 1; i++) {
-                var nextLen = gr.emuSourceFormAA[i][gr.emuSourceFormInxA[i]];
-                var nowLen = gr.pulseFormAA[i][gr.pulseFormInxA[i]];
-                var nowTime = deltaTime + nowLen;
-                while (true) {
-                    if (nextLen === 0 || nowTime < nextLen) {
-                        gr.pulseFormAA[i][gr.pulseFormInxA[i]] = nowTime;
-                        break;
-                    } else {
-                        gr.pulseFormAA[i][gr.pulseFormInxA[i]] = nextLen;
-                        gr.pulseFormInxA[i]++;
-                        if (gr.pulseFormInxA[i] > gr.pulseFormLenA[i])
-                            gr.pulseFormLenA[i] = gr.pulseFormInxA[i];
-                        if (gr.pulseFormInxA[i] >= gr.pulseFormAA[i].length)
-                            gr.pulseFormInxA[i] = 0;
-
-                        nowTime = nowTime - nextLen;
-                        gr.emuSourceFormInxA[i]++;
-                        if (gr.emuSourceFormInxA[i] >= gr.emuSourceFormAA[i].length)
-                            gr.emuSourceFormInxA[i] = 0;
-                        nextLen = gr.emuSourceFormAA[i][gr.emuSourceFormInxA[i]];
-                    }
-                }
-            }
 
 
 
 
 
-
-        }
 
 
     }
@@ -7726,7 +7664,10 @@ class SyncGloble {
         gr.pulseFormAddInxA = [0, 0, 0, 0];
         gr.pulseFormAddPreInxA = [0, 0, 0, 0];
         gr.pulseFormAddBufAA = [];
-        gr.prePulse_f=0;
+        gr.prePulse_f = 0;
+        gr.signalMode = 0;
+        gr.signalModeInx = 0;
+        gr.plotValue = [0, 0, 0, 0];
 
 
 
@@ -7873,7 +7814,21 @@ class SyncGloble {
         rd.commPackageCntA = [0, 0];
         rd.commOkRateA = [0, 0];
         rd.rfRxPowerA = [0, 0, 0, 0];//mast rx1,mast rx1,sub1 rx sub2 rx
-        rd.pulseFormAddBufA0=[];    
+        rd.pulseFormAddBufA0 = [];
+
+
+
+        rd.meterFiterAA = [];
+        for (var j = 0; j < 9; j++) {
+            var ibuf = [];
+            for (var i = 0; i < 256; i++) {
+                ibuf.push(0);
+            }
+            rd.meterFiterAA.push(ibuf);
+        }
+        rd.meterFiterInxA = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+
     }
     timer() {
         //if (gr.paraSet.emulate === 1) {

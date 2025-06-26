@@ -876,6 +876,8 @@ class MyNewScope {
         st.phaseSpeed += 2;
         if (st.phaseSpeed >= 1000)
             st.phaseSpeed -= 1000;
+        gr.signalMode=op.signalMode ;
+        gr.signalModeInx=op.signalModeInx ;
 
         if (op.signalMode === 2) {
             st.drawed_f = 1;
@@ -1002,6 +1004,30 @@ class MyNewScope {
             }
         }
 
+        if (op.signalMode === 3) {
+            for (var i = 0; i < 4; i++) {
+                var lineObj = op.lines[i];
+                if (!lineObj.offOn_f)
+                    continue;
+                st.drawed_f = 1;
+                if (op.signalModeInx === 0) {
+                    if (!lineObj.sampleRest)
+                        lineObj.sampleRest = 0;
+                    var timef = lineObj.sampleRate / 62;
+                    var timei = timef | 0;
+                    lineObj.sampleRest += timef - timei;
+                    if (lineObj.sampleRest >= 1) {
+                        lineObj.sampleRest - 1;
+                        timei++;
+                    }
+                    var buf = [];
+                    for (var j = 0; j < timei; j++) {
+                        buf.push(gr.plotValue[i]);
+                    }
+                    self.addLineBuf(buf, i);
+                }
+            }
+        }
 
 
 
