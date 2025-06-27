@@ -263,8 +263,9 @@ class MyNewScopeCtr {
                         for (var i = 0; i < 4; i++) {
                             var lineObj = scope.opts.lines[i];
                             lineObj.yScaleTbl = MyNewScope.yScaleVoltTbl;
-                            lineObj.sampleRate = 200;
-                            scope.opts.xScale = 29;
+                            lineObj.sampleRate = 2000;
+                            scope.opts.xScale = 26;
+                            lineObj.yScaleSet = 3;
                             lineObj.offOn_f = 1;
                             lineObj.name = "測試信號" + (op.signalModeInx + 1) + "-" + (i + 1);
                         }
@@ -304,19 +305,19 @@ class MyNewScopeCtr {
                             op.chSelectInx = 0;
                         }
                         if (i === 1) {
+                            lineObj.yScaleTbl = MyNewScope.yScaleDbTbl;
+                            lineObj.yScaleSet = 2;
+                            lineObj.name = "驅動輸出功率";
+                        }
+                        if (i === 2) {
                             lineObj.name = "順向輸出功率";
                             lineObj.yScaleTbl = MyNewScope.yScaleDbTbl;
                             lineObj.yScaleSet = 4;
                         }
-                        if (i === 2) {
+                        if (i === 3) {
                             lineObj.name = "反向輸出功率";
                             lineObj.yScaleTbl = MyNewScope.yScaleDbTbl;
                             lineObj.yScaleSet = 3;
-                        }
-                        if (i === 3) {
-                            lineObj.yScaleTbl = MyNewScope.yScaleAmpTbl;
-                            lineObj.yScaleSet = 8;
-                            lineObj.name = "放大器電源總電流";
                         }
                     }
                     md = md.reCreate();
@@ -772,7 +773,7 @@ class MyNewScope {
             }
             lineObj.name = "CH" + (i + 1);
             lineObj.color = colorTbl[i];
-            lineObj.offset = -10 + 10 * i;
+            lineObj.offset = -40 + 20 * i;
             lineObj.offOn_f = 0;
             lineObj.digit_f = 0;
             lineObj.yScaleSet = 4;//
@@ -997,7 +998,7 @@ class MyNewScope {
                     }
                     var buf = [];
                     for (var j = 0; j < timei; j++) {
-                        buf.push(Math.round(10 * Math.random() - 5));
+                        buf.push(Math.round(10 * Math.random()-5)+10);
                     }
                     self.addLineBuf(buf, i);
                 }
@@ -1051,7 +1052,7 @@ class MyNewScope {
         st.drawed_f = 1;
         var lineObj = op.lines[inx];
         for (var j = 0; j < buf.length; j++) {
-            if (lineObj.recordLen === op.sampleAmt) {
+            if (lineObj.recordLen >= (op.sampleAmt+1)) {
                 lineObj.stInx++;
                 if (lineObj.stInx >= op.sampleBufSize)
                     lineObj.stInx -= op.sampleBufSize;
@@ -1062,6 +1063,8 @@ class MyNewScope {
             }
             if (inx >= op.sampleBufSize)
                 inx -= op.sampleBufSize;
+            if(buf[j]===0)
+                var debugV=0;
             lineObj.buffer[inx] = buf[j];
         }
     }
@@ -1189,8 +1192,6 @@ class MyNewScope {
                 break;
             }
 
-            if (i >= 4999)
-                var uu = 0;
 
             var vv = opts.buffer[rinx];
             if (opts.digit_f) {
@@ -1215,6 +1216,8 @@ class MyNewScope {
                     minV = 0;
                 }
                 var ylen = vv * yGridLen / opts.yScale;
+                if(vv===0)
+                    var tt=0;
 
                 var realY = ycen - ylen - yOffset;
                 if (realY > maxY)

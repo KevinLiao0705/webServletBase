@@ -5376,16 +5376,25 @@ class DummyTargetCtr {
             }
 
             if (gr.signalMode === 3) {
-                var rand = Math.round(10 * Math.random() - 5);
+                //<<debug
+                var rand = Math.round(20 * Math.random() - 10);
                 rd.meterStatusAA[0] = 855 + rand;
+                var rand = Math.round(10 * Math.random() - 10);
+                rd.meterStatusAA[3] = 755 + rand;
+                var rand = Math.round(10 * Math.random() - 10);
+                rd.meterStatusAA[4] = 555 + rand;
+                var rand = Math.round(10 * Math.random() - 10);
+                rd.meterStatusAA[5] = 655 + rand;
+                
+                
                 var wa = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"];
                 var wac = ["#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd"];
                 var da = gr.radarData.meterStatusAA;
                 DummyTargetCtrPane.getMeterStatus(wa, wac);
                 gr.plotValue[0] = wa[0];
-                gr.plotValue[1] = wa[4];
-                gr.plotValue[2] = wa[5];
-                gr.plotValue[3] = wa[9];
+                gr.plotValue[1] = wa[3];
+                gr.plotValue[2] = wa[4];
+                gr.plotValue[3] = wa[5];
             }
             console.log("radarData");
 
@@ -5657,7 +5666,31 @@ class DummyTargetCtrPane {
                     inx--;
                 }
                 value = sum / filterLen;
+                var delayLen=10;
+                if(rd.meterPreValueA[dinx]<value){
+                    rd.meterDelayCntA[dinx]++;
+                    if(rd.meterDelayCntA[dinx]>=delayLen){
+                        rd.meterDelayCntA[dinx]=0;
+                        rd.meterPreValueA[dinx]+=0.1;
+                    }
+                }
+                else if(rd.meterPreValueA[dinx]>value){
+                    rd.meterDelayCntA[dinx]++;
+                    if(rd.meterDelayCntA[dinx]>=delayLen){
+                        rd.meterDelayCntA[dinx]=0;
+                        rd.meterPreValueA[dinx]-=0.1;
+                    }
+                }else{
+                    rd.meterDelayCntA[dinx]=0;
+                }
+                var sumV=rd.meterPreValueA[dinx];    
+                
+                
             }
+            
+            
+            
+            
 
 
             //========================================
@@ -5677,19 +5710,19 @@ class DummyTargetCtrPane {
         wac[0] = va[1];
         //======================================
         //======================================
-        var va = prg(da[2], "PreAmpOutRfpow", 1);
+        var va = prg(da[2], "PreAmpOutRfpow", 1,2);
         wa[2] = va[0];
         wac[2] = va[1];
         //======================================
-        var va = prg(da[3], "DriverAmpOutRfpow", 1);
+        var va = prg(da[3], "DriverAmpOutRfpow", 1,3);
         wa[3] = va[0];
         wac[3] = va[1];
         //======================================
-        var va = prg(da[4], "CwAmpOutRfpow", 1);
+        var va = prg(da[4], "CwAmpOutRfpow", 1,4);
         wa[4] = va[0];
         wac[4] = va[1];
         //======================================
-        var va = prg(da[5], "CcwAmpOutRfpow", 1);
+        var va = prg(da[5], "CcwAmpOutRfpow", 1,5);
         wa[5] = va[0];
         wac[5] = va[1];
         //======================================
@@ -7827,6 +7860,8 @@ class SyncGloble {
             rd.meterFiterAA.push(ibuf);
         }
         rd.meterFiterInxA = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        rd.meterDelayCntA = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        rd.meterPreValueA = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 
     }
