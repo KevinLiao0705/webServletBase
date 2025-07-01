@@ -71,6 +71,7 @@ class DummyTargetMaster {
                 opts.kvTexts.push("系統重啟");
                 opts.kvTexts.push("即時資料");
                 opts.kvTexts.push("數位波形群組");
+                opts.kvTexts.push("關閉UI介面");
             }
             opts.actionFunc = function (iobj) {
                 console.log(iobj);
@@ -79,8 +80,15 @@ class DummyTargetMaster {
                 opts.title = iobj.selectText;
                 opts.setNames = [];
 
-                if (iobj.selectText === "數位波形群組") {
+                if (iobj.selectText === "關閉UI介面") {
+                    MdaPopWin.popOff(2);
+                    gr.gbcs.command({'act': "closeUi"});
+                    return;
+                    
+                    
+                }    
 
+                if (iobj.selectText === "數位波形群組") {
                     var opts = {};
                     opts.paraSet = gr.paraSet;
                     opts.title = "數位波形群組";
@@ -105,7 +113,6 @@ class DummyTargetMaster {
                         sv.saveStringToFile("responseDialogError", "null", fileName, content);
                     };
                     box.selectBox(opts);
-
                     return;
                 }
 
@@ -5377,6 +5384,7 @@ class DummyTargetCtr {
 
             if (gr.signalMode === 3) {
                 //<<debug
+                /*
                 var rand = Math.round(20 * Math.random() - 10);
                 rd.meterStatusAA[0] = 855 + rand;
                 var rand = Math.round(10 * Math.random() - 10);
@@ -5385,11 +5393,11 @@ class DummyTargetCtr {
                 rd.meterStatusAA[4] = 555 + rand;
                 var rand = Math.round(10 * Math.random() - 10);
                 rd.meterStatusAA[5] = 655 + rand;
+                */
                 
                 
                 var wa = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"];
                 var wac = ["#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd"];
-                var da = gr.radarData.meterStatusAA;
                 DummyTargetCtrPane.getMeterStatus(wa, wac);
                 gr.plotValue[0] = wa[0];
                 gr.plotValue[1] = wa[3];
@@ -8125,6 +8133,8 @@ class SyncGloble {
                 gr.gbcs.command({'act': preText + "EmergencyOn"});
             return;
         }
+        
+        
         //=====================================================================
         if (iobj.act === preText + "SspaPowerOn") {
             if ((ready_f !== 2) || emergency)
@@ -8211,6 +8221,11 @@ class SyncGloble {
         }
         if (iobj.act === preText + "EmergencyOff") {
             gr.logMessage.messages.push({type: "cmd", text: "緊急停止關閉"});
+            ws.cmd(iobj.act);
+            return;
+        }
+        if (iobj.act === "closeUi") {
+            gr.logMessage.messages.push({type: "cmd", text: "closeUi"});
             ws.cmd(iobj.act);
             return;
         }
