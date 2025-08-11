@@ -212,15 +212,12 @@ class Block {
                 elem.style.borderTop = st.borderWidth + "px solid " + op.borderColor;
                 elem.style.borderRight = st.borderWidth + "px solid " + op.borderColor;
                 elem.style.borderLeft = st.borderWidth + "px solid " + op.baseColor;
-                ;
                 elem.style.borderBottom = st.borderWidth + "px solid " + op.baseColor;
                 break;
             case "gridT":
                 elem.style.borderTop = st.borderWidth + "px solid " + op.borderColor;
                 elem.style.borderRight = st.borderWidth + "px solid " + op.baseColor;
-                ;
                 elem.style.borderLeft = st.borderWidth + "px solid " + op.baseColor;
-                ;
                 elem.style.borderBottom = st.borderWidth + "px solid " + op.baseColor;
                 break;
 
@@ -943,9 +940,6 @@ class Block {
         var self = this;
         for (var i = 0; i < self.opts.inputRegs.length; i++) {
 
-            if (self.baseType === "MdaSetLine") {
-                var ii = 0;
-            }
 
 
             var ipObj = self.opts.inputRegs[i];
@@ -1901,15 +1895,8 @@ class Cp_base {
         }
         //=====================================
         if ("setBaseElem") {
-            if (this.baseType === "button") {
-                if (this.subType === "check") {
-                    if (op.checked_f) {
-                        st.innerText = '<i class="gf">&#xe5ca</i>';
-                    } else {
-                        st.innerText = "";
-                    }
-                }
-            }
+            if (md.subType0 === "none") 
+                return;
             var elem = document.createElement("div");
             elem.id = md.kid;
             md.elemId = elem.id;
@@ -1960,7 +1947,6 @@ class Cp_base {
             self.setInputText(elem);
             self.setInputRange(elem);
             self.setTextArea(elem);
-
             if (op.styles) {
                 try {
                     var styles = "";
@@ -1972,9 +1958,6 @@ class Cp_base {
                 } catch (e) {
                 }
             }
-
-
-
             elem.md = md;
             felem.appendChild(elem);
             md.elems["base"] = elem;

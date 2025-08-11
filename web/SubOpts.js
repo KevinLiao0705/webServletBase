@@ -16,7 +16,7 @@ class SubOpts {
             opts.viewMouseOverOut_f = 1;
             opts.mouseOnBorderColor = "#aaf";
             //=================
-            opts.innerText = "1.2Wi8";//"1234568<br>abcd";
+            opts.innerText = "Button";//"1234568<br>abcd";
             opts.fontSize = "0.7rh";
             opts.textShadow = "1px 1px 1px #fff";
             opts.innerTextColor = "#000";

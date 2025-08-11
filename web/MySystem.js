@@ -110,7 +110,7 @@ class MySystem {
 
 
 
-                gr.mdMain = new Block("test", "Model~MdaMdTest~base.sys0", {}, {});
+                gr.mdMain = new Block("test", "Model~MdTest~base.sys0", {}, {});
                 gr.mdMain.create("rootBody");
                 break;
 

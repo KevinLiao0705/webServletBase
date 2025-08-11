@@ -832,6 +832,10 @@ class Component {
         self.transData(st.x, st.y, st.w, st.h);
         //=====================================
         if ("setBaseElem") {
+            if (this.baseType === "none") {
+                return;
+            }
+            
 
             if (this.baseType === "button") {
                 if (this.subType === "check") {

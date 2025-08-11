@@ -1,53 +1,60 @@
 class GlobalRes {
-    
-    
-    static initApp(self){
-        if(self.appId===0)
-            self.appType="Model~DummyTargetMaster~base.sys0";
-        if(self.appId===1)
-            self.appType="Model~DummyTargetSub~base.sys0";
-        if(self.appId===2)
-            self.appType="Model~DummyTargetSub~base.sys0";
-        if(self.appId===3)
-            self.appType="Model~DummyTargetCtr~base.sys0";
-        if(self.appId===4)
-            self.appType="Model~DummyTargetCtr~base.sys0";
-        if(self.appId===99)
-            self.appType="Model~MdaMdTest~base.sys0";
+
+    static initApp(self) {
+        if (self.appName === "sync") {
+            if (self.appId === 0)
+                self.appType = "Model~DummyTargetMaster~base.sys0";
+            if (self.appId === 1)
+                self.appType = "Model~DummyTargetSub~base.sys0";
+            if (self.appId === 2)
+                self.appType = "Model~DummyTargetSub~base.sys0";
+            if (self.appId === 3)
+                self.appType = "Model~DummyTargetCtr~base.sys0";
+            if (self.appId === 4)
+                self.appType = "Model~DummyTargetCtr~base.sys0";
+            if (self.appId === 99)
+                self.appType = "Model~MdTest~base.sys0";
+        }
+        if (self.appName === "webBuilder") {
+            self.appType = "Model~MdaMdTest~base.sys0";
+        }    
+        
     }
     constructor() {
-        //this.appName="webBuilder";
-        this.systemName="sync";
-        this.appName="sync";
-        this.appId=3;
-        this.appType="Model~DummyTargetCtr~base.sys0";
-        this.globleTime="DummyTargetMaster.globleTime()";
-        GlobalRes.initApp(this);
-        
-        
+        this.appName = "webBuilder";
+        /*
+         this.systemName="sync";
+         this.appName="sync";
+         this.appId=3;
+         this.appType="Model~DummyTargetCtr~base.sys0";
+         this.globleTime="DummyTargetMaster.globleTime()";
+         GlobalRes.initApp(this);
+         */
+
+
         this.language = "chnT";
-        this.appPageCnt=0;
-        this.logoImage="systemResource/dummyTargetLogo.png";
-        this.logoImageWidth=1000;
-        this.logoImageHeight=630;
+        this.appPageCnt = 0;
+        this.logoImage = "systemResource/dummyTargetLogo.png";
+        this.logoImageWidth = 1000;
+        this.logoImageHeight = 630;
         this.defaultUserName = "kevinAdmin";
         this.defaultUserPassword = "16020039";
         this.clearCookie_f = 0;
-        this.appFirstEntry_f=0;
-        this.selfTestStartAll_f=0;
-        this.selfTestTime=0;
-        this.selfTestInx=0;
-        
+        this.appFirstEntry_f = 0;
+        this.selfTestStartAll_f = 0;
+        this.selfTestTime = 0;
+        this.selfTestInx = 0;
+
         //==============================
         this.kid = 0;
         this.ser = 0;
         // this.kidMap=new Map();
         //this.webSocketAddress = "192.168.0.28";
-        this.webSocketAddress="127.0.0.1";
+        this.webSocketAddress = "127.0.0.1";
         //this.webSocketAddress="192.168.121.10";
         this.webSocketPort = "8899";
         this.webSocketConnTime = 0;
-        this.webSocketConnect_f=0;
+        this.webSocketConnect_f = 0;
         //
         this.userName = "sync";
         this.password = "1234";
@@ -60,29 +67,29 @@ class GlobalRes {
         this.debugCnt = 0;
         this.mouseDown_f = 0;
         this.addSubTimer = null;
-        this.flash_f=0;
-        this.mesBoxOn_f=0;
+        this.flash_f = 0;
+        this.mesBoxOn_f = 0;
         this.paras = {};
-        this.syncTmp={};
-        this.blockSubOpts={};
+        this.syncTmp = {};
+        this.blockSubOpts = {};
         //============================
-        this.footBarMessageText="";
-        this.footBarMessageColor="#000";
-        this.footBarMessageTime=0;
-        this.footBarStatus0="";
-        this.footBarStatus1="";
-        this.footBarStatus2="";
+        this.footBarMessageText = "";
+        this.footBarMessageColor = "#000";
+        this.footBarMessageTime = 0;
+        this.footBarStatus0 = "";
+        this.footBarStatus1 = "";
+        this.footBarStatus2 = "";
         /*
-        this.message = "";
-        this.messageKobj = null;
-        this.messageTime = 0;
-        this.messageColor = "#000";
-        this.messageTimerId = null;
-        this.status1 = "";
-        this.status2 = "";
-        this.status3 = "";
-        */
-        this.version="1.0";
+         this.message = "";
+         this.messageKobj = null;
+         this.messageTime = 0;
+         this.messageColor = "#000";
+         this.messageTimerId = null;
+         this.status1 = "";
+         this.status2 = "";
+         this.status3 = "";
+         */
+        this.version = "1.0";
         //============================
         this.animates = [];
         this.compOpts = {};
@@ -91,8 +98,8 @@ class GlobalRes {
         this.plotOpts = {};
         this.plotBaseOpts = {};
         this.urlSelectObj = {};
-        this.paraSet={};
-        this.socketRetPrgTbl={};
+        this.paraSet = {};
+        this.socketRetPrgTbl = {};
         //=====================
         this.editUndoStack = [];
         this.editUndoInx = -1;
@@ -101,23 +108,23 @@ class GlobalRes {
         this.editRedo_f = 0;
         this.editUndoMax = 64;
         //============================
-        this.systemParaSetPassword="1234";
-        this.systemParaSetDefaultPassword="1234";
+        this.systemParaSetPassword = "1234";
+        this.systemParaSetDefaultPassword = "1234";
         this.repaint_f = 0;
         this.window_innerWidth_old = -1;
         this.window_innerHeight_old = -1;
-        
+
         //this.systemName="webFrame";
         //this.systemName="future";
         //this.systemName="keyboardOled";
         //this.systemName="webIcs";
-        
-        
-        
+
+
+
         this.showLogo_f = 1;
-        this.showLogoTime=1000;//ms
+        this.showLogoTime = 1000;//ms
         this.enabelLogin_f = 1;
-        this.logoUrl='./systemResource/robot_aiot_1920x1080.jpg';
+        this.logoUrl = './systemResource/robot_aiot_1920x1080.jpg';
 
         this.mouseFuncPara = null;
         //this.googleMapKeys = ["AIzaSyDOlTL0xvlXJGN1gnqcV4zxEPhQW5rmd8Q"];
@@ -257,21 +264,21 @@ gbStyle.innerHTML = `
 }
  `;
 
-var mouseWheelFunc=function(event){
-    gr.wheelEvent=event;
+var mouseWheelFunc = function (event) {
+    gr.wheelEvent = event;
     console.log("global wheel");
 };
 
-var mouseUpFunc=function(event){
-    gr.mouseDown_f=1;
+var mouseUpFunc = function (event) {
+    gr.mouseDown_f = 1;
 };
-var mouseDownFunc=function(event){
-    gr.mouseDown_f=0;
-    gr.mouseDisable_f=0;
+var mouseDownFunc = function (event) {
+    gr.mouseDown_f = 0;
+    gr.mouseDisable_f = 0;
 };
 
 document.head.appendChild(gbStyle);
-document.addEventListener('mousedown',mouseUpFunc);
+document.addEventListener('mousedown', mouseUpFunc);
 document.addEventListener('mouseup', mouseDownFunc);
 //document.addEventListener('wheel', mouseWheelFunc);
 

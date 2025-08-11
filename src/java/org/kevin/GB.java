@@ -21,11 +21,12 @@ public class GB {
 
     
     // Select 1 ====================================
-    public static int osInx = 1;
-    ///public static String sourceDir = "web/";          //for debug use
-    public static String sourceDir="webapps/ROOT/";     //for deplyment use
+    public static int osInx = 0;
+    public static String sourceDir = "web/";          //for debug use
+    //public static String sourceDir="webapps/ROOT/";     //for deplyment use
     //public static String paraSetPath = "e:/kevin/myCode/syncSet";
-    public static String paraSetPath = "/home/admintx/syncSetExe";
+    public static String paraSetPath = "e:/kevin/myCode/webSet";
+    //public static String paraSetPath = "/home/admintx/syncSetExe";
     //==============================================
     //======================================
     public static int syssec_f = 0;

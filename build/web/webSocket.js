@@ -71,7 +71,7 @@ class MyWebSocket {
         var self = this;
         if (!self.wsok) {
             self.webSocketConnTime++;
-            if (self.webSocketConnTime >= 2) {
+            if (self.webSocketConnTime >= 60) {
                 self.webSocketConnTime = 0;
                 self.socketPrg();
             }

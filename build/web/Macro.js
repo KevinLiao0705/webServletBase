@@ -298,10 +298,13 @@ class Macro {
                     gr.userName = userName;
                     gr.password = password;
                     gr.appPageCnt = 2;
+                    if (gr.paraSet.appName !== undefined) {
+                        gr.appName = gr.paraSet.appName;
+                    }
                     if (gr.paraSet.appId !== undefined) {
                         gr.appId = gr.paraSet.appId;
-                        GlobalRes.initApp(gr);
                     }
+                    GlobalRes.initApp(gr);
                     sys.dispWebPage();
                 }
                 return;
@@ -562,6 +565,46 @@ class Macro {
         return {type: "Model~MdaBox~base.sys0", opts: opts};
     }
 
+    setContainerBoxOpts(op1, op2) {
+        if (!op1)
+            op1 = {};
+        if (!op2)
+            op2 = {};
+        var opts = {};
+        opts.title = "Container Box";
+        opts.titleColor = "#000";
+        opts.headButtons = ["OK", "ESC"];
+        opts.headButtonIds = ["ok", "esc"];
+        opts.margin = 0;
+        opts.tm = 10;
+        opts.lm = 10;
+        opts.rm = 10;
+        opts.bm = 10;
+        opts.innerType = "Model~MdaContainer~base.page";
+        KvLib.deepCoverObject(opts, op1);
+        var kobj = opts.ksObj = {};
+        var kopts = kobj.opts = {};
+        kobj.name = "mdaContainer";
+        kobj.type = opts.innerType;
+        //===================================
+        kopts.eh = 50;
+        kopts.rowAmt = 0;
+        kopts.rowStart = 0;
+        kopts.margin = 0;
+        kopts.etm = 4;
+        kopts.ebm = 4;
+        kopts.erm = 4;
+        kopts.elm = 4;
+        kopts.xm = 4;
+        kopts.ym = 4;
+        kopts.baseColor = "#ccc";
+        kopts.borderColor = "#fff";
+        kopts.borderWidth = 1;
+        kopts.ksObjss = op2.ksObjss;
+        kopts.ksObjWs = op2.ksObjWs;
+        KvLib.deepCoverObject(kopts, op2);
+        return opts;
+    }
     containerBoxOpts(_op) {
         var op = {};
         //===
@@ -578,8 +621,8 @@ class Macro {
         op.margin = 4;
         op.ym = 4;
         op.buttonXm = 10;
-        op.headButtons = ["OK", "ESC"];
-        op.headButtonIds = ["ok", "ESC"];
+        op.headButtons = ["ESC"];
+        op.headButtonIds = ["esc"];
         //
         op.listBodyColor = "#cce";
         op.listBorderColor = "#fff";
@@ -612,6 +655,7 @@ class Macro {
         var kopts = ksObj.opts = {};
         ksObj.name = "mdaContainer";
         ksObj.type = op.containerType;
+
         kopts.eh = op.eh;
         kopts.rowAmt = op.rowAmt;
         kopts.margin = op.eMargin;
@@ -903,7 +947,8 @@ class KvSetOpts {
         setOpts.lm = 0;
         setOpts.fontSize = 24;
         setOpts.titleFontSize = 25;
-        setOpts.titleWidth = 0;
+        setOpts.titleWidth = 200;
+        setOpts.title = "buttonRadio";
         if (op) {
             KvLib.deepCoverObject(setOpts, op);
         }
@@ -1108,12 +1153,28 @@ class KvSetOpts {
         setOpts.dataType = "int";
         setOpts.checkType = "int";
         setOpts.value = 0;
-        setOpts.titleWidth = 0;
-        setOpts.title = "";
+        setOpts.titleWidth = 200;
+        setOpts.title = "inputText";
         setOpts.titleFontSize = 20;
         setOpts.actButtons = ["inc", "dec", "pad"];
         if (op) {
             KvLib.deepCoverObject(setOpts, op);
+        }
+        return setOpts;
+    }
+
+    getStrInputText(sop) {
+        var setOpts = {};
+        setOpts.setType = "inputText";
+        setOpts.dataType = "str";
+        setOpts.checkType = "str";
+        setOpts.value = "";
+        setOpts.titleWidth = 200;
+        setOpts.title = "inputText str";
+        setOpts.titleFontSize = 20;
+        setOpts.actButtons = ["pad"];
+        if (sop) {
+            KvLib.deepCoverObject(setOpts, sop);
         }
         return setOpts;
     }
@@ -1124,10 +1185,10 @@ class KvSetOpts {
         setOpts.dataType = "str";
         setOpts.checkType = "str";
         setOpts.value = "";
-        setOpts.titleWidth = 0;
-        setOpts.title = "";
+        setOpts.titleWidth = 200;
+        setOpts.title = "inputText simple";
         setOpts.titleFontSize = 20;
-        setOpts.actButtons = [];
+        setOpts.actButtons = ["pad"];
         if (sop) {
             KvLib.deepCoverObject(setOpts, sop);
         }
@@ -1140,15 +1201,13 @@ class KvSetOpts {
         setOpts.dataType = "str";
         setOpts.checkType = "int";
         setOpts.value = "";
-        setOpts.titleWidth = 0;
-        setOpts.title = "";
+        setOpts.titleWidth = 400;
+        setOpts.title = "inputText password";
+        setOpts.titleFontSize = 0;
         setOpts.password_f = 1;
-        setOpts.checkType = "int";
-        setOpts.actButtons = [];
+        setOpts.actButtons = ["pad"];
         setOpts.min = 0;
         setOpts.max = 99999999;
-
-
         if (op) {
             KvLib.deepCoverObject(setOpts, op);
         }
@@ -1527,13 +1586,14 @@ class KvBox {
 
     selectOkBox(op) {
         var opts = {};
-        op.selectEsc_f = 0;
-        op.selectAble_f = 1;
-        op.selectInx = 0;
-        op.headButtons = ["OK", "ESC"];
-        op.headButtonIds = ["ok", "esc"];
-        op.buttons = [];
-        op.buttonIds = [];
+        opts.selectEsc_f = 0;
+        opts.selectAble_f = 1;
+        opts.selectInx = 1;
+        opts.headButtons = ["OK", "ESC"];
+        opts.headButtonIds = ["ok", "esc"];
+        opts.buttons = [];
+        opts.buttonIds = [];
+        opts.buttonOn_f = 0;
         KvLib.deepCoverObject(opts, op);
         this.selectPageBox(opts);
 
@@ -1552,6 +1612,7 @@ class KvBox {
         opts.buttonIds = [];
         opts.textAlign = "center";
         opts.lpd = 0;
+        opts.buttonOn_f = 0;
         KvLib.deepCoverObject(opts, op);
         this.selectPageBox(opts);
 
@@ -1580,6 +1641,10 @@ class KvBox {
         op.titleBaseColor = "#004";
         op.textAlign = "center";
         op.lpd = 0;
+        op.buttonOn_f = 1;
+        op.headButtons = ["ESC"];
+        op.headButtonIds = ["esc"];
+
         KvLib.deepCoverObject(op, _op);
         //=====================================
         var opts = {};
@@ -1593,6 +1658,8 @@ class KvBox {
         opts.buttonXm = op.buttonXm;
         opts.baseColor = op.baseColor;
         opts.ym = op.ym;
+        opts.buttonsOn_f = op.buttonOn_f;
+
         mda.setMargin(opts, op);
         //=================
         var ksObj = opts.ksObj = {};
@@ -1616,7 +1683,8 @@ class KvBox {
             console.log(iobj);
             if (iobj.act === "selected") {
                 KvLib.exeFunc(_op.actionFunc, iobj);
-                //MdaPopWin.popOffTo(iobj.sender.opts.popStackCnt);
+                if (iobj.kvObj.fatherMd.opts.selectEsc_f)
+                    MdaPopWin.popOffTo(iobj.sender.opts.popStackCnt);
                 return;
             }
             if (iobj.act === "mouseClick") {
@@ -1686,6 +1754,8 @@ class KvBox {
         op.setOpts = {};
         KvLib.deepCoverObject(op.setOpts, dsc.optsCopy.int);
         KvLib.deepCoverObject(op, _op);
+        op.setOpts.title="";
+        op.setOpts.titleWidth=0;
         //=====================================
         if (op.setOpts.setType === "textArea")
             op.h = 600;
@@ -1967,7 +2037,35 @@ class KvBox {
         mda.popObj(op.w, op.h, kvObj);
     }
 
-    containerFreeBox(op) {
+    containerFreeBox(_op1, _op2) {
+        var op1 = {};
+        var op2 = {};
+
+
+        op1.innerType = "Model~MdaContainer~base.free";
+        op2.ksObjWs = [150, 200, 150, 500, 9999];
+
+        op2.ksObjss = [];
+        for (var i = 0; i < 30; i++) {
+            var ksObjs = [];
+            for (var j = 0; j < 10; j++) {
+                var ksObj = {};
+                ksObj.name = "name#" + i + "." + j;
+                ksObj.type = "Component~Cp_base~button.sys0";
+                ksObj.opts = {};
+                ksObjs.push(ksObj);
+            }
+            op2.ksObjss.push(ksObjs);
+        }
+        op2.ksObjss[2][1].iw = 50;
+        op2.ksObjss[3][0].ih = 100;
+
+
+        KvLib.deepCoverObject(op1, _op1);
+        KvLib.deepCoverObject(op2, _op2);
+        return box.containerPageBox(op1, op2);
+
+
         var opts = {};
         opts.containerType = "Model~MdaContainer~base.free";
         opts.title = "Object Free Table";
@@ -1978,25 +2076,23 @@ class KvBox {
         return mda.popObj(opts.w, opts.h, kvObj);
     }
 
-    containerTableBox(op) {
-        var opts = {};
-        opts.containerType = "Model~MdaContainer~base.table";
-        opts.title = "Container Table Box";
-        op.ksObjWs = [150, 200, 300, 400];
-        KvLib.deepCoverObject(opts, op);
-        var obj = mac.containerBoxOpts(opts);
-        var kvObj = new Block("containerPgeBox", obj.type, obj.opts);
-        return mda.popObj(opts.w, opts.h, kvObj);
+    containerTableBox(_op1, _op2) {
+        var op1 = {};
+        var op2 = {};
+        op1.innerType = "Model~MdaContainer~base.table";
+        op2.ksObjWs = [150, 200, 150, 500, 9999];
+        KvLib.deepCoverObject(op1, _op1);
+        KvLib.deepCoverObject(op2, _op2);
+        return box.containerPageBox(op1, op2);
     }
 
-    containerPageBox(op) {
-        var opts = {};
-        opts.containerType = "Model~MdaContainer~base.page";
-        opts.title = "Container Page Page";
-        opts.ksObjWs = [150, 200, 9999];
-        opts.ksObjss = [];
-        opts.rowAmt = 0;
-        for (var i = 0; i < 100; i++) {
+    containerPageBox(_op1, _op2) {
+        var op1 = {};
+        var op2 = {};
+        op1.innerType = "Model~MdaContainer~base.page";
+        op2.ksObjWs = [150, 200, 150, 500, 9999];
+        op2.ksObjss = [];
+        for (var i = 0; i < 30; i++) {
             var ksObjs = [];
             for (var j = 0; j < 10; j++) {
                 var ksObj = {};
@@ -2005,15 +2101,21 @@ class KvBox {
                 ksObj.opts = {};
                 ksObjs.push(ksObj);
             }
-            opts.ksObjss.push(ksObjs);
+            op2.ksObjss.push(ksObjs);
         }
-
-
-
-        KvLib.deepCoverObject(opts, op);
-        var obj = mac.containerBoxOpts(opts);
-        var kvObj = new Block("containerPgeBox", obj.type, obj.opts);
-        return mda.popObj(opts.w, opts.h, kvObj);
+        KvLib.deepCoverObject(op1, _op1);
+        KvLib.deepCoverObject(op2, _op2);
+        var opts = mac.setContainerBoxOpts(op1, op2);
+        opts.actionFunc = function (iobj) {
+            if (iobj.act === "mouseClick") {
+                if(iobj.kvObj.opts.id==="esc")
+                    MdaPopWin.popOffTo(iobj.sender.opts.popStackCnt);
+                if (op1)
+                    KvLib.exeFunc(op1.actionFunc, iobj);
+            }
+        };
+        var kvObj = new Block("containerBox", "Model~MdaBox~base.sys0", opts);
+        return mda.popObj(0, 0, kvObj);
     }
 
     setOptsBox(_op) {
@@ -2077,7 +2179,7 @@ class KvBox {
                 mdaBox.reCreate();
             }
         };
-        mda.setLineBox(opts);
+        box.setLineBox(opts);
     }
 
     setLineBox(_op)
@@ -2197,17 +2299,17 @@ class KvBox {
         opts.headButtonIds = ["esc"];
         opts.eh = 50;
         opts.ym = 10;
-        opts.setOptsA=[];
+        opts.setOptsA = [];
         var setOpts = sopt.getOptsPara("buttonActs");
         setOpts.enum = ["脈波啟動", "脈波停止"];
         //setOpts.borderWidth = 1;
         //setOpts.fontSize = "0.6rh";
         //setOpts.titleFontSize = "0.9rh";
-        setOpts.titleWidth=200;
-        setOpts.title="Title";
+        setOpts.titleWidth = 200;
+        setOpts.title = "Title";
         //setOpts.baseColor="#222";
         opts.setOptsA.push(setOpts);
-        
+
         var setOpts = sopt.getOptsPara("buttonSelect");
         setOpts.enum = ["脈波啟動", "脈波停止"];
         opts.setOptsA.push(setOpts);
@@ -2231,7 +2333,7 @@ class KvBox {
         opts.actionFunc = function (iobj) {
             if (iobj.act === "mouseClick" && iobj.buttonId === "ok") {
                 console.log(iobj);
-                KvLib.exeFunc(_opts.actionFunc,iobj);
+                KvLib.exeFunc(_opts.actionFunc, iobj);
             }
         };
         box.setLineBox(opts);
