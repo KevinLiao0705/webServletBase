@@ -21,15 +21,14 @@ class GlobalRes {
         
     }
     constructor() {
+        this.debug_f=0;
         this.appName = "webBuilder";
-        /*
          this.systemName="sync";
          this.appName="sync";
          this.appId=3;
          this.appType="Model~DummyTargetCtr~base.sys0";
          this.globleTime="DummyTargetMaster.globleTime()";
          GlobalRes.initApp(this);
-         */
 
 
         this.language = "chnT";

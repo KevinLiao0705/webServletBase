@@ -425,7 +425,6 @@ class MyNewScopeCtr {
                 console.log(iobj);
                 op.signalMode = inx;
                 op.signalModeInx = iobj.selectInx;
-                MdaPopWin.popOff(2);
                 setSignalPrg(iobj.selectText);
                 return;
             };

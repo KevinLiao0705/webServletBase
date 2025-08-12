@@ -1385,9 +1385,6 @@ class MdaContainer {
         st.allLine = op.ksObjss.length;
         var cname = md.lyMaps["body"] + "~" + 0;
         md.clearOptsAll(cname);
-
-        var cname = md.lyMaps["body"];
-        md.clear(cname);
         var cname = md.lyMaps["body"] + "~" + 0;
         var opts = {};
         opts.yArr = [0, 9999];
@@ -1395,7 +1392,7 @@ class MdaContainer {
 
         var cname = md.lyMaps["mainBody"] + "~" + 1;
         var posObj = md.getRectObj(cname, md.layouts);
-        var listBodyH = posObj.h - op.headTitleHeight;
+        var listBodyH = posObj.h// - op.headTitleHeight;
         var listBodyW = posObj.w;
         var vScrollWidth = op.scrollWidth;
         var hScrollWidth = op.scrollWidth;
@@ -1447,7 +1444,6 @@ class MdaContainer {
             st.allW = allW;
             st.lineHRate = 1 / st.allLine;
         }
-
         if (op.layoutType === "page") {
             hScrollWidth = 0;
             st.allW = listBodyW;
@@ -1515,19 +1511,20 @@ class MdaContainer {
         if (!st.scrollH_f)
             hScrollWidth = 0;
 
-        var cname = md.lyMaps["mainBody"] + "~" + 1;
-
-        md.clear(cname);
+        //var cname = md.lyMaps["mainBody"] + "~" + 1;
+        //md.clear(cname);
+        
         var cname = md.lyMaps["mainBody"] + "~" + 1;
         var opts = {};
         opts.xArr = [9999, vScrollWidth];
         md.newLayout(cname, opts, "Layout~Ly_base~xyArray.sys0", "main");
+        //===================================================================
 
         var cname = md.lyMaps["main"] + "~" + 0;
         var opts = {};
         opts.yArr = [op.headTitleHeight, 9999, hScrollWidth];
         var lyObj = md.newLayout(cname, opts, "Layout~Ly_base~xyArray.sys0", "listBody");
-
+        
         var cname = md.lyMaps["listBody"] + "~" + 0;
         var opts = {};
         opts.xc = op.ksObjss[0].length;
@@ -1544,17 +1541,16 @@ class MdaContainer {
             opts.headTitles = op.headTitles;
             md.newBlock(cname, opts, "Model~MdaHeadTitle~base.sys0", "headTitle#" + i);
         }
+        
 
         var cname = md.lyMaps["listBody"] + "~" + 1;
         var opts = {};
         var lyObj = md.newLayout(cname, opts, "Layout~Ly_base~xyArray.sys0", "listPanelBody");
 
 
-        //lyObj.stas.rects[0].elemId = plateObj.elemId;
-
         var cname = md.lyMaps["listPanelBody"] + "~" + 0;
         var opts = {};
-        opts.setPanel_f = 1;
+        opts.basePanel_f = 1;
         var plateObj = md.newBlock(cname, opts, "Component~Cp_base~plate.none", "listPanel");
         lyObj.stas.rects[0].elemId = plateObj.elemId;
 
@@ -2637,13 +2633,13 @@ class MdaSelector {
                     var elem = document.getElementById(iobj.kvObj.elemId);
                     elem.style.backgroundColor = "#88f";
                 }
-                if (op.selectEsc_f) {
+                //if (op.selectEsc_f) {
                     iobj.sender = md;
                     iobj.act = "selected";
                     iobj.selectText = iobj.kvObj.opts.innerText;
                     iobj.selectInx = KvLib.toInt(iobj.kvObj.name.split("#")[1], -1);
                     KvLib.exeFunc(op.actionFunc, iobj);
-                }
+                //}
             };
             md.newBlock(cname, opts, "Component~Cp_base~button.sys3", "item#" + inx);
             inx++;
@@ -3701,6 +3697,27 @@ class MdaSetLine {
             if (setOpts.rm)
                 opts.rm = setOpts.rm;
             opts.innerText = setOpts.value;
+            opts.baseColor = setOpts.editBaseColor;
+            opts.innerTextColor = setOpts.editTextColor;
+            if (setOpts.fontSize)
+                opts.fontSize = setOpts.fontSize;
+            if (setOpts.watchDatas) {
+                for (var i = 0; i < setOpts.watchDatas.length; i++) {
+                    var items = setOpts.watchDatas[i];
+                    md.setInputWatch(opts, items[0], items[1], items[2], items[3]);
+                }
+            }
+            md.newBlock(cname, opts, "Component~Cp_base~images.lcd", "labelMain#" + i);
+            return;
+        }
+        
+        if (setOpts.setType === "lcdYellow") {
+            var opts = {};
+            if (setOpts.lm)
+                opts.lm = setOpts.lm;
+            if (setOpts.rm)
+                opts.rm = setOpts.rm;
+            opts.innerText = setOpts.value;
             if (setOpts.fontSize)
                 opts.fontSize = setOpts.fontSize;
             if (setOpts.watchDatas) {
@@ -3718,6 +3735,9 @@ class MdaSetLine {
             md.newBlock(cname, opts, "Component~Cp_base~images.sys0", "labelMain#" + i);
             return;
         }
+
+        
+        
         if (setOpts.setType === "buttonActs") {
             var opts = {};
             opts.xm = setOpts.xm;

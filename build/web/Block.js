@@ -1090,12 +1090,16 @@ class Block {
             var rect = fatherLay.stas.rects[fatherLayCnt];
             if (!rect)
                 var i = 0;
-            if (rect.elemId)
+            if (rect.elemId){
                 lr.fhid = rect.elemId;
-            else
+                lr.x = 0;
+                lr.y = 0;
+            }    
+            else{
                 lr.fhid = fatherLay.elemId;
-            lr.x = rect.x;
-            lr.y = rect.y;
+                lr.x = rect.x;
+                lr.y = rect.y;
+            }    
             lr.w = rect.w;
             lr.h = rect.h;
             lr.z = rect.z;

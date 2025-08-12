@@ -38,6 +38,7 @@ class DummyTargetMaster {
             opts.textAlign = "left";
             opts.lpd = 10;
             opts.kvTexts = [];
+            opts.selectEsc_f=0;
             if (gr.appId === 0) {
                 opts.kvTexts.push("雷達信號參數設定");
                 opts.kvTexts.push("同步參數設定");
@@ -126,15 +127,19 @@ class DummyTargetMaster {
                     for (var i = 0; i < 256; i++) {
                         gr.viewDatas.push("");
                     }
-                    var opts = {};
-                    opts.title = iobj.selectText;
-                    opts.ksObjWs = [9999];
-                    opts.rowAmt = 32;
-                    opts.eym = 2;
+                    var op1 = {};
+                    op1.title = iobj.selectText;
+                    var op2 = {};
+                    
+                    
+                    
+                    op2.ksObjWs = [9999];
+                    op2.rowAmt = 32;
+                    op2.eym = 2;
                     for (var i = 0; i < 8; i++) {
-                        opts.ksObjWs.push("0.120rw");
+                        op2.ksObjWs.push("0.120rw");
                     }
-                    opts.ksObjss = [];
+                    op2.ksObjss = [];
                     var inx = 0;
                     for (var i = 0; i < 32; i++) {
                         var ksObjs = [];
@@ -146,7 +151,9 @@ class DummyTargetMaster {
                             var kopts = ksObj.opts = {};
                             if (j === 0) {
                                 kopts.baseColor = "#ccc";
+                                kopts.innerText="" + (i >> 1) + "#" + ((i & 1) * 8);
                                 ksObj.name = "" + (i >> 1) + "#" + ((i & 1) * 8);
+                                
                             } else {
                                 kopts.baseColor = "#cff";
                                 var watchReg = "gr.viewDatas#" + inx;
@@ -157,14 +164,14 @@ class DummyTargetMaster {
                             kopts.fontSize = "0.7rh";
                             ksObjs.push(ksObj);
                         }
-                        opts.ksObjss.push(ksObjs);
+                        op2.ksObjss.push(ksObjs);
                     }
-                    opts.actionFunc = function (iobj) {
+                    op1.actionFunc = function (iobj) {
                         console.log(iobj);
                         gr.viewDatas_f = 0;
                     };
                     gr.viewDatas_f = 1;
-                    box.containerPageBox(opts);
+                    box.containerPageBox(op1,op2);
                     return;
                 }
                 if (iobj.selectText === "脈波寬度設定") {
@@ -280,9 +287,10 @@ class DummyTargetMaster {
                     opts.ksObjss = [];
                     opts.xm = 20;
                     opts.eh = 50;
-                    opts.etm = 0;
+                    opts.etm = 4;
                     opts.headTitles = ["名稱", "波寬(us)", "工作比(%)", "頻率(G)", "次數"];
                     opts.headTitleXArr = [240, 9999, 106, 80, 64];
+                    opts.headTitleXArr = ["0.27rw", "0.25rw", "0.187rw", "0.14rw", "0.14rw"];
                     opts.headTitleHeight = 24;
                     var ksObjs = [];
                     for (var i = 0; i < pulsePara.length; i++) {
@@ -302,11 +310,11 @@ class DummyTargetMaster {
                         setOpts.enum = [pulseWidthStr, strA[2], strA[3], strA[4]];
                         setOpts.value = 0;
                         setOpts.id = "" + i;
-                        setOpts.titleWidth = 200;
+                        setOpts.titleWidth = "0.2rw";
                         setOpts.titleFontSize = 20;
                         setOpts.checkWidth = 40;
                         setOpts.title = "脈波 " + (i + 1);
-                        setOpts.xArr = [9999, 100, 80, 60];
+                        setOpts.xArr = ["0.35rw", "0.25rw", "0.2rw", "0.2rw"];
                         setOpts.fontSize = 24;
                         ksObjs.push(ksObj);
                         if (i % 2)
@@ -5404,7 +5412,8 @@ class DummyTargetCtr {
                 gr.plotValue[2] = wa[4];
                 gr.plotValue[3] = wa[5];
             }
-            console.log("radarData");
+            if(gr.degug_f)
+                console.log("radarData");
 
         };
     }

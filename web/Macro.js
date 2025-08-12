@@ -573,8 +573,8 @@ class Macro {
         var opts = {};
         opts.title = "Container Box";
         opts.titleColor = "#000";
-        opts.headButtons = ["OK", "ESC"];
-        opts.headButtonIds = ["ok", "esc"];
+        opts.headButtons = ["ESC"];
+        opts.headButtonIds = ["esc"];
         opts.margin = 0;
         opts.tm = 10;
         opts.lm = 10;
@@ -1682,9 +1682,9 @@ class KvBox {
         opts.actionFunc = function (iobj) {
             console.log(iobj);
             if (iobj.act === "selected") {
-                KvLib.exeFunc(_op.actionFunc, iobj);
                 if (iobj.kvObj.fatherMd.opts.selectEsc_f)
                     MdaPopWin.popOffTo(iobj.sender.opts.popStackCnt);
+                KvLib.exeFunc(_op.actionFunc, iobj);
                 return;
             }
             if (iobj.act === "mouseClick") {
