@@ -17,28 +17,34 @@ class GlobalRes {
         }
         if (self.appName === "webBuilder") {
             self.appType = "Model~MdaMdTest~base.sys0";
-        }    
-        
+        }
+
     }
     constructor() {
-        this.debug_f=0;
+        this.debug_f = 0;
+        this.version = "1.0";
         this.appName = "webBuilder";
-         this.systemName="sync";
-         this.appName="sync";
-         this.appId=3;
-         this.appType="Model~DummyTargetCtr~base.sys0";
-         this.globleTime="DummyTargetMaster.globleTime()";
-         GlobalRes.initApp(this);
+        //this.appName = "sync";
+        this.appId = 3;
+        //=================================
+        this.showLogo_f = 1;
+        this.showLogoTime = 1000;//ms
+        this.logoImage = "systemResource/dummyTargetLogo.png";
+        //this.logoImage = 'systemResource/robot_aiot_1920x1080.jpg';
+        this.logoImageWidth = 1000;
+        this.logoImageHeight = 630;
+        //=================================
+        this.enabelLogin_f = 1;
+        this.defaultUserName = "kevinAdmin";
+        this.defaultUserPassword = "16020039";
+        this.clearCookie_f = 0;
+        //=================================
+        this.globleTime = "DummyTargetMaster.globleTime()";
+        GlobalRes.initApp(this);
 
 
         this.language = "chnT";
         this.appPageCnt = 0;
-        this.logoImage = "systemResource/dummyTargetLogo.png";
-        this.logoImageWidth = 1000;
-        this.logoImageHeight = 630;
-        this.defaultUserName = "kevinAdmin";
-        this.defaultUserPassword = "16020039";
-        this.clearCookie_f = 0;
         this.appFirstEntry_f = 0;
         this.selfTestStartAll_f = 0;
         this.selfTestTime = 0;
@@ -47,16 +53,12 @@ class GlobalRes {
         //==============================
         this.kid = 0;
         this.ser = 0;
-        // this.kidMap=new Map();
         //this.webSocketAddress = "192.168.0.28";
         this.webSocketAddress = "127.0.0.1";
-        //this.webSocketAddress="192.168.121.10";
         this.webSocketPort = "8899";
         this.webSocketConnTime = 0;
         this.webSocketConnect_f = 0;
         //
-        this.userName = "sync";
-        this.password = "1234";
         this.mouseAct = {};
         this.baseColor = "#27282c";
         this.minFontSize = 10;
@@ -88,7 +90,6 @@ class GlobalRes {
          this.status2 = "";
          this.status3 = "";
          */
-        this.version = "1.0";
         //============================
         this.animates = [];
         this.compOpts = {};
@@ -119,11 +120,6 @@ class GlobalRes {
         //this.systemName="webIcs";
 
 
-
-        this.showLogo_f = 1;
-        this.showLogoTime = 1000;//ms
-        this.enabelLogin_f = 1;
-        this.logoUrl = './systemResource/robot_aiot_1920x1080.jpg';
 
         this.mouseFuncPara = null;
         //this.googleMapKeys = ["AIzaSyDOlTL0xvlXJGN1gnqcV4zxEPhQW5rmd8Q"];
@@ -220,16 +216,26 @@ var gbStyle = document.createElement('style');
 gbStyle.innerHTML = `
 @font-face {
         font-family: digital_1;
-        src: url(DS-DIGIT.TTF);
+        src: url(font/digital7a-mono.ttf);
 }
 @font-face {
         font-family: digital_2;
-        src: url(digital-7.ttf);
+        src: url(font/digital7a-fixMono.ttf);
 }
 @font-face {
         font-family: digital_3;
-        src: url(digital-7a.ttf);
+        src: url(font/digital7a-fixItaly.ttf);
 }
+@font-face {
+        font-family: digital_4;
+        src: url(font/digital7b-italy.ttf);
+}
+@font-face {
+        font-family: hk-1;
+        src: url(font/hk-1.ttc);
+}
+
+
 
 @font-face {
   font-family: 'Material Icons';

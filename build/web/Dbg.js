@@ -214,6 +214,9 @@ class Dbg {
         kvs06[3].id="showSetLines";
         kvs06[3].eng="Show SetLines";
         kvs06[3].image = "systemResource/icons8-info-64.png";
+        kvs06[4].id="showGauges";
+        kvs06[4].eng="Show Gauges";
+        kvs06[4].image = "systemResource/icons8-info-64.png";
         
         
         

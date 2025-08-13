@@ -254,8 +254,8 @@ class Macro {
     loginBox(_op) {
         var op = {};
         op.background = "linear-gradient(to top, #c5d5fa, #c3dc99)";
-        op.width = 800;
-        op.height = 200;
+        op.width = 600;
+        op.height = 180;
         op.userName = gr.defaultUserName;
         op.password = gr.defaultUserPassword;
         if (!gr.defaultUserName) {
@@ -355,7 +355,9 @@ class Macro {
             opts.title = syst.login;
             opts.w = op.width;
             opts.h = op.height;
-            opts.buttons = [];
+            opts.buttons = ["OK"];
+            opts.buttonIds = ["ok"];
+            
             opts.eBaseColor = "#ccc";
             opts.actionFunc = function (iobj) {
                 console.log(iobj);
@@ -412,7 +414,7 @@ class Macro {
         op.eBorderColor = "#ccc";
         op.eBorderWidth = 0;
         op.eBaseColor = "#222";
-        op.headButtons = ["SAVE", "ESC"];
+        op.headButtons = ["OK", "ESC"];
         op.headButtonIds = ["ok", "esc"];
         KvLib.deepCoverObject(op, _op);
         //=======================================================
@@ -2080,7 +2082,7 @@ class KvBox {
         var op1 = {};
         var op2 = {};
         op1.innerType = "Model~MdaContainer~base.table";
-        op2.ksObjWs = [150, 200, 150, 500, 9999];
+        op2.ksObjWs = [150, 200, 150, 500, 100,300,200];
         KvLib.deepCoverObject(op1, _op1);
         KvLib.deepCoverObject(op2, _op2);
         return box.containerPageBox(op1, op2);
@@ -2099,6 +2101,7 @@ class KvBox {
                 ksObj.name = "name#" + i + "." + j;
                 ksObj.type = "Component~Cp_base~button.sys0";
                 ksObj.opts = {};
+                ksObj.opts.innerText=ksObj.name;
                 ksObjs.push(ksObj);
             }
             op2.ksObjss.push(ksObjs);

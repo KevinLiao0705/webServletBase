@@ -220,27 +220,15 @@ class MdaMdTest {
                 return;
             }
             if (iobj.keyId === "testContainerBox~base.page") {
-                var actionFunc = function (iobj) {
-                    console.log(iobj);
-                    MdaPopWin.popOffTo(iobj.sender.opts.popStackCnt);
-                };
-                box.containerPageBox({});
+                box.containerPageBox({},{});
                 return;
             }
             if (iobj.keyId === "testContainerBox~base.table") {
-                var actionFunc = function (iobj) {
-                    console.log(iobj);
-                    MdaPopWin.popOffTo(iobj.sender.opts.popStackCnt);
-                };
-                box.containerTableBox({});
+                box.containerTableBox({},{});
                 return;
             }
             if (iobj.keyId === "testContainerBox~base.free") {
-                var actionFunc = function (iobj) {
-                    console.log(iobj);
-                    MdaPopWin.popOffTo(iobj.sender.opts.popStackCnt);
-                };
-                box.containerFreeBox({});
+                box.containerFreeBox({},{});
                 return;
             }
             if (iobj.keyId === "testSetLine~buttonActs") {
@@ -629,7 +617,7 @@ class MdaMdTest {
                 op2.background="linear-gradient(to top, #110044, #332266)";
                 var inx = 0;
                 var ser = 0;
-                var lim = 18;
+                var lim = 19;
                 for (var i = 0; i < 14; i++) {
                     var ksObjs = [];
                     for (var j = 0; j < 2; j++) {
@@ -666,14 +654,16 @@ class MdaMdTest {
                         if (inx === 12)
                             var csObj = cs.get("setLine.lcdView");
                         if (inx === 13)
-                            var csObj = cs.get("setLine.leds");
+                            var csObj = cs.get("setLine.lcdYellow");
                         if (inx === 14)
-                            var csObj = cs.get("setLine.view");
+                            var csObj = cs.get("setLine.leds");
                         if (inx === 15)
-                            var csObj = cs.get("setLine.textArea");
+                            var csObj = cs.get("setLine.view");
                         if (inx === 16)
-                            var csObj = cs.get("setLine.select");
+                            var csObj = cs.get("setLine.textArea");
                         if (inx === 17)
+                            var csObj = cs.get("setLine.select");
+                        if (inx === 18)
                             var csObj = cs.get("setLine.inputSelect");
                         opts.type = csObj.type;
                         opts.opts = csObj.opts;
@@ -689,6 +679,50 @@ class MdaMdTest {
                 return;
             }
 
+            if (iobj.keyId === "componentTest~showGauges") {
+                var op1 = {};
+                var op2 = {};
+                op1.title = "Select Buttons";
+                op1.headButtons = ["ESC"];
+                op1.headButtonIds = ["esc"];
+                op2.ksObjWs = ["0.33rw", "0.33rw", 9999];
+                op2.eh = 400;
+                op2.ksObjss = [];
+                op2.ym = 10;
+                op2.xm = 10;
+                var inx = 0;
+                var ser = 0;
+                var lim = 4;
+                for (var i = 0; i < 2; i++) {
+                    var ksObjs = [];
+                    for (var j = 0; j < 3; j++) {
+                        if (inx >= lim)
+                            break;
+                        var ksObj = {};
+                        ksObj.type = "Model~MdaBlockSelect~base.sys0";
+                        var opts = ksObj.opts = {};
+
+                        if (inx === 0)
+                            var csObj = cs.get("guage.circle");
+                        if (inx === 1)
+                            var csObj = cs.get("guage.line");
+                        if (inx === 2)
+                            var csObj = cs.get("guage.compass");
+                        if (inx === 3)
+                            var csObj = cs.get("guage.test");
+                        opts.type = csObj.type;
+                        opts.opts = csObj.opts;
+                        opts.csName = csObj.csName;
+                        opts.opts.fontSize = "0.5rh";
+                        ksObjs.push(ksObj);
+                        inx++;
+                    }
+                    if (ksObjs.length)
+                        op2.ksObjss.push(ksObjs);
+                }
+                box.containerPageBox(op1, op2);
+                return;
+            }
 
 
         };

@@ -1801,7 +1801,7 @@ class Cp_base {
 
     }
 
-    setCanvas(elem) {
+    setContainer(elem) {
         if (this.md.subType0 !== "container")
             return;
         var md = this.md;
@@ -1811,7 +1811,13 @@ class Cp_base {
         st.containerHeight = st.ch;
         st.containerBaseId = this.kid;
         return;
-
+    }    
+    setCanvas(elem) {
+        if (this.md.subType0 !== "canvas")
+            return;
+        var md = this.md;
+        var op = md.opts;
+        var st = md.stas;
         var selem = document.createElement("canvas");
         selem.id = md.kid + "_canvas";
         selem.width = st.cw;
@@ -1966,6 +1972,7 @@ class Cp_base {
             felem.appendChild(elem);
             md.elems["base"] = elem;
             self.setEditor(elem);
+            self.setContainer(elem);
             self.setCanvas(elem);
 
         }

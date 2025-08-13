@@ -554,7 +554,7 @@ class Cells {
                 case "intPassword":
                     var obj = cs.get("setLine.inputTextNature");
                     obj.opts.setOpts.dataType = "str";
-                    obj.opts.setOpts.checkType = "int";
+                    obj.opts.setOpts.checkType = "intStr";
                     obj.opts.setOpts.value = "1234";
                     obj.opts.setOpts.password_f = 1;
                     obj.opts.setOpts.actButtons = ["pad"];
@@ -575,7 +575,6 @@ class Cells {
                     obj.opts.setOpts.title = strA[1];
                     obj.opts.setOpts.readOnly_f = 1;
                     obj.opts.setOpts.editBaseColor = "#eeeeff";
-                    obj.opts.setOpts.title = strA[1];
                     obj.csName = csName;
                     return obj;
                 case "lcdView":
@@ -585,12 +584,20 @@ class Cells {
                     setOpts.checkType = "str";
                     setOpts.actButtons = [];
                     setOpts.readOnly_f = 1;
-                    setOpts.editBaseColor = "#eeeeff";
+                    setOpts.editBaseColor = "#44f";
                     setOpts.titleWidth = 200;
                     setOpts.title = strA[1];
                     setOpts.value = "CONTENT OF LCD";
                     setOpts.fontSize = "0.5rh";
                     return {type: "Model~MdaSetLine~base.sys0", opts: opts, csName: csName};
+                    
+                case "lcdYellow":
+                    var obj = cs.get("setLine.lcdView");
+                    obj.opts.setOpts.setType = "lcdYellow";
+                    obj.opts.setOpts.title = strA[1];
+                    obj.csName = csName;
+                    return obj;
+                    
                 case "leds":
                     var setOpts = opts.setOpts = {};
                     setOpts.setType = "leds";
@@ -605,7 +612,7 @@ class Cells {
                     setOpts.actButtons = [];
                     setOpts.borderWidth = 0;
                     setOpts.editTextColor = "#fff";
-                    setOpts.fontSize = "0.4rh";
+                    setOpts.fontSize = "0.5rh";
                     return {type: "Model~MdaSetLine~base.sys0", opts: opts, csName: csName};
                 case "textArea":
                     var setOpts = opts.setOpts = {};
@@ -646,6 +653,26 @@ class Cells {
 
             }
         }
+        if (strA[0] === "guage") {
+            switch (strA[1]) {
+                case "circle":
+                    return {type: "Model~MdbGauge~circle.sys0", opts: opts, csName: csName};
+                case "line":
+                    return {type: "Model~MdbGauge~line.sys0", opts: opts, csName: csName};
+                case "compass":
+                    return {type: "Model~MdbGauge~compass.sys0", opts: opts, csName: csName};
+                case "test":
+                    return {type: "Model~MdbGauge~test.sys0", opts: opts, csName: csName};
+                case "inputText":
+                    opts.innerText = "";
+                    opts.titleWidth = 0;
+                    opts.lpd = 0;
+                    opts.rpd = 0;
+                    return {type: "Component~Cp_base~inputText.sys0", opts: opts, csName: csName};
+
+
+            }
+        }
 
 
 
@@ -655,3 +682,4 @@ class Cells {
 var cs = new Cells();
 
 
+//linear-gradient(to top, #c5d5fa, #c3dc99);

@@ -945,6 +945,7 @@ class MdaContainer {
                 ksObj.name = "name#" + i + "." + j;
                 ksObj.type = "Component~Cp_base~button.sys0";
                 ksObj.opts = {};
+                ksObj.opts.innerText = ksObj.name;
                 ksObjs.push(ksObj);
             }
             opts.ksObjss.push(ksObjs);
@@ -1513,7 +1514,7 @@ class MdaContainer {
 
         //var cname = md.lyMaps["mainBody"] + "~" + 1;
         //md.clear(cname);
-        
+
         var cname = md.lyMaps["mainBody"] + "~" + 1;
         var opts = {};
         opts.xArr = [9999, vScrollWidth];
@@ -1524,7 +1525,7 @@ class MdaContainer {
         var opts = {};
         opts.yArr = [op.headTitleHeight, 9999, hScrollWidth];
         var lyObj = md.newLayout(cname, opts, "Layout~Ly_base~xyArray.sys0", "listBody");
-        
+
         var cname = md.lyMaps["listBody"] + "~" + 0;
         var opts = {};
         opts.xc = op.ksObjss[0].length;
@@ -1541,7 +1542,7 @@ class MdaContainer {
             opts.headTitles = op.headTitles;
             md.newBlock(cname, opts, "Model~MdaHeadTitle~base.sys0", "headTitle#" + i);
         }
-        
+
 
         var cname = md.lyMaps["listBody"] + "~" + 1;
         var opts = {};
@@ -2634,11 +2635,11 @@ class MdaSelector {
                     elem.style.backgroundColor = "#88f";
                 }
                 //if (op.selectEsc_f) {
-                    iobj.sender = md;
-                    iobj.act = "selected";
-                    iobj.selectText = iobj.kvObj.opts.innerText;
-                    iobj.selectInx = KvLib.toInt(iobj.kvObj.name.split("#")[1], -1);
-                    KvLib.exeFunc(op.actionFunc, iobj);
+                iobj.sender = md;
+                iobj.act = "selected";
+                iobj.selectText = iobj.kvObj.opts.innerText;
+                iobj.selectInx = KvLib.toInt(iobj.kvObj.name.split("#")[1], -1);
+                KvLib.exeFunc(op.actionFunc, iobj);
                 //}
             };
             md.newBlock(cname, opts, "Component~Cp_base~button.sys3", "item#" + inx);
@@ -3265,8 +3266,8 @@ class MdaSetLine {
             var opts = {};
             opts.innerText = setOpts.unit;
             opts.fontSize = setOpts.unitFontSize;
-            if(!opts.fontSize)
-                opts.fontSize=14;
+            if (!opts.fontSize)
+                opts.fontSize = 14;
             opts.baseColor = op.titleBaseColor;
             opts.textAlign = "left";
             opts.lpd = 4;
@@ -3710,7 +3711,7 @@ class MdaSetLine {
             md.newBlock(cname, opts, "Component~Cp_base~images.lcd", "labelMain#" + i);
             return;
         }
-        
+
         if (setOpts.setType === "lcdYellow") {
             var opts = {};
             if (setOpts.lm)
@@ -3736,8 +3737,8 @@ class MdaSetLine {
             return;
         }
 
-        
-        
+
+
         if (setOpts.setType === "buttonActs") {
             var opts = {};
             opts.xm = setOpts.xm;
@@ -3895,7 +3896,7 @@ class MdaSetLine {
                     setOpts.value ^= (1 << inx);
                     iobj.kvObj.opts.baseColor = "#ccc";
                     iobj.kvObj.opts.innerTextColor = "#000";
-                    if ((setOpts.value >> inx) & 1) 
+                    if ((setOpts.value >> inx) & 1)
                         iobj.kvObj.opts.baseColor = setOpts.onColor;
                     else
                         iobj.kvObj.opts.baseColor = setOpts.offColor;
@@ -5681,3 +5682,6 @@ class MdaHeadTitle {
         }
     }
 }
+
+
+
