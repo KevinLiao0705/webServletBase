@@ -655,21 +655,35 @@ class Cells {
         }
         if (strA[0] === "guage") {
             switch (strA[1]) {
-                case "circle":
-                    return {type: "Model~MdbGauge~circle.sys0", opts: opts, csName: csName};
-                case "line":
-                    return {type: "Model~MdbGauge~line.sys0", opts: opts, csName: csName};
-                case "compass":
-                    return {type: "Model~MdbGauge~compass.sys0", opts: opts, csName: csName};
-                case "test":
-                    return {type: "Model~MdbGauge~test.sys0", opts: opts, csName: csName};
-                case "inputText":
-                    opts.innerText = "";
-                    opts.titleWidth = 0;
-                    opts.lpd = 0;
-                    opts.rpd = 0;
-                    return {type: "Component~Cp_base~inputText.sys0", opts: opts, csName: csName};
+                case "circleDark":
+                    return {type: "Model~MdbGauge~circle.dark", opts: opts, csName: csName};
+                case "lineDark":
+                    return {type: "Model~MdbGauge~line.dark", opts: opts, csName: csName};
+                case "compassDark":
+                    return {type: "Model~MdbGauge~compass.dark", opts: opts, csName: csName};
+                case "circleLight":
+                    return {type: "Model~MdbGauge~circle.light", opts: opts, csName: csName};
+                case "lineLight":
+                    return {type: "Model~MdbGauge~line.light", opts: opts, csName: csName};
+                case "compassLight":
+                    return {type: "Model~MdbGauge~compass.light", opts: opts, csName: csName};
 
+            }
+        }
+        if (strA[0] === "chart") {
+            switch (strA[1]) {
+                case "barLight":
+                    return {type: "Model~MdbChart~bar.light", opts: opts, csName: csName};
+                case "barDark":
+                    return {type: "Model~MdbChart~bar.dark", opts: opts, csName: csName};
+                case "compassDark":
+                    return {type: "Model~MdbGauge~compass.dark", opts: opts, csName: csName};
+                case "circleLight":
+                    return {type: "Model~MdbGauge~circle.light", opts: opts, csName: csName};
+                case "lineLight":
+                    return {type: "Model~MdbGauge~line.light", opts: opts, csName: csName};
+                case "compassLight":
+                    return {type: "Model~MdbGauge~compass.light", opts: opts, csName: csName};
 
             }
         }

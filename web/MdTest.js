@@ -692,7 +692,7 @@ class MdaMdTest {
                 op2.xm = 10;
                 var inx = 0;
                 var ser = 0;
-                var lim = 4;
+                var lim = 6;
                 for (var i = 0; i < 2; i++) {
                     var ksObjs = [];
                     for (var j = 0; j < 3; j++) {
@@ -703,13 +703,67 @@ class MdaMdTest {
                         var opts = ksObj.opts = {};
 
                         if (inx === 0)
-                            var csObj = cs.get("guage.circle");
+                            var csObj = cs.get("guage.circleDark");
                         if (inx === 1)
-                            var csObj = cs.get("guage.line");
+                            var csObj = cs.get("guage.lineDark");
                         if (inx === 2)
-                            var csObj = cs.get("guage.compass");
+                            var csObj = cs.get("guage.compassDark");
                         if (inx === 3)
-                            var csObj = cs.get("guage.test");
+                            var csObj = cs.get("guage.circleLight");
+                        if (inx === 4)
+                            var csObj = cs.get("guage.lineLight");
+                        if (inx === 5)
+                            var csObj = cs.get("guage.compassLight");
+                        opts.type = csObj.type;
+                        opts.opts = csObj.opts;
+                        opts.csName = csObj.csName;
+                        opts.opts.fontSize = "0.5rh";
+                        ksObjs.push(ksObj);
+                        inx++;
+                    }
+                    if (ksObjs.length)
+                        op2.ksObjss.push(ksObjs);
+                }
+                box.containerPageBox(op1, op2);
+                return;
+            }
+
+
+            if (iobj.keyId === "componentTest~showCharts") {
+                var op1 = {};
+                var op2 = {};
+                op1.title = "Select Buttons";
+                op1.headButtons = ["ESC"];
+                op1.headButtonIds = ["esc"];
+                op2.ksObjWs = ["0.33rw", "0.33rw", 9999];
+                op2.eh = 400;
+                op2.ksObjss = [];
+                op2.ym = 10;
+                op2.xm = 10;
+                var inx = 0;
+                var ser = 0;
+                var lim = 2;
+                for (var i = 0; i < 2; i++) {
+                    var ksObjs = [];
+                    for (var j = 0; j < 3; j++) {
+                        if (inx >= lim)
+                            break;
+                        var ksObj = {};
+                        ksObj.type = "Model~MdaBlockSelect~base.sys0";
+                        var opts = ksObj.opts = {};
+
+                        if (inx === 0)
+                            var csObj = cs.get("chart.barLight");
+                        if (inx === 1)
+                            var csObj = cs.get("chart.barDark");
+                        if (inx === 2)
+                            var csObj = cs.get("guage.compassDark");
+                        if (inx === 3)
+                            var csObj = cs.get("guage.circleLight");
+                        if (inx === 4)
+                            var csObj = cs.get("guage.lineLight");
+                        if (inx === 5)
+                            var csObj = cs.get("guage.compassLight");
                         opts.type = csObj.type;
                         opts.opts = csObj.opts;
                         opts.csName = csObj.csName;

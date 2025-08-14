@@ -46,7 +46,7 @@ class MdbGauge {
         opts.gaugeOffset = 10;
         opts.gg_minValue = 0;
         opts.gg_maxValue = 220;
-        opts.gg_colorPlate = '#004';
+        opts.gg_colorPlate = '#003';
         opts.gg_barWidth = 8;
 
 
@@ -185,9 +185,9 @@ class MdbGauge {
         return opts;
     }
     subTypeOpts(opts) {
-        if (this.md.subType === "circle.sys0") {
+        if (this.md.subType === "circle.dark") {
         }
-        if (this.md.subType === "line.sys0") {
+        if (this.md.subType === "line.dark") {
             opts.gg_linear_f = 1;
             opts.whr = 0.4;
             opts.gg_animationRule = 'bounce';
@@ -202,7 +202,7 @@ class MdbGauge {
             opts.gg_minValue = -60;
 
         }
-        if (this.md.subType === "compass.sys0") {
+        if (this.md.subType === "compass.dark") {
             opts.gg_minValue = 0;
             opts.gg_maxValue = 360;
             opts.gg_majorTicks = ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"];
@@ -210,7 +210,6 @@ class MdbGauge {
             opts.gg_ticksAngle = 360;
             opts.gg_startAngle = 180;
             opts.gg_highlights = [];
-            //opts.gg_colorPlate = "#33a";
             opts.gg_colorMajorTicks = "#f5f5f5";
             opts.gg_colorMinorTicks = "#ddd";
             opts.gg_colorNumbers = "#ccc";
@@ -237,10 +236,139 @@ class MdbGauge {
             opts.gg_animationDuration = 1500;
         }
 
-        if (this.md.subType === "test.sys0") {
-            opts.gg_needleType = "";
+        if (this.md.subType === "compass.light") {
+            opts.gg_minValue = 0;
+            opts.gg_maxValue = 360;
+            opts.gg_majorTicks = ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"];
+            opts.gg_minorTicks = 22;
+            opts.gg_ticksAngle = 360;
+            opts.gg_startAngle = 180;
+            opts.gg_highlights = [];
+            opts.gg_colorMajorTicks = "#f5f5f5";
+            opts.gg_colorMinorTicks = "#ddd";
+            opts.gg_colorNumbers = "#ccc";
+            opts.gg_colorNeedle = "rgba(240, 128, 128, 1)";
+            opts.gg_colorNeedleEnd = "rgba(255, 160, 122, .9)";
+            opts.gg_valueBox_f = 0;
+            opts.gg_valueTextShadow_f = 0;
+            opts.gg_colorNeedleCircleOuter = "#ccc";
+            opts.gg_needleCircleSize = 0;
             opts.gg_needleCircleOuter_f = 0;
-            opts.gg_needleWidth = 0;
+            opts.gg_animationRule = "linear";
+            opts.gg_needleType = "line";
+            opts.gg_needleStart = 75;
+            opts.gg_needleEnd = 99;
+            opts.gg_needleWidth = 3;
+            opts.gg_colorBorderOuter = "#ccf";
+            opts.gg_colorBorderOuterEnd = "#ccc";
+            opts.gg_animationTarget = "plate";
+            //gg_animationTarget: "needle";
+            opts.gg_units = "";
+            opts.gg_title = "DIRECTION";
+            opts.gg_fontTitleSize = 19;
+            opts.gg_colorTitle = "#f5f5f5";
+            opts.gg_animationDuration = 1500;
+
+            opts.gg_colorPlate = '#fff';
+            opts.gg_colorMajorTicks = '#000';
+            opts.gg_colorMinorTicks = '#000';
+            opts.gg_colorTitle = '#000';
+            opts.gg_colorUnits = '#000';
+
+            opts.gg_colorNeedle = 'rgba(180, 0, 0, 1)';
+            opts.gg_colorNeedleEnd = 'rgba(180, 0, 0, .5)';
+            opts.gg_colorNeedleShadowUp = "#400";
+            opts.gg_colorNeedleShadowDown = "#400";
+            opts.gg_colorNeedleCircleOuter = "#666";
+            opts.gg_colorNeedleCircleOuterEnd = "#222";
+            opts.gg_colorNeedleCircleInner = "#f00";
+            opts.gg_colorNeedleCircleInnerEnd = "#f00";
+            opts.gg_colorNumbers = '#000';
+
+
+            opts.gg_colorBorderOuter = "#ccf";
+            opts.gg_colorBorderOuterEnd = "#ccc";
+            opts.gg_colorBorderMiddle = "#ddd";
+            opts.gg_colorBorderMiddleEnd = "#444";
+            opts.gg_colorBorderInner = "#fff";
+            opts.gg_colorBorderInnerEnd = "#222";
+
+        }
+
+
+        if (this.md.subType === "circle.light") {
+            opts.gg_colorPlate = '#fff';
+            opts.gg_colorMajorTicks = '#000';
+            opts.gg_colorMinorTicks = '#000';
+            opts.gg_colorTitle = '#000';
+            opts.gg_colorUnits = '#000';
+
+            opts.gg_colorNeedle = 'rgba(180, 0, 0, 1)';
+            opts.gg_colorNeedleEnd = 'rgba(180, 0, 0, .5)';
+            opts.gg_colorNeedleShadowUp = "#400";
+            opts.gg_colorNeedleShadowDown = "#400";
+            opts.gg_colorNeedleCircleOuter = "#666";
+            opts.gg_colorNeedleCircleOuterEnd = "#222";
+            opts.gg_colorNeedleCircleInner = "#f00";
+            opts.gg_colorNeedleCircleInnerEnd = "#f00";
+            opts.gg_colorNumbers = '#000';
+
+
+            opts.gg_colorBorderOuter = "#ccf";
+            opts.gg_colorBorderOuterEnd = "#ccc";
+            opts.gg_colorBorderMiddle = "#ddd";
+            opts.gg_colorBorderMiddleEnd = "#444";
+            opts.gg_colorBorderInner = "#fff";
+            opts.gg_colorBorderInnerEnd = "#222";
+
+
+
+
+
+        }
+
+
+        if (this.md.subType === "line.light") {
+            opts.gg_colorPlate = '#fff';
+            opts.gg_colorMajorTicks = '#000';
+            opts.gg_colorMinorTicks = '#000';
+            opts.gg_colorTitle = '#000';
+            opts.gg_colorUnits = '#000';
+
+            opts.gg_colorNeedle = 'rgba(180, 0, 0, 1)';
+            opts.gg_colorNeedleEnd = 'rgba(180, 0, 0, .5)';
+            opts.gg_colorNeedleShadowUp = "#400";
+            opts.gg_colorNeedleShadowDown = "#400";
+            opts.gg_colorNeedleCircleOuter = "#666";
+            opts.gg_colorNeedleCircleOuterEnd = "#222";
+            opts.gg_colorNeedleCircleInner = "#f00";
+            opts.gg_colorNeedleCircleInnerEnd = "#f00";
+            opts.gg_colorNumbers = '#000';
+
+
+            opts.gg_colorBorderOuter = "#ccf";
+            opts.gg_colorBorderOuterEnd = "#ccc";
+            opts.gg_colorBorderMiddle = "#ddd";
+            opts.gg_colorBorderMiddleEnd = "#444";
+            opts.gg_colorBorderInner = "#fff";
+            opts.gg_colorBorderInnerEnd = "#222";
+
+
+            opts.gg_linear_f = 1;
+            opts.whr = 0.4;
+            opts.gg_animationRule = 'bounce';
+            opts.gg_majorTicks = ['-60', '-40', '-20', '0', '20', '40', '60', '80', '100', '120', '140', '160', '180', '200', '220'];
+            opts.gg_needleWidth = 6;
+            opts.gg_title = "Temperatur";
+            opts.gg_fontTitleSize = 24;
+            opts.gg_fontNumbersSize = 24;
+            opts.gg_fontValueSize = 34;
+            opts.gg_fontUnitsSize = 24;
+            opts.gg_units = '°C';
+            opts.gg_minValue = -60;
+
+
+
         }
 
     }
@@ -357,6 +485,283 @@ class MdbGauge {
         else
             md.objs["guage"] = new RadialGauge(opts);
         md.objs["guage"].draw();
+
+
+        //===============
+        var iobj = {};
+        iobj.act = "afterCreate";
+        iobj.sender = md;
+        KvLib.exe(op.actionFunc, iobj);
+    }
+    build() {
+        var self = this;
+        var md = self.md;
+        var op = md.opts;
+        var st = md.stas;
+        var lyMaps = md.lyMaps;
+        var blocks = op.blocks;
+        var layouts = op.layouts;
+        //======================================    
+        var cname = "c";
+        var opts = {};
+        layouts[cname] = {name: cname, type: "Layout~Ly_base~array.sys0", opts: opts};
+        lyMaps["body"] = cname;
+        //======================================    
+        var opts = {};
+        md.setPns(opts);
+        blocks[cname] = {name: "basePanel", type: "Component~Cp_base~plate.sys0", opts: opts};
+        //======================================    
+        var cname = lyMaps["body"] + "~" + 0;
+        var opts = {};
+        opts.baseColor = op.baseColor;
+        opts.whr = op.whr;
+        opts.margin = op.margin;
+        blocks[cname] = {name: "canvas", type: "Component~Cp_base~canvas.sys0", opts: opts};
+        return;
+    }
+}
+
+
+
+class MdbChart {
+    constructor() {
+        this.testTimeTh = 100;
+        this.testTime = 0;
+    }
+    initOpts(md) {
+        var self = this;
+        var opts = {};
+        Block.setBaseOpts(opts);
+        opts.baseColor = "#fff";
+        opts.margin = 10;
+        opts.testValue_f = 1;
+        opts.title = "Title";
+        opts.baseColor = "#fff";
+        opts.titleColor = "#000";
+        opts.yAxe_f = 0;
+        opts.datasetName = "datasetName";
+        opts.chartDatas = [45, 89];
+        opts.chartLabels = ["label1", "label2"];
+        opts.chartMin = 0;
+        opts.chartStep = 20;
+        opts.chartMax = 100;
+        opts.chartAxesFontSize = 10;
+        opts.chartLineColor = "#000";
+        opts.chartBackgroundColors = ["#0f0", "#f00"];
+        opts.chartFilter = "if(inData>50) outData='#0f0';else outData='#f00';";
+        opts.gridColor = "#888";
+
+
+        this.subTypeOpts(opts);
+        return opts;
+    }
+    subTypeOpts(opts) {
+        if (this.md.subType === "bar.light") {
+        }
+        if (this.md.subType === "bar.dark") {
+            opts.baseColor = "#002";
+            opts.titleColor = "#ddd";
+            opts.gridColor = "#888";
+            opts.chartLineColor = "#fff";
+        }
+        if (this.md.subType === "line.dark") {
+            opts.title = "Title";
+            opts.datasetName = "datasetName";
+            opts.chartDatas = [10, 32, 5, 65, 44, 70, 89, 24, 100, 23];
+            opts.chartLabels = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+            opts.chartMin = 0;
+            opts.chartMax = 100;
+            opts.chartStep = 20;
+            opts.chartAxesFontSize = 10;
+            opts.chartLineColor = "#fff";
+            opts.chartBackgroundColors = ["#0f0", "#f00"];
+            opts.chartFilter = "if(inData>50) outData='#0f0';else outData='#f00';";
+        }
+        if (this.md.subType === "doughnut.dark") {
+            opts.title = "Title";
+            opts.chartDatas = [10, 32, 5, 65, 44];
+            opts.chartLabels = ["1", "2", "3", "4", "5"];
+            opts.chartBackgroundColors = ["#f00", "#0f0", '#00f', '#ff0', '#0ff'];
+
+
+
+        }
+        if (this.md.subType === "pie.dark") {
+            opts.title = "Title";
+            opts.chartDatas = [10, 32, 5, 65, 44];
+            opts.chartLabels = ["1", "2", "3", "4", "5"];
+            opts.chartBackgroundColors = ["#f00", "#0f0", '#00f', '#ff0', '#0ff'];
+
+
+        }
+        if (this.md.subType === "circle.light") {
+        }
+        if (this.md.subType === "line.light") {
+        }
+
+    }
+    chkWatch() {
+        var md = this.md;
+        var op = md.opts;
+        var st = md.stas;
+
+        if (op.testValue_f) {
+            this.testTime++;
+            if (this.testTime >= this.testTimeTh) {
+                this.testTime = 0;
+                //md.objs["guage"].value = Math.floor(Math.random() * 220);
+            }
+        }
+    }
+    afterCreate() {
+        var md = this.md;
+        var op = md.opts;
+        var st = md.stas;
+        //=======================================================
+        var canvasObj = md.blockRefs["canvas"];
+        var canvasElem = canvasObj.elems["canvas"];
+
+        var chartData = {labels: [], datasets: []};
+        for (let i = 0; i < op.chartLabels.length; i++)
+            chartData.labels.push(op.chartLabels[i]);
+        var xAxe = {
+            grid: {
+                display: true,
+                color: 'rgba(80, 80, 80, 0.5)', // Sets the X-axis grid line color to a semi-transparent red
+                //borderColor: 'red' // Optional: Sets the color of the axis border itself
+            },
+
+            ticks: {
+                fontSize: op.chartAxesFontSize,
+                labelOffset: 10,
+                color: op.gridColor,
+                maxRotation: 0
+            }
+
+        };
+        var yAxe = {
+            grid: {
+                display: true,
+                color: 'rgba(80, 80, 80, 0.5)' // Sets the X-axis grid line color to a semi-transparent red
+                //borderColor: 'red' // Optional: Sets the color of the axis border itself
+            },
+            ticks: {
+                beginAtZero: true,
+                max: op.chartMax,
+                min: op.chartMin,
+                stepSize: op.chartStep,
+                fontSize: op.chartAxesFontSize
+            }
+        };
+        switch (md.subType0) {
+            case "bar":
+                var dispLegend = false;
+                var opts = {
+                    label: op.datasetName,
+                    fontColor: "#f00",
+                    borderColor: op.chartLineColor,
+                    borderWidth: 1,
+                    backgroundColor: [],
+                    data: []
+                };
+                if (op.chartFilter) {
+                    for (let i = 0; i < op.chartLabels.length; i++) {
+                        var valueObj = KvLib.watchFilter(op.chartDatas[i], op.chartFilter);
+                        opts.backgroundColor.push(valueObj);
+                    }
+                } else {
+                    for (let i = 0; i < op.chartBackgroundColors.length; i++)
+                        opts.backgroundColor.push(op.chartBackgroundColors[i]);
+                }
+
+
+
+                for (let i = 0; i < op.chartLabels.length; i++) {
+                    opts.data.push(op.chartDatas[i]);
+                }
+                chartData.datasets.push(opts);
+
+                var barScales = {xAxes: [xAxe], yAxes: [yAxe]};
+                var barScales = {x: xAxe, y: yAxe};
+                var barType = "bar";
+                if (op.yAxe_f) {
+                    barType = "horizontalBar";
+                    barScales = {xAxes: [yAxe], yAxes: [xAxe]};
+                }
+                break;
+            case "line":
+                var barType = "line";
+                var dispLegend = false;
+                var opts = {
+                    label: op.datasetName,
+                    borderColor: op.chartLineColor,
+                    borderWidth: 1,
+                    pointBackgroundColor: [],
+                    fill: KvLib.toBoolean(op.chartFill_f),
+                    data: []
+                };
+                if (op.chartFilter) {
+                    for (let i = 0; i < op.chartLabels.length; i++) {
+                        var valueObj = KvLib.watchFilter(op.chartDatas[i], op.chartFilter);
+                        opts.pointBackgroundColor.push(valueObj);
+                    }
+                } else {
+                    for (let i = 0; i < op.chartBackgroundColors.length; i++)
+                        opts.pointBackgroundColor.push(op.chartBackgroundColors[i]);
+                }
+                for (let i = 0; i < op.chartLabels.length; i++) {
+                    opts.data.push(op.chartDatas[i]);
+                }
+                chartData.datasets.push(opts);
+                var barScales = {xAxes: [xAxe], yAxes: [yAxe]};
+                break;
+            case "doughnut":
+            case "pie":
+                var barType = self.subType;
+                var dispLegend = true;
+                var opts = {
+                    label: op.datasetName,
+                    borderColor: "#000",
+                    borderWidth: 1,
+                    backgroundColor: [],
+                    data: []
+                };
+                if (op.chartFilter) {
+                    for (let i = 0; i < op.chartLabels.length; i++) {
+                        var valueObj = KvLib.watchFilter(op.chartDatas[i], op.chartFilter);
+                        opts.backgroundColor.push(valueObj);
+                    }
+                } else {
+                    for (let i = 0; i < op.chartBackgroundColors.length; i++)
+                        opts.backgroundColor.push(op.chartBackgroundColors[i]);
+                }
+                for (let i = 0; i < op.chartLabels.length; i++) {
+                    opts.data.push(op.chartDatas[i]);
+                }
+                chartData.datasets.push(opts);
+                var barScales = {};
+                break;
+        }
+        //========================================
+        var ctx = canvasElem.getContext('2d');
+
+        md.objs["chart"] = new Chart(ctx, {
+            type: barType,
+            data: chartData,
+            options: {
+                responsive: true,
+                legend: {
+                    display: dispLegend,
+                    position: 'top'
+                },
+                title: {
+                    fontColor: op.titleColor,
+                    display: true,
+                    text: op.title
+                },
+                scales: barScales
+            }
+        });
 
 
         //===============
