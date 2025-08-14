@@ -21,10 +21,10 @@ class GlobalRes {
 
     }
     constructor() {
-        this.debug_f = 0;
+        this.debug_f = 1;
         this.version = "1.0";
-        this.appName = "webBuilder";
-        //this.appName = "sync";
+        //this.appName = "webBuilder";
+        this.appName = "sync";
         this.appId = 3;
         //=================================
         this.showLogo_f = 1;
