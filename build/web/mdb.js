@@ -532,71 +532,89 @@ class MdbChart {
         var self = this;
         var opts = {};
         Block.setBaseOpts(opts);
-        opts.baseColor = "#fff";
+        opts.barType = "bar";
+        opts.indexAxis = 'x';
         opts.margin = 10;
         opts.testValue_f = 1;
+        opts.horizontal_f_f = 0;
         opts.title = "Title";
-        opts.baseColor = "#fff";
-        opts.titleColor = "#000";
-        opts.yAxe_f = 0;
-        opts.datasetName = "datasetName";
-        opts.chartDatas = [45, 89];
-        opts.chartLabels = ["label1", "label2"];
+        opts.grid_f = 1;
+        opts.chartLabels = ["label1", "label2", "label3", "label4"];
+        //==============================
+        opts.datasetNames = ["datasetName1"];
+        opts.chartBackgroundColorAA = [["#f00", "#0f0", "#00f", "#ff0"]];
+        opts.chartBorderColorAA = [["#f00", "#0f0", "#00f", "#ff0"]];
+        opts.chartOpacity = 0.5;
+        opts.dataAA = [[12, 45, 89, 64]];
+        //==============================
         opts.chartMin = 0;
         opts.chartStep = 20;
         opts.chartMax = 100;
         opts.chartAxesFontSize = 10;
-        opts.chartLineColor = "#000";
-        opts.chartBackgroundColors = ["#0f0", "#f00"];
+        opts.gridColor = "#ccc";
+        opts.baseColor = "#fff";
+        opts.titleColor = "#0f0";
+        opts.xLabelColor = "#444";
+        opts.yLabelColor = "#444";
+        opts.legendFontSize = 12;
         opts.chartFilter = "if(inData>50) outData='#0f0';else outData='#f00';";
-        opts.gridColor = "#888";
-
-
         this.subTypeOpts(opts);
         return opts;
     }
     subTypeOpts(opts) {
-        if (this.md.subType === "bar.light") {
-        }
-        if (this.md.subType === "bar.dark") {
+        if (this.md.subType1 === "dark") {
             opts.baseColor = "#002";
             opts.titleColor = "#ddd";
-            opts.gridColor = "#888";
+            opts.gridColor = "#444";
             opts.chartLineColor = "#fff";
+            opts.xLabelColor = "#ccc";
+            opts.yLabelColor = "#ccc";
         }
-        if (this.md.subType === "line.dark") {
-            opts.title = "Title";
-            opts.datasetName = "datasetName";
-            opts.chartDatas = [10, 32, 5, 65, 44, 70, 89, 24, 100, 23];
-            opts.chartLabels = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
-            opts.chartMin = 0;
-            opts.chartMax = 100;
-            opts.chartStep = 20;
-            opts.chartAxesFontSize = 10;
-            opts.chartLineColor = "#fff";
-            opts.chartBackgroundColors = ["#0f0", "#f00"];
-            opts.chartFilter = "if(inData>50) outData='#0f0';else outData='#f00';";
+        if (this.md.subType0 === "bar") {
         }
-        if (this.md.subType === "doughnut.dark") {
-            opts.title = "Title";
-            opts.chartDatas = [10, 32, 5, 65, 44];
-            opts.chartLabels = ["1", "2", "3", "4", "5"];
-            opts.chartBackgroundColors = ["#f00", "#0f0", '#00f', '#ff0', '#0ff'];
-
-
-
+        if (this.md.subType0 === "line") {
+            opts.barType = "line";
+            opts.datasetNames = ["datasetName1", "datasetName2"];
+            opts.chartBackgroundColorAA = [["#f00"], ["#0f0"]];
+            opts.chartBorderColorAA = [["#f00"], ["#0f0"]];
+            opts.chartOpacity = 0.5;
+            opts.dataAA = [[12, 45, 60, 64], [33, 40, 79, 12]];
         }
-        if (this.md.subType === "pie.dark") {
-            opts.title = "Title";
-            opts.chartDatas = [10, 32, 5, 65, 44];
-            opts.chartLabels = ["1", "2", "3", "4", "5"];
-            opts.chartBackgroundColors = ["#f00", "#0f0", '#00f', '#ff0', '#0ff'];
-
-
+        if (this.md.subType0 === "moutain") {
+            opts.barType = "line";
+            opts.fill_f = 1;
+            opts.chartBackgroundColorAA = [["#0f0"]];
+            opts.chartBorderColorAA = [["#0f0"]];
+            opts.chartOpacity = 0.5;
         }
-        if (this.md.subType === "circle.light") {
+        if (this.md.subType0 === "doughnut") {
+            opts.chartOpacity = 1;
+            opts.grid_f = 0;
+            opts.barType = "doughnut";
+            opts.whr = 1;
         }
-        if (this.md.subType === "line.light") {
+        if (this.md.subType0 === "pie") {
+            opts.chartOpacity = 1;
+            opts.grid_f = 0;
+            opts.whr = 1;
+            opts.barType = "pie";
+        }
+        if (this.md.subType0 === "polar") {
+            opts.chartOpacity = 0.5;
+            opts.whr = 1;
+            opts.grid_f = 0;
+            opts.barType = "polarArea";
+        }
+        if (this.md.subType0 === "radar") {
+            opts.barType = "radar";
+            opts.fill_f = 1;
+            opts.chartLabels = ["label1", "label2", "label3", "label4", "label5", "label6"];
+            opts.chartBackgroundColorAA = [["#0f0"]];
+            opts.chartBorderColorAA = [["#0f0"]];
+            opts.chartOpacity = 0.5;
+            opts.grid_f = 0;
+            opts.whr = 1;
+            opts.dataAA = [[12, 45, 60, 64, 12, 11]];
         }
 
     }
@@ -609,7 +627,16 @@ class MdbChart {
             this.testTime++;
             if (this.testTime >= this.testTimeTh) {
                 this.testTime = 0;
-                //md.objs["guage"].value = Math.floor(Math.random() * 220);
+                var chartObj = md.objs["chart"];
+                var datasets = chartObj.data.datasets;
+                var len = op.chartMax - op.chartMin;
+
+                for (var i = 0; i < datasets.length; i++) {
+                    for (var j = 0; j < datasets[i].data.length; j++) {
+                        datasets[i].data[j] = Math.floor(Math.random() * (len)) + op.chartMin;
+                    }
+                }
+                chartObj.update();
             }
         }
     }
@@ -621,145 +648,112 @@ class MdbChart {
         var canvasObj = md.blockRefs["canvas"];
         var canvasElem = canvasObj.elems["canvas"];
 
-        var chartData = {labels: [], datasets: []};
-        for (let i = 0; i < op.chartLabels.length; i++)
-            chartData.labels.push(op.chartLabels[i]);
-        var xAxe = {
-            grid: {
-                display: true,
-                color: 'rgba(80, 80, 80, 0.5)', // Sets the X-axis grid line color to a semi-transparent red
-                //borderColor: 'red' // Optional: Sets the color of the axis border itself
-            },
+        var datasets = [];
+        for (var i = 0; i < op.datasetNames.length; i++) {
+            var dataSet = {};
 
-            ticks: {
-                fontSize: op.chartAxesFontSize,
-                labelOffset: 10,
-                color: op.gridColor,
-                maxRotation: 0
-            }
-
-        };
-        var yAxe = {
-            grid: {
-                display: true,
-                color: 'rgba(80, 80, 80, 0.5)' // Sets the X-axis grid line color to a semi-transparent red
-                //borderColor: 'red' // Optional: Sets the color of the axis border itself
-            },
-            ticks: {
-                beginAtZero: true,
-                max: op.chartMax,
-                min: op.chartMin,
-                stepSize: op.chartStep,
-                fontSize: op.chartAxesFontSize
-            }
-        };
-        switch (md.subType0) {
-            case "bar":
-                var dispLegend = false;
-                var opts = {
-                    label: op.datasetName,
-                    fontColor: "#f00",
-                    borderColor: op.chartLineColor,
-                    borderWidth: 1,
-                    backgroundColor: [],
-                    data: []
-                };
-                if (op.chartFilter) {
-                    for (let i = 0; i < op.chartLabels.length; i++) {
-                        var valueObj = KvLib.watchFilter(op.chartDatas[i], op.chartFilter);
-                        opts.backgroundColor.push(valueObj);
-                    }
-                } else {
-                    for (let i = 0; i < op.chartBackgroundColors.length; i++)
-                        opts.backgroundColor.push(op.chartBackgroundColors[i]);
-                }
+            var chartBackgroundColors = [];
+            var chartBackgroundColorA = op.chartBackgroundColorAA[i];
+            for (var j = 0; j < chartBackgroundColorA.length; j++)
+                chartBackgroundColors.push(KvLib.setColorRgba(chartBackgroundColorA[j], op.chartOpacity));
+            var chartBorderColors = [];
+            var chartBorderColorA = op.chartBorderColorAA[i];
+            for (var j = 0; j < chartBorderColorA.length; j++)
+                chartBorderColors.push(chartBorderColorA[j]);
 
 
-
-                for (let i = 0; i < op.chartLabels.length; i++) {
-                    opts.data.push(op.chartDatas[i]);
-                }
-                chartData.datasets.push(opts);
-
-                var barScales = {xAxes: [xAxe], yAxes: [yAxe]};
-                var barScales = {x: xAxe, y: yAxe};
-                var barType = "bar";
-                if (op.yAxe_f) {
-                    barType = "horizontalBar";
-                    barScales = {xAxes: [yAxe], yAxes: [xAxe]};
-                }
-                break;
-            case "line":
-                var barType = "line";
-                var dispLegend = false;
-                var opts = {
-                    label: op.datasetName,
-                    borderColor: op.chartLineColor,
-                    borderWidth: 1,
-                    pointBackgroundColor: [],
-                    fill: KvLib.toBoolean(op.chartFill_f),
-                    data: []
-                };
-                if (op.chartFilter) {
-                    for (let i = 0; i < op.chartLabels.length; i++) {
-                        var valueObj = KvLib.watchFilter(op.chartDatas[i], op.chartFilter);
-                        opts.pointBackgroundColor.push(valueObj);
-                    }
-                } else {
-                    for (let i = 0; i < op.chartBackgroundColors.length; i++)
-                        opts.pointBackgroundColor.push(op.chartBackgroundColors[i]);
-                }
-                for (let i = 0; i < op.chartLabels.length; i++) {
-                    opts.data.push(op.chartDatas[i]);
-                }
-                chartData.datasets.push(opts);
-                var barScales = {xAxes: [xAxe], yAxes: [yAxe]};
-                break;
-            case "doughnut":
-            case "pie":
-                var barType = self.subType;
-                var dispLegend = true;
-                var opts = {
-                    label: op.datasetName,
-                    borderColor: "#000",
-                    borderWidth: 1,
-                    backgroundColor: [],
-                    data: []
-                };
-                if (op.chartFilter) {
-                    for (let i = 0; i < op.chartLabels.length; i++) {
-                        var valueObj = KvLib.watchFilter(op.chartDatas[i], op.chartFilter);
-                        opts.backgroundColor.push(valueObj);
-                    }
-                } else {
-                    for (let i = 0; i < op.chartBackgroundColors.length; i++)
-                        opts.backgroundColor.push(op.chartBackgroundColors[i]);
-                }
-                for (let i = 0; i < op.chartLabels.length; i++) {
-                    opts.data.push(op.chartDatas[i]);
-                }
-                chartData.datasets.push(opts);
-                var barScales = {};
-                break;
+            dataSet.label = op.datasetNames[i];
+            dataSet.data = op.dataAA[i];
+            dataSet.backgroundColor = chartBackgroundColors;
+            dataSet.borderColor = chartBorderColors;
+            dataSet.borderWidth = 1;
+            dataSet.fill = KvLib.toBoolean(op.fill_f);
+            datasets.push(dataSet);
         }
-        //========================================
-        var ctx = canvasElem.getContext('2d');
+        var chartData = {
+            labels: op.chartLabels,
+            datasets: datasets
+        };
+        var scales = {
+            x: {
+                display: op.grid_f,
+                grid: {
+                    display: op.grid_f,
+                    color: op.gridColor
+                },
 
+                ticks: {
+                    display: op.grid_f,
+                    fontSize: op.chartAxesFontSize,
+                    labelOffset: 10,
+                    color: op.xLabelColor,
+                    maxRotation: 0
+                }
+            },
+            y: {
+                display: op.grid_f,
+                grid: {
+                    display: op.grid_f,
+                    color: op.gridColor
+                },
+                ticks: {
+                    display: op.grid_f,
+                    beginAtZero: true,
+                    color: op.yLabelColor,
+                    max: op.chartMax,
+                    min: op.chartMin,
+                    stepSize: op.chartStep,
+                    fontSize: op.chartAxesFontSize
+
+                }
+            }
+        };
+
+        var legend = {
+            display: true,
+            position: 'bottom', //top | bottom | left | right
+            align: 'center', //start | center | end
+            labels: {
+                font: {
+                    size: op.legnedFontSize
+                }
+                //color: 'blue',
+                //padding: 20
+            },
+            title: {
+                display: false,
+                text: 'MyChartLegend'
+                        //color: 'darkgray'
+            }
+            /*
+             onClick: (e, legendItem, legend) => {
+             // Custom logic on legend item click
+             console.log('Legend item clicked:', legendItem);
+             }
+             * 
+             */
+        };
+
+
+        var ctx = canvasElem.getContext('2d');
+        var titleDisp_f = 0;
+        if (op.title)
+            titleDisp_f = 1;
         md.objs["chart"] = new Chart(ctx, {
-            type: barType,
+            type: op.barType,
             data: chartData,
             options: {
                 responsive: true,
-                legend: {
-                    display: dispLegend,
-                    position: 'top'
+                indexAxis: op.indexAxis,
+                plugins: {
+                    title: {
+                        fontColor: op.titleColor,
+                        display: titleDisp_f,
+                        text: op.title
+                    },
+                    legend: legend
                 },
-                title: {
-                    fontColor: op.titleColor,
-                    display: true,
-                    text: op.title
-                },
-                scales: barScales
+                scales: scales
             }
         });
 

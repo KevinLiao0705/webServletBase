@@ -30,7 +30,7 @@ class SubOpts {
             opts.borderWidth = 2;
             opts.borderColor = "#fff";
             //=================
-            opts.insideShadowBlur = "0.2rh";
+            opts.insideShadowBlur = "0.1rh";
             opts.outsideShadowBlur = null;
             opts.mouseClick_f = 1;
             opts.cursor="pointer";

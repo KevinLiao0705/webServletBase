@@ -590,14 +590,14 @@ class Cells {
                     setOpts.value = "CONTENT OF LCD";
                     setOpts.fontSize = "0.5rh";
                     return {type: "Model~MdaSetLine~base.sys0", opts: opts, csName: csName};
-                    
+
                 case "lcdYellow":
                     var obj = cs.get("setLine.lcdView");
                     obj.opts.setOpts.setType = "lcdYellow";
                     obj.opts.setOpts.title = strA[1];
                     obj.csName = csName;
                     return obj;
-                    
+
                 case "leds":
                     var setOpts = opts.setOpts = {};
                     setOpts.setType = "leds";
@@ -667,23 +667,46 @@ class Cells {
                     return {type: "Model~MdbGauge~line.light", opts: opts, csName: csName};
                 case "compassLight":
                     return {type: "Model~MdbGauge~compass.light", opts: opts, csName: csName};
-
             }
         }
         if (strA[0] === "chart") {
             switch (strA[1]) {
-                case "barLight":
-                    return {type: "Model~MdbChart~bar.light", opts: opts, csName: csName};
+                case "bar":
+                    return {type: "Model~MdbChart~bar", opts: opts, csName: csName};
+                case "hbar":
+                    opts.indexAxis='y';
+                    return {type: "Model~MdbChart~bar", opts: opts, csName: csName};
                 case "barDark":
                     return {type: "Model~MdbChart~bar.dark", opts: opts, csName: csName};
-                case "compassDark":
-                    return {type: "Model~MdbGauge~compass.dark", opts: opts, csName: csName};
-                case "circleLight":
-                    return {type: "Model~MdbGauge~circle.light", opts: opts, csName: csName};
-                case "lineLight":
-                    return {type: "Model~MdbGauge~line.light", opts: opts, csName: csName};
-                case "compassLight":
-                    return {type: "Model~MdbGauge~compass.light", opts: opts, csName: csName};
+                case "hbarDark":
+                    opts.indexAxis='y';
+                    return {type: "Model~MdbChart~bar.dark", opts: opts, csName: csName};
+                case "line":
+                    return {type: "Model~MdbChart~line", opts: opts, csName: csName};
+                case "lineDark":
+                    return {type: "Model~MdbChart~line.dark", opts: opts, csName: csName};
+                case "moutain":
+                    return {type: "Model~MdbChart~moutain", opts: opts, csName: csName};
+                case "moutainDark":
+                    return {type: "Model~MdbChart~moutain.dark", opts: opts, csName: csName};
+                    
+                    
+                case "doughnut":
+                    return {type: "Model~MdbChart~doughnut", opts: opts, csName: csName};
+                case "doughnutDark":
+                    return {type: "Model~MdbChart~doughnut.dark", opts: opts, csName: csName};
+                case "pie":
+                    return {type: "Model~MdbChart~pie", opts: opts, csName: csName};
+                case "pieDark":
+                    return {type: "Model~MdbChart~pie.dark", opts: opts, csName: csName};
+                case "polar":
+                    return {type: "Model~MdbChart~polar", opts: opts, csName: csName};
+                case "polarDark":
+                    return {type: "Model~MdbChart~polar.dark", opts: opts, csName: csName};
+                case "radar":
+                    return {type: "Model~MdbChart~radar", opts: opts, csName: csName};
+                case "radarDark":
+                    return {type: "Model~MdbChart~radar.dark", opts: opts, csName: csName};
 
             }
         }

@@ -107,7 +107,7 @@ class MdaMdTest {
                         ksObj.type = "Model~MdaBlockView~base.sys0";
                         var kopts = ksObj.opts = {};
                         kopts.title = types[inx];
-                        kopts.blockType = types[inx]
+                        kopts.blockType = types[inx];
                         ksObjs.push(ksObj);
                         inx++;
                     }
@@ -468,7 +468,7 @@ class MdaMdTest {
             if (iobj.keyId === "componentTest~showLabels") {
                 var op1 = {};
                 var op2 = {};
-                op1.title = "Select Buttons";
+                op1.title = "Select Labels";
                 op1.headButtons = ["ESC"];
                 op1.headButtonIds = ["esc"];
                 op2.ksObjWs = ["0.25rw", "0.25rw", "0.25rw", 9999];
@@ -557,7 +557,7 @@ class MdaMdTest {
             if (iobj.keyId === "componentTest~showInputs") {
                 var op1 = {};
                 var op2 = {};
-                op1.title = "Select Buttons";
+                op1.title = "Select Inputs";
                 op1.headButtons = ["ESC"];
                 op1.headButtonIds = ["esc"];
                 op2.ksObjWs = ["0.25rw", "0.25rw", "0.25rw", 9999];
@@ -606,7 +606,7 @@ class MdaMdTest {
             if (iobj.keyId === "componentTest~showSetLines") {
                 var op1 = {};
                 var op2 = {};
-                op1.title = "Select Buttons";
+                op1.title = "Select SetLines";
                 op1.headButtons = ["ESC"];
                 op1.headButtonIds = ["esc"];
                 op2.ksObjWs = ["0.5rw", 9999];
@@ -682,7 +682,7 @@ class MdaMdTest {
             if (iobj.keyId === "componentTest~showGauges") {
                 var op1 = {};
                 var op2 = {};
-                op1.title = "Select Buttons";
+                op1.title = "Select Gauges";
                 op1.headButtons = ["ESC"];
                 op1.headButtonIds = ["esc"];
                 op2.ksObjWs = ["0.33rw", "0.33rw", 9999];
@@ -728,24 +728,23 @@ class MdaMdTest {
                 return;
             }
 
-
             if (iobj.keyId === "componentTest~showCharts") {
                 var op1 = {};
                 var op2 = {};
-                op1.title = "Select Buttons";
+                op1.title = "Select Charts";
                 op1.headButtons = ["ESC"];
                 op1.headButtonIds = ["esc"];
-                op2.ksObjWs = ["0.33rw", "0.33rw", 9999];
+                op2.ksObjWs = ["0.5rw", 9999];
                 op2.eh = 400;
                 op2.ksObjss = [];
                 op2.ym = 10;
                 op2.xm = 10;
                 var inx = 0;
                 var ser = 0;
-                var lim = 2;
-                for (var i = 0; i < 2; i++) {
+                var lim = 16;
+                for (var i = 0; i < 10; i++) {
                     var ksObjs = [];
-                    for (var j = 0; j < 3; j++) {
+                    for (var j = 0; j < 2; j++) {
                         if (inx >= lim)
                             break;
                         var ksObj = {};
@@ -753,17 +752,39 @@ class MdaMdTest {
                         var opts = ksObj.opts = {};
 
                         if (inx === 0)
-                            var csObj = cs.get("chart.barLight");
+                            var csObj = cs.get("chart.bar");
                         if (inx === 1)
-                            var csObj = cs.get("chart.barDark");
+                            var csObj = cs.get("chart.hbar");
                         if (inx === 2)
-                            var csObj = cs.get("guage.compassDark");
+                            var csObj = cs.get("chart.barDark");
                         if (inx === 3)
-                            var csObj = cs.get("guage.circleLight");
+                            var csObj = cs.get("chart.hbarDark");
                         if (inx === 4)
-                            var csObj = cs.get("guage.lineLight");
+                            var csObj = cs.get("chart.line");
                         if (inx === 5)
-                            var csObj = cs.get("guage.compassLight");
+                            var csObj = cs.get("chart.lineDark");
+                        if (inx === 6)
+                            var csObj = cs.get("chart.moutain");
+                        if (inx === 7)
+                            var csObj = cs.get("chart.moutainDark");
+                        
+                        
+                        if (inx === 8)
+                            var csObj = cs.get("chart.doughnut");
+                        if (inx === 9)
+                            var csObj = cs.get("chart.doughnutDark");
+                        if (inx === 10)
+                            var csObj = cs.get("chart.pie");
+                        if (inx === 11)
+                            var csObj = cs.get("chart.pieDark");
+                        if (inx === 12)
+                            var csObj = cs.get("chart.polar");
+                        if (inx === 13)
+                            var csObj = cs.get("chart.polarDark");
+                        if (inx === 14)
+                            var csObj = cs.get("chart.radar");
+                        if (inx === 15)
+                            var csObj = cs.get("chart.radarDark");
                         opts.type = csObj.type;
                         opts.opts = csObj.opts;
                         opts.csName = csObj.csName;
@@ -966,7 +987,7 @@ class MdaMdTest {
             nmd.opts.backgroundInxTmp++;
             if (nmd.opts.backgroundInxTmp > 5)
                 nmd.opts.backgroundInxTmp = 0;
-            console.log("timer");
+            //console.log("timer");
         });
         opts.backgroundInxTmp = 0;
         md.setInputWatch(opts, "directName", "self.opts.backgroundInxTmp", "backgroundInx", 1);

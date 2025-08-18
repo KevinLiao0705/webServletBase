@@ -42,6 +42,8 @@ class MyNewScopeCtr {
         opts.yOffsets = [0, -50, 50, 100];
         opts.yScales = [1, 2, 3, 4];
         opts.gridDispInx = 0;
+        opts.xRealScale=100000;
+        
 
         opts.typeCnt = 0;
         opts.dispValue = 15;
@@ -723,6 +725,7 @@ class MyNewScope {
         //===============
         opts.xAxeOffs = 0;
         opts.xScale = 8;//unit=ns;
+        opts.xRealScale = 100000;//ns;
         //=====================
         opts.xyOffx = 30;    //total 1000    //origin point x 
         opts.xAxeLen = 940;  //total 1000    //x axile len rate    
@@ -741,6 +744,10 @@ class MyNewScope {
         opts.yAxeLen = 940;
         opts.yAxeGridAmt = 10;
         opts.ySubAxeGridAmt = 5;
+        
+        opts.zoomTimeEnd=0;
+        opts.zoomTimeLen=100*1000;
+        
         //===============
         opts.messages = [];
         var mesObj = {};
@@ -778,13 +785,32 @@ class MyNewScope {
             lineObj.yScaleSet = 4;//
             lineObj.yScaleTbl = MyNewScope.yScaleVoltTbl;
             lineObj.stInx = 0;
+            lineObj.endInx = 0;
             lineObj.recordLen = 0;
             lineObj.buffer = buffer;
             lineObj.sampleRate = 200000000;
-            lineObj.lineWidth = 1.5;
+            lineObj.lineWidth = 1;
+            lineObj.serialCnt = 0;
 
             opts.lines.push(lineObj);
         }
+
+        var phaseSpeed = 0;
+        for (var i = 0; i < 4; i++) {
+            var lineObj = opts.lines[i];
+            var angOff = Math.PI * 2 * phaseSpeed * (i + 2) * 4 / 1000;
+            var inx = 0;
+            for (var j = 0; j < opts.sampleAmt; j++) {
+                var sin = Math.sin((Math.PI * 2 * j * (i + 1) / 2000) + angOff);
+                lineObj.buffer[inx] = sin * 10 * (i + 1);
+                inx++;
+                if (inx >= opts.sampleBufSize)
+                    inx -= opts.sampleBufSize;
+            }
+            lineObj.endInx = inx;
+            lineObj.recordLen = opts.sampleAmt;
+        }
+
     }
 
     afterCreate() {
@@ -823,6 +849,40 @@ class MyNewScope {
         if (!op.powerOn_f)
             return;
         //=========================================
+        var canvasClickFunc = function (iobj) {
+            console.log(iobj);
+        };
+        var canvasDragFunc = function (iobj) {
+            
+                console.log(iobj);
+            }        
+        var canvasWheelFunc = function (iobj) {
+            
+            console.log(iobj.deltaY);
+            st.xAxeLen = op.xAxeLen * st.wRate;
+            st.xyOffx = op.xyOffx * st.wRate;
+            var zoomPosRate=(iobj.x-st.xyOffx)/st.xAxeLen;
+            if(zoomPosRate<0)
+                zoomPosRate=0;
+            if(zoomPosRate>1)
+                zoomPosRate=1;
+            var zoomTimeStart=op.zoomTimeEnd-op.zoomTimeLen;
+            var zoomPos=zoomTimeStart+op.zoomTimeLen*zoomPosRate;
+            var rr=1.2;
+            if(iobj.deltaY>0)
+                var rate=rr;
+            else
+                var rate=1/rr;
+            var rightZoom=op.zoomTimeEnd-zoomPos;
+            rightZoom*=rate;
+            op.zoomTimeEnd=Math.round(zoomPos+rightZoom);
+            op.zoomTimeLen=Math.round(op.zoomTimeLen*rate);
+            
+            //    op.xScale = iobj.value;
+            //''    op.xAxeOffs = iobj.offsetValue;
+            md.mdClass.createScope();
+        };
+
         var selem = document.createElement("canvas");
         selem.id = md.kid + "_canvasLy1";
         selem.width = st.containerWidth;
@@ -833,6 +893,11 @@ class MyNewScope {
         selem.style.zIndex = "1";
         selem.style.width = "100%";
         selem.style.height = "100%";
+        selem.addEventListener("click", canvasClickFunc);
+        selem.addEventListener("wheel", canvasWheelFunc);
+        selem.addEventListener("dragover", canvasDragFunc);
+        selem.addEventListener("dragstart", canvasDragFunc);
+
         plotElem.appendChild(selem);
         st.canvasLy1 = selem;
         //=========================================
@@ -876,12 +941,12 @@ class MyNewScope {
         st.phaseSpeed += 2;
         if (st.phaseSpeed >= 1000)
             st.phaseSpeed -= 1000;
-        gr.signalMode=op.signalMode ;
-        gr.signalModeInx=op.signalModeInx ;
+        gr.signalMode = op.signalMode;
+        gr.signalModeInx = op.signalModeInx;
 
         if (op.signalMode === 2) {
             st.drawed_f = 1;
-            var totalTime = st.xScale;
+            var totalTime = op.xRealScale;
             var sampleTime = (totalTime * 10) / op.sampleAmt;
 
             var lineObj = op.lines[op.trigInx];
@@ -972,6 +1037,22 @@ class MyNewScope {
                     continue;
                 st.drawed_f = 1;
                 if (op.signalModeInx === 0) {
+                    var bufSize=lineObj.buffer.length;
+                    var angOff = 0;
+                    for (var j = 0; j < 100; j++) {
+                        var sin = Math.sin((Math.PI * 2 * lineObj.serialCnt * (i + 1) / 2000) + angOff);
+                        lineObj.buffer[lineObj.endInx] = sin * 10 * (i + 1);
+                        lineObj.endInx++;
+                        if (lineObj.endInx >= bufSize)
+                            lineObj.endInx = 0;
+                        lineObj.recordLen++;
+                        lineObj.serialCnt++;
+                    }
+                    if (lineObj.recordLen >= bufSize)
+                        lineObj.recordLen = bufSize;
+                    continue;
+
+
                     var angOff = Math.PI * 2 * st.phaseSpeed * (i + 2) * 4 / 1000;
                     lineObj.stInx += 1 + i;
                     if (lineObj.stInx >= op.sampleBufSize)
@@ -984,6 +1065,8 @@ class MyNewScope {
                         lineObj.buffer[inx] = sin * 10 * (i + 1);
                     }
                     lineObj.recordLen = op.sampleAmt;
+
+
                 }
                 if (op.signalModeInx === 1) {
                     if (!lineObj.sampleRest)
@@ -997,7 +1080,7 @@ class MyNewScope {
                     }
                     var buf = [];
                     for (var j = 0; j < timei; j++) {
-                        buf.push(Math.round(10 * Math.random()-5)+10);
+                        buf.push(Math.round(10 * Math.random() - 5) + 10);
                     }
                     self.addLineBuf(buf, i);
                 }
@@ -1051,7 +1134,7 @@ class MyNewScope {
         st.drawed_f = 1;
         var lineObj = op.lines[inx];
         for (var j = 0; j < buf.length; j++) {
-            if (lineObj.recordLen >= (op.sampleAmt+1)) {
+            if (lineObj.recordLen >= (op.sampleAmt + 1)) {
                 lineObj.stInx++;
                 if (lineObj.stInx >= op.sampleBufSize)
                     lineObj.stInx -= op.sampleBufSize;
@@ -1062,8 +1145,8 @@ class MyNewScope {
             }
             if (inx >= op.sampleBufSize)
                 inx -= op.sampleBufSize;
-            if(buf[j]===0)
-                var debugV=0;
+            if (buf[j] === 0)
+                var debugV = 0;
             lineObj.buffer[inx] = buf[j];
         }
     }
@@ -1106,7 +1189,7 @@ class MyNewScope {
         ctx.clearRect(0, 0, st.containerWidth, st.containerHeight);
     }
 
-    drawBufs(opts, clr) {
+    drawBufsA(opts, clr) {
         var op = this.md.opts;
         var st = this.md.stas;
         var ctx = st.ctx1;
@@ -1128,10 +1211,10 @@ class MyNewScope {
         st.preStInx = opts.stInx;
         st.zoomCenterInx = opts.stInx + parseInt(op.sampleAmt / 2);
         var sampleTime = 1000000000 / opts.sampleRate;
-        st.zoomSize = (st.xScale * op.xAxeGridAmt / sampleTime) | 0;
+        st.zoomSize = (op.xRealScale * op.xAxeGridAmt / sampleTime) | 0;
         var stepLenPerSamp = st.xAxeLen / st.zoomSize;//every sample pixel length
         //=================================================
-        var xOffSetTime = (-1) * st.xScale * op.xAxeGridAmt * op.xAxeOffs / op.xAxeOffsAmt;
+        var xOffSetTime = (-1) * op.xRealScale * op.xAxeGridAmt * op.xAxeOffs / op.xAxeOffsAmt;
         var xOffSetSamp = (xOffSetTime / sampleTime) | 0;
         var zoomCenterInx = st.zoomCenterInx - xOffSetSamp;
         //================================================
@@ -1204,8 +1287,8 @@ class MyNewScope {
             if ((rinx % loopLim) === 0) {
                 if (opts.digit_f) {
                     if (chgCnt !== 0) {
-                        if (preLevel == 0)
-                            vv = maxV
+                        if (preLevel === 0)
+                            vv = maxV;
                         else
                             vv = 0;
                         preLevel = vv;
@@ -1215,8 +1298,8 @@ class MyNewScope {
                     minV = 0;
                 }
                 var ylen = vv * yGridLen / opts.yScale;
-                if(vv===0)
-                    var tt=0;
+                if (vv === 0)
+                    var tt = 0;
 
                 var realY = ycen - ylen - yOffset;
                 if (realY > maxY)
@@ -1236,6 +1319,91 @@ class MyNewScope {
             xlen += stepLenPerSamp;
             if (xlen > st.xAxeLen)
                 break;
+        }
+        ctx.stroke();
+        return;
+    }
+
+    drawBufs(opts, clr) {
+        var op = this.md.opts;
+        var st = this.md.stas;
+        var ctx = st.ctx1;
+        if (clr)
+            ctx.clearRect(0, 0, st.containerWidth, st.containerHeight);
+        //if (!opts.offOn_f)
+        //    return;
+        ctx.strokeStyle = opts.color;
+        ctx.lineWidth = opts.lineWidth;
+        ctx.beginPath();
+        var xzero = st.xyOffx | 0;
+        var ycen = st.containerHeight - st.xyOffy - st.yAxeLen / 2;
+        var yGridLen = st.yAxeLen / op.yAxeGridAmt;
+        var yOffset = st.yAxeLen * opts.offset / 100;
+        //============================================
+        var maxY = st.containerHeight - st.xyOffy;
+        var minY = st.containerHeight - st.xyOffy - st.yAxeLen;
+        var lenY = st.yAxeLen;
+        var lenX = st.xAxeLen;
+        var sampleTime = 1000000000 / opts.sampleRate;
+        //============================================
+        var recBufSize = opts.buffer.length;
+        var recSampTime = 1000000000 / opts.sampleRate;
+        var recEndInx = opts.endInx;
+        var recLen = opts.recordLen;
+        var recStartInx = recEndInx - recLen;
+        if (recStartInx < 0)
+            recStartInx += recBufSize;
+        //============================================
+        var recTimeLen = recLen * recSampTime;
+        var recTimeStart = recTimeLen * -1;
+        var recTimeEnd = recTimeStart+recTimeLen;
+        
+        var zoomTimeLen = op.zoomTimeLen;
+        var zoomTimeEnd = op.zoomTimeEnd;
+        var zoomTimeStart = op.zoomTimeEnd-op.zoomTimeLen;
+        
+        
+        
+        
+        var xOffSetTime = op.xRealScale * op.xAxeGridAmt * op.xAxeOffs / op.xAxeOffsAmt;
+        zoomTimeStart += xOffSetTime;
+
+
+        var pointTime = zoomTimeLen / lenX;
+        //============================================
+        var nowTime = zoomTimeStart;
+        var first_f = 0;
+        var mux = 1;
+        for (var ii = 0; ii < lenX * mux; ii++, nowTime += (pointTime / mux)) {
+            if (nowTime < recTimeStart)
+                continue;
+            if (nowTime >= recTimeEnd)
+                break;
+            var posRecTime = nowTime - recTimeStart;
+            var recInxPos = (posRecTime / recTimeLen) * recLen + recStartInx;
+            //================================================
+            var recInx0 = recInxPos | 0;
+            var restRate = (recInxPos - recInx0);
+            if (recInx0 >= recBufSize)
+                recInx0 -= recBufSize;
+            var recInx1 = recInx0 + 1;
+            if (recInx1 >= recBufSize)
+                recInx1 -= recBufSize;
+            var vv0 = opts.buffer[recInx0];
+            var vv1 = opts.buffer[recInx1];
+            var vv = (vv1 - vv0) * restRate + vv0;
+            var ylen = vv * yGridLen / opts.yScale;
+            var realY = ycen - ylen - yOffset;
+            if (realY > maxY)
+                realY = maxY;
+            if (realY < minY)
+                realY = minY;
+            if (!first_f)
+                ctx.moveTo(xzero + (ii / mux), realY);
+            else
+                ctx.lineTo(xzero + (ii / mux), realY);
+            first_f = 1;
+
         }
         ctx.stroke();
         return;
@@ -1262,7 +1430,7 @@ class MyNewScope {
         op.messages = [];
         var mesObj = {};
 
-        var xOffset = (-1) * (st.xScale * 10) * op.xAxeOffs / op.xAxeOffsAmt;
+        var xOffset = (-1) * (op.xRealScale * 10) * op.xAxeOffs / op.xAxeOffsAmt;
         var unit = "ns";
         var value = xOffset * -1;
 
@@ -1302,7 +1470,7 @@ class MyNewScope {
 
         var mesObj = {};
         var unit = "ns";
-        var value = st.xScale;
+        var value = op.xRealScale;
         if (value >= 1000) {
             unit = "us";
             value = value / 1000;
@@ -1466,7 +1634,7 @@ class MyNewScope {
         var y = st.containerHeight - st.xyOffy - st.yAxeLen + 7;
         ctx.fillText(str, x, y);
 
-        var xoff = st.xAxeLen * xOffset / (st.xScale * 10);
+        var xoff = st.xAxeLen * xOffset / (op.xRealScale * 10);
 
         xoff += st.xAxeLen * 5 / 10;
         if (xoff < 0)

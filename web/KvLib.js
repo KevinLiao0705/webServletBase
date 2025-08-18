@@ -306,6 +306,20 @@ class KvLib {
             return "#" + KvLib.numToHex2b(cr) + KvLib.numToHex2b(cg) + KvLib.numToHex2b(cb);
         }
     }
+    static setColorRgba(colorStr, ca) {
+        var errColor = {r: 0, g: 0, b: 0};
+        var cobj=KvLib.transColor(colorStr, errColor);
+        cobj.a=ca;
+        var str = "rgba(";
+        str += cobj.r ;
+        str += "," + cobj.g ;
+        str += "," + cobj.b ;
+        str += "," + cobj.a ;
+        str += ")";
+        return str;
+    }
+
+
 
     static darkColor(cstr, darkRate) {
         var cobj = KvLib.transColor(cstr);
