@@ -783,7 +783,12 @@ class MyNewScope {
             lineObj.offset = -40 + 20 * i;
             lineObj.offOn_f = 0;
             lineObj.digit_f = 0;
+            
             lineObj.yScale = 20;//
+            lineObj.yScaleFixed = 0;//
+            lineObj.yScaleUnit = "mV";//
+            
+            
             lineObj.yScaleSet = 4;//
             lineObj.yScaleTbl = MyNewScope.yScaleVoltTbl;
             lineObj.stInx = 0;
@@ -966,7 +971,11 @@ class MyNewScope {
             if(st.noRectOnFlag){
                 for(var i=0;i<op.lines.length;i++){
                     if(st.noRectOnFlag&(1<<i)){
-                        op.lines[i].yScale*=rate;
+                        var opts=op.lines[i];
+                        opts.yScale*=rate;
+                        var vStr=opts.yScale.toFixed(opts.yScaleFixed);
+                        opts.yScale=KvLib.toNumber(vStr,1);
+
                     }
                 }
                 md.mdClass.createScope();
@@ -1593,17 +1602,27 @@ class MyNewScope {
             var vStr = value.toFixed(1);
         else
             var vStr = value.toFixed(0);
-        mesObj.x = st.xyOffx + st.xAxeLen / 2;
+        
+        var mesObj = {};
+        mesObj.x = -1+st.xyOffx + st.xAxeLen / 2;
         mesObj.y = st.containerHeight - st.xyOffy - st.yAxeLen - 4;
-        mesObj.text = mstr + vStr + " " + unit;
+        mesObj.text = "▶︎";
         mesObj.color = "#fff";
         mesObj.font = "12px sans-serif";
         op.messages.push(mesObj);
 
+        var mesObj = {};
+        mesObj.x = -9+st.xyOffx + st.xAxeLen *6/ 10;
+        mesObj.y = st.containerHeight - st.xyOffy - st.yAxeLen - 4;
+        mesObj.text = "◀︎︎";
+        mesObj.color = "#fff";
+        mesObj.font = "12px sans-serif";
+        op.messages.push(mesObj);
 
         var mesObj = {};
         var unit = "ns";
-        var value = op.xRealScale;
+        //var value = op.xRealScale;
+        var value = op.zoomTimeLen;
         if (value >= 1000) {
             unit = "us";
             value = value / 1000;
@@ -1622,9 +1641,11 @@ class MyNewScope {
             var vStr = value.toFixed(1);
         else
             var vStr = value.toFixed(0);
-        mesObj.x = st.xyOffx + st.xAxeLen * 6 / 10;
+        mesObj.text = vStr + " " + unit ;
+        var size = ctx.measureText(mesObj.text);
+        var offs=((st.xAxeLen / 10)-size.width)/2;
+        mesObj.x = offs+st.xyOffx + st.xAxeLen * 5 / 10;
         mesObj.y = st.containerHeight - st.xyOffy - st.yAxeLen - 4;
-        mesObj.text = vStr + " " + unit + "/";
         mesObj.color = "#fff";
         mesObj.font = "12px sans-serif";
         op.messages.push(mesObj);
@@ -1636,10 +1657,12 @@ class MyNewScope {
             if (!opts.offOn_f)
                 continue
             var mesObj = {};
-            var vStr = op.lines[i].yScaleTbl[opts.yScaleSet];
+            //var vStr = op.lines[i].yScaleTbl[opts.yScaleSet];
+            vStr=opts.yScale.toFixed(opts.yScaleFixed);
+            vStr+=opts.yScaleUnit;
             mesObj.x = x;
             mesObj.y = st.containerHeight - st.xyOffy - st.yAxeLen - 4;
-            mesObj.text = (i + 1) + ":" + vStr + "/";
+            mesObj.text = (i + 1) + " " + vStr + "/";
             mesObj.color = opts.color;
             mesObj.font = "12px sans-serif";
             op.messages.push(mesObj);
@@ -1777,7 +1800,7 @@ class MyNewScope {
             }
             st.noRectA.push(noRect);
         }
-
+        /*
         var fontSize = 12;
         ctx.font = "" + fontSize + "px monospace";
         ctx.fillStyle = "#ccc";
@@ -1785,9 +1808,10 @@ class MyNewScope {
         var x = -3 + st.xyOffx + st.xAxeLen / 2;
         var y = st.containerHeight - st.xyOffy - st.yAxeLen + 7;
         ctx.fillText(str, x, y);
-
+        */
+       
+       /*
         var xoff = st.xAxeLen * xOffset / (op.xRealScale * 10);
-
         xoff += st.xAxeLen * 5 / 10;
         if (xoff < 0)
             xoff = 0;
@@ -1800,7 +1824,7 @@ class MyNewScope {
         var x = -3 + st.xyOffx + xoff;
         var y = st.containerHeight - st.xyOffy - st.yAxeLen + 7;
         ctx.fillText(str, x, y);
-
+        */
 
 
         return;
