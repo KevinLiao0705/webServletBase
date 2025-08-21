@@ -879,45 +879,68 @@ class MyNewScope {
         var canvasPressFunc = function (iobj) {
             st.xAxeLen = op.xAxeLen * st.wRate;
             st.xyOffx = op.xyOffx * st.wRate;
-            var zoomPosRate = (iobj.x - st.xyOffx) / st.xAxeLen;
-            if (zoomPosRate < 0)
-                zoomPosRate = 0;
-            if (zoomPosRate > 1)
-                zoomPosRate = 1;
-            var zoomTimeStart = op.zoomTimeEnd - op.zoomTimeLen;
-            var zoomPos = zoomTimeStart + op.zoomTimeLen * zoomPosRate;
-            md.stas.dragOn_f = 1;
-            md.stas.zoomPosRateSt = zoomPosRate;
-            md.stas.zoomPosRateDt = 0;
+            var zoomPosRateX = (iobj.offsetX - st.xyOffx) / st.xAxeLen;
+            var zoomPosRateY = (iobj.offsetY - st.xyOffy) / st.yAxeLen;
+            var grap_f = 0;
+            if (zoomPosRateX > 0.1 && zoomPosRateX < 0.9) {
+                if (zoomPosRateY > 0.1 && zoomPosRateY < 0.9) {
+                    st.dragPosOn_f = 1;
+                    st.zoomPosRateSt = zoomPosRateX;
+                    st.zoomPosRateDt = 0;
+                    st.grapSpeed = 0;
+                    grap_f = 1;
+                }
+            }
+            if (st.noRectOnFlag) {
+                st.noRectDragFlag = st.noRectOnFlag;
+                grap_f = 1;
+            }
+            if (st.dutyBarRect_f) {
+                st.dutyBarRectDrag_f = 1;
+                st.dutyBarPreX = iobj.offsetX;
+                st.zoomTimeDelta = 0;
+                grap_f = 1;
+            }
+            if (!grap_f)
+                return;
+
             var checkMouseUpFunc = function () {
                 if (gr.mouseDown_f) {
                     setTimeout(checkMouseUpFunc, 100);
                     return;
                 }
-                md.stas.dragOn_f = 0;
                 var plotObj = md.blockRefs["container"];
                 var plotElem = plotObj.elems["base"];
                 plotElem.style.cursor = "";
+                st.dragPosOn_f = 0;
                 st.noRectDragFlag = 0;
+                st.dutyBarRectDrag_f = 0;
+                st.zoomTimeDelta = 0;
             };
             setTimeout(checkMouseUpFunc, 100, md);
             var plotObj = md.blockRefs["container"];
             var plotElem = plotObj.elems["base"];
             plotElem.style.cursor = "grab";
-            st.grapSpeed = 0;
-            if (st.noRectOnFlag) {
-                st.noRectDragFlag = st.noRectOnFlag;
-            }
             self.reDrawBuf();
         };
         var canvasUpFunc = function (iobj) {
-            md.stas.dragOn_f = 0;
             var plotObj = md.blockRefs["container"];
             var plotElem = plotObj.elems["base"];
             plotElem.style.cursor = "";
             st.noRectDragFlag = 0;
-            var deltaTime = md.stas.zoomPosRateDt * op.zoomTimeLen;
-            op.zoomTimeEnd -= deltaTime;
+            if (st.dutyBarRectDrag_f) {
+                if (!st.zoomTimeDelta)
+                    st.zoomTimeDelta = 0;
+                op.zoomTimeEnd -= st.zoomTimeDelta;
+            }
+            if (md.stas.dragPosOn_f) {
+                var deltaTime = md.stas.zoomPosRateDt * op.zoomTimeLen;
+                op.zoomTimeEnd -= deltaTime;
+            }
+            st.noRectOnFlag = 0;
+            st.dragPosOn_f = 0;
+            st.dutyBarRectDrag_f = 0;
+            st.zoomTimeDelta = 0;
             self.reDrawBuf();
         };
         var canvasMoveFunc = function (iobj) {
@@ -944,8 +967,19 @@ class MyNewScope {
                 st.noRectOnFlag = noRectOnFlag;
                 self.drawAxe(1);
             }
-            if (!md.stas.dragOn_f)
-                return;
+
+            st.dutyBarRect_f = 1;
+            if (st.dutyBarRect) {
+                if (st.dutyBarRect[0] > iobj.offsetX)
+                    st.dutyBarRect_f = 0;
+                if (st.dutyBarRect[2] < iobj.offsetX)
+                    st.dutyBarRect_f = 0;
+                if (st.dutyBarRect[1] > iobj.offsetY)
+                    st.dutyBarRect_f = 0;
+                if (st.dutyBarRect[3] < iobj.offsetY)
+                    st.dutyBarRect_f = 0;
+            }
+
 
             if (st.noRectDragFlag) {
                 var posRate = (iobj.offsetY - st.xyOffy) / st.yAxeLen;
@@ -953,7 +987,7 @@ class MyNewScope {
                     posRate = 0;
                 if (posRate > 1)
                     posRate = 1;
-                console.log(posRate);
+                //console.log(posRate);
                 for (var i = 0; i < op.lines.length; i++) {
                     if (st.noRectDragFlag & (1 << i)) {
                         var kk = ((0.5 - posRate) * 100) | 0;
@@ -961,25 +995,32 @@ class MyNewScope {
                         break;
                     }
                 }
-                md.mdClass.createScope();
-                return;
+                self.drawAxe(1);
+            }
+            if (st.dutyBarRectDrag_f) {
+                var deltaX = st.dutyBarPreX - iobj.offsetX;
+                if (st.maxRecordLenTime) {
+                    console.log("deltaX: " + deltaX);
+                    st.zoomTimeDelta = st.maxRecordLenTime * deltaX / st.xAxeLen;
+                }
             }
 
-
-            var zoomPosRate = (iobj.offsetX - st.xyOffx) / st.xAxeLen;
-            if (zoomPosRate < 0)
-                zoomPosRate = 0;
-            if (zoomPosRate > 1)
-                zoomPosRate = 1;
-            var zoomTimeStart = op.zoomTimeEnd - op.zoomTimeLen;
-            var zoomPos = zoomTimeStart + op.zoomTimeLen * zoomPosRate;
-            md.stas.zoomPosRateDt = zoomPosRate - md.stas.zoomPosRateSt;
-            //console.log(md.stas.zoomPosRateDt);
-            self.reDrawBuf();
-            if (st.preCursorX === undefined)
+            if (st.dragPosOn_f) {
+                var zoomPosRate = (iobj.offsetX - st.xyOffx) / st.xAxeLen;
+                if (zoomPosRate < 0)
+                    zoomPosRate = 0;
+                if (zoomPosRate > 1)
+                    zoomPosRate = 1;
+                var zoomTimeStart = op.zoomTimeEnd - op.zoomTimeLen;
+                var zoomPos = zoomTimeStart + op.zoomTimeLen * zoomPosRate;
+                md.stas.zoomPosRateDt = zoomPosRate - md.stas.zoomPosRateSt;
+                //console.log(md.stas.zoomPosRateDt);
+                if (st.preCursorX === undefined)
+                    st.preCursorX = iobj.offsetX;
+                st.grapSpeed = iobj.offsetX - st.preCursorX;
                 st.preCursorX = iobj.offsetX;
-            st.grapSpeed = iobj.offsetX - st.preCursorX;
-            st.preCursorX = iobj.offsetX;
+            }
+                self.reDrawBuf();
         };
 
         var canvasWheelFunc = function (iobj) {
@@ -1081,7 +1122,7 @@ class MyNewScope {
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
-        if (!st.dragOn_f) {
+        if (!st.dragPosOn_f) {
             if (st.grapSpeed >= 2 || st.grapSpeed <= -2) {
                 var rate = st.grapSpeed * 0.0004;
                 var deltaTime = rate * op.zoomTimeLen;
@@ -1099,18 +1140,19 @@ class MyNewScope {
                 }
             }
         }
-        if (st.drawed_f)
+        if (st.drawed_f) {
             self.drawClear();
-        st.drawed_f = 0;
-        var opts = op.lines[0];
-        self.drawBufs(opts, 1);
-        var opts = op.lines[1];
-        self.drawBufs(opts, 0);
-        var opts = op.lines[2];
-        self.drawBufs(opts, 0);
-        var opts = op.lines[3];
-        self.drawBufs(opts, 0);
-        self.drawDutyBar();
+            var opts = op.lines[0];
+            self.drawBufs(opts, 1);
+            var opts = op.lines[1];
+            self.drawBufs(opts, 0);
+            var opts = op.lines[2];
+            self.drawBufs(opts, 0);
+            var opts = op.lines[3];
+            self.drawBufs(opts, 0);
+            self.drawDutyBar();
+            st.drawed_f = 0;
+        }
 
         if (!op.run_f)
             return;
@@ -1327,15 +1369,8 @@ class MyNewScope {
         var op = md.opts;
         var st = md.stas;
         var ctx = st.ctx;
-
-        st.xScale = MyNewScope.transXScale(MyNewScope.xScaleTbl[op.xScale]);
-        MyNewScope.transYScale(op);
         self.drawAxe(1);
-        self.drawClear(1);
-        for (var i = 0; i < op.lines.length; i++) {
-            var opts = op.lines[i];
-            self.drawBufs(opts);
-        }
+        st.drawed_f=1;
 
     }
 
@@ -1540,10 +1575,12 @@ class MyNewScope {
             var recTimeStart = recTimeLen * -1;
         }
         var recTimeEnd = 0;
+        if (!st.zoomTimeDelta)
+            st.zoomTimeDelta = 0;
         var zoomTimeLen = op.zoomTimeLen;
-        var zoomTimeEnd = op.zoomTimeEnd;
-        var zoomTimeStart = op.zoomTimeEnd - op.zoomTimeLen;
-        if (md.stas.dragOn_f) {
+        var zoomTimeEnd = op.zoomTimeEnd - st.zoomTimeDelta;
+        var zoomTimeStart = zoomTimeEnd - op.zoomTimeLen;
+        if (md.stas.dragPosOn_f) {
             var deltaTime = md.stas.zoomPosRateDt * zoomTimeLen;
             zoomTimeEnd -= deltaTime;
             zoomTimeStart -= deltaTime;
@@ -1911,33 +1948,50 @@ class MyNewScope {
         ctx.lineWidth = 6;
         ctx.beginPath();
         var x = st.xyOffx;
-        var y = st.containerHeight - st.xyOffy - st.yAxeLen + 2;
+        var y = st.containerHeight - st.xyOffy - 3;
         ctx.moveTo(x, y);
         x += st.xAxeLen;
         ctx.lineTo(x, y);
         ctx.stroke();
 
-        var maxLen = 0;
+        var recLenTime = 0;
         for (var i = 0; i < op.lines.length; i++) {
             var len = op.lines[i].recTimeLen;
-            if (len > maxLen)
-                maxLen = len;
+            if (len > recLenTime)
+                recLenTime = len;
         }
-        if (maxLen) {
-            var rate = op.zoomTimeLen / maxLen;
-            if(rate>1)
-                rate=1;
-            if(rate<0.02)
-                rate=0.02
-            ctx.strokeStyle = "#fff";
+        st.maxRecordLenTime = recLenTime;
+        if (recLenTime) {
+            var recStartTime = recLenTime * -1;
+            var recEndTime = 0;
+            var zoomTimeEnd = op.zoomTimeEnd - st.zoomTimeDelta;
+            var zoomTimeStart = zoomTimeEnd - op.zoomTimeLen;
+            if (zoomTimeStart < recStartTime)
+                zoomTimeStart = recStartTime;
+            if (zoomTimeEnd > recEndTime)
+                zoomTimeEnd = recEndTime;
+            var startPos = st.xAxeLen * (zoomTimeStart - recStartTime) / recLenTime;
+            var endPos = st.xAxeLen * (zoomTimeEnd - recStartTime) / recLenTime;
+            if (startPos > (st.xAxeLen - 20))
+                startPos = (st.xAxeLen - 20);
+            if (endPos - startPos < 20)
+                endPos = startPos + 20;
+
+            if (st.dutyBarRect_f)
+                ctx.strokeStyle = "#88f";
+            else
+                ctx.strokeStyle = "#fff";
+
             ctx.lineWidth = 6;
             ctx.beginPath();
-            var x = st.xyOffx;
-            var y = st.containerHeight - st.xyOffy - st.yAxeLen + 2;
-            ctx.moveTo(x, y);
-            x += st.xAxeLen * rate;
-            ctx.lineTo(x, y);
+            var x1 = st.xyOffx + startPos;
+            ctx.moveTo(x1, y);
+            var x2 = st.xyOffx + endPos;
+            ctx.lineTo(x2, y);
             ctx.stroke();
+            var y1 = y - 8;
+            var y2 = y1 + 12;
+            st.dutyBarRect = [x1, y1, x2, y2];
         }
 
 
