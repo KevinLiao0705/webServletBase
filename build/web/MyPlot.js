@@ -670,11 +670,32 @@ class MyNewScope {
 
 
     }
-    static  xScaleTbl = [
+    static  xScaleTblxxx = [
         "1 nS", "2 nS", "5 nS", "10 nS", "20 nS", "50 nS", "100 nS", "200 nS", "500 nS",
         "1 uS", "2 uS", "5 uS", "10 uS", "20 uS", "50 uS", "100 uS", "200 uS", "500 uS",
         "1 mS", "2 mS", "5 mS", "10 mS", "20 mS", "50 mS", "100 mS", "200 mS", "500 mS",
         "1 S", "2 S", "5 S", "10 S", "20 S", "50 S", "100 S"
+    ];
+    static  xScaleTbl = [
+        5, 6, 7.5, 8, 10,
+        12.5, 15, 20, 25, 30, 35, 40, 45, 50, 60, 75, 80, 100,
+        125, 150, 200, 250, 300, 350, 400, 450, 500, 600, 750, 800, 1000,
+        1250, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 6000, 7500, 8000, 10000,
+        12500, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 60000, 75000, 80000, 100000,
+        125000, 150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000, 600000, 750000, 800000, 1000000,
+        1250000, 1500000, 2000000, 2500000, 3000000, 3500000, 4000000, 4500000, 5000000, 6000000, 7500000, 8000000, 10000000,
+        12500000, 15000000, 20000000, 25000000, 30000000, 35000000, 40000000, 45000000, 50000000, 60000000, 75000000, 80000000, 100000000,
+        125000000, 150000000, 200000000, 250000000, 300000000, 350000000, 400000000, 450000000, 500000000, 600000000, 750000000, 800000000, 1000000000,
+        1250000000, 1500000000, 2000000000, 2500000000, 3000000000, 3500000000, 4000000000, 4500000000, 5000000000, 6000000000, 7500000000, 8000000000, 10000000000
+    ];
+
+    static  yScaleTbl = [
+        1, 1.25, 1.5, 2, 3, 4, 5, 7.5,
+        10, 12.5, 15, 20, 30, 40, 50, 75,
+        100, 125, 150, 200, 300, 400, 500, 750,
+        1000, 1250, 1500, 2000, 3000, 4000, 5000, 7500,
+        10000, 12500, 15000, 20000, 30000, 40000, 50000, 75000,
+        100000, 125000, 150000, 200000, 300000, 400000, 500000, 750000
     ];
 
     static yScaleVoltTbl = ["1 mV", "2 mV", "5 mV", "10 mV", "20 mV", "50 mV", "100 mV", "200 mV", "500 mV", "1 V", "2 V", "5 V", "10 V", "20 V", "50 V", "100 V"];
@@ -813,7 +834,7 @@ class MyNewScope {
             lineObj.offset = -30 + 20 * i;
             lineObj.offOn_f = 0;
             lineObj.digit_f = 0;
-
+            //================    
             lineObj.typeCnt = 0;
             lineObj.yScale = 20;//
             lineObj.yScaleFixed = 0;//
@@ -882,8 +903,8 @@ class MyNewScope {
             var zoomPosRateX = (iobj.offsetX - st.xyOffx) / st.xAxeLen;
             var zoomPosRateY = (iobj.offsetY - st.xyOffy) / st.yAxeLen;
             var grap_f = 0;
-            if (zoomPosRateX > 0.1 && zoomPosRateX < 0.9) {
-                if (zoomPosRateY > 0.1 && zoomPosRateY < 0.9) {
+            if (zoomPosRateX > 0.02 && zoomPosRateX < 0.98) {
+                if (zoomPosRateY > 0.02 && zoomPosRateY < 0.98) {
                     st.dragPosOn_f = 1;
                     st.zoomPosRateSt = zoomPosRateX;
                     st.zoomPosRateDt = 0;
@@ -1000,12 +1021,27 @@ class MyNewScope {
             if (st.dutyBarRectDrag_f) {
                 var deltaX = st.dutyBarPreX - iobj.offsetX;
                 if (st.maxRecordLenTime) {
-                    console.log("deltaX: " + deltaX);
-                    st.zoomTimeDelta = st.maxRecordLenTime * deltaX / st.xAxeLen;
+                    var zoomTimeDelta = st.maxRecordLenTime * deltaX / st.xAxeLen;
+                    var zoomTimeEnd = op.zoomTimeEnd - zoomTimeDelta;
+                    var zoomTimeStart = zoomTimeEnd - op.zoomTimeLen;
+                    var left = ((st.maxRecordLenTime + op.zoomTimeLen * 0.6) | 0) * (-1);
+                    var right = (op.zoomTimeLen * 0.6) | 0;
+                    if (zoomTimeStart < left) {
+                        zoomTimeDelta = op.zoomTimeEnd - (op.zoomTimeLen + left);
+                    }
+                    if (zoomTimeEnd > right) {
+                        zoomTimeDelta = op.zoomTimeEnd - right;
+                    }
+
+                    st.zoomTimeDelta = zoomTimeDelta;
                 }
             }
 
             if (st.dragPosOn_f) {
+                if (st.preCursorX === undefined)
+                    st.preCursorX = iobj.offsetX;
+                st.grapSpeed = iobj.offsetX - st.preCursorX;
+                st.preCursorX = iobj.offsetX;
                 var zoomPosRate = (iobj.offsetX - st.xyOffx) / st.xAxeLen;
                 if (zoomPosRate < 0)
                     zoomPosRate = 0;
@@ -1014,55 +1050,81 @@ class MyNewScope {
                 var zoomTimeStart = op.zoomTimeEnd - op.zoomTimeLen;
                 var zoomPos = zoomTimeStart + op.zoomTimeLen * zoomPosRate;
                 md.stas.zoomPosRateDt = zoomPosRate - md.stas.zoomPosRateSt;
-                //console.log(md.stas.zoomPosRateDt);
-                if (st.preCursorX === undefined)
-                    st.preCursorX = iobj.offsetX;
-                st.grapSpeed = iobj.offsetX - st.preCursorX;
-                st.preCursorX = iobj.offsetX;
+                //=========================================
+                var deltaTime = (md.stas.zoomPosRateDt * op.zoomTimeLen);
+                var zoomTimeEnd = op.zoomTimeEnd - deltaTime;
+                var zoomTimeStart = zoomTimeEnd - op.zoomTimeLen;
+                var maxRight = (0.6 * op.zoomTimeLen) | 0;
+                var minLeft = st.maxRecordLenTime * (-1) - (0.6 * op.zoomTimeLen);
+                if (zoomTimeEnd > maxRight) {
+                    md.stas.zoomPosRateDt = (op.zoomTimeEnd - maxRight) / op.zoomTimeLen;
+                }
+                if (zoomTimeEnd - op.zoomTimeLen < minLeft) {
+                    md.stas.zoomPosRateDt = (op.zoomTimeEnd - (minLeft + op.zoomTimeLen)) / op.zoomTimeLen;
+                }
             }
-                self.reDrawBuf();
+            self.reDrawBuf();
         };
 
         var canvasWheelFunc = function (iobj) {
-            //console.log(iobj.deltaY);
-            st.xAxeLen = op.xAxeLen * st.wRate;
-            st.xyOffx = op.xyOffx * st.wRate;
-            var zoomPosRate = (iobj.offsetX - st.xyOffx) / st.xAxeLen;
-            if (zoomPosRate < 0)
-                zoomPosRate = 0;
-            if (zoomPosRate > 1)
-                zoomPosRate = 1;
-            var zoomTimeStart = op.zoomTimeEnd - op.zoomTimeLen;
-            var zoomPos = zoomTimeStart + op.zoomTimeLen * zoomPosRate;
-            var rr = 1.2;
-            if (iobj.deltaY > 0)
-                var rate = rr;
-            else {
-                var rate = 1 / rr;
-                if ((op.zoomTimeLen * rate) < 50)
-                    rate = 50 / op.zoomTimeLen;
-            }
-            //====================
             if (st.noRectOnFlag) {
+                if (iobj.deltaY > 0)
+                    var rate = 1.2;
+                else
+                    var rate = 0.8;
                 for (var i = 0; i < op.lines.length; i++) {
                     if (st.noRectOnFlag & (1 << i)) {
                         var opts = op.lines[i];
-                        opts.yScale *= rate;
-                        var vStr = opts.yScale.toFixed(opts.yScaleFixed);
-                        opts.yScale = KvLib.toNumber(vStr, 1);
-
+                        for (var j = 0; j < MyNewScope.yScaleTbl.length; j++) {
+                            if (iobj.deltaY > 0) {
+                                var vv = MyNewScope.yScaleTbl[j];
+                                if (vv > opts.yScale) {
+                                    opts.yScale = vv;
+                                    break;
+                                }
+                            } else {
+                                var vv = MyNewScope.yScaleTbl[MyNewScope.yScaleTbl.length - j - 1];
+                                if (vv < opts.yScale) {
+                                    opts.yScale = vv;
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
                 md.mdClass.createScope();
                 return;
             }
-
-            //====================
-            var rightZoom = op.zoomTimeEnd - zoomPos;
-            rightZoom *= rate;
-            op.zoomTimeEnd = Math.round(zoomPos + rightZoom);
-            op.zoomTimeLen = Math.round(op.zoomTimeLen * rate);
+            st.xAxeLen = op.xAxeLen * st.wRate;
+            st.xyOffx = op.xyOffx * st.wRate;
+            var zoomPosRate = (iobj.offsetX - st.xyOffx) / st.xAxeLen;
+            if (zoomPosRate < 0)
+                return;
+            if (zoomPosRate > 1)
+                return;
+            var zoomTimeStart = op.zoomTimeEnd - op.zoomTimeLen;
+            var zoomPosTime = zoomTimeStart + op.zoomTimeLen * zoomPosRate;
+            var newZoomTimeLen = op.zoomTimeLen;
+            for (var i = 0; i < MyNewScope.xScaleTbl.length; i++) {
+                if (iobj.deltaY > 0) {
+                    var vv = MyNewScope.xScaleTbl[i] * 10;
+                    if (vv > op.zoomTimeLen) {
+                        newZoomTimeLen = vv;
+                        break;
+                    }
+                } else {
+                    var vv = MyNewScope.xScaleTbl[MyNewScope.xScaleTbl.length - i - 1] * 10;
+                    if (vv < op.zoomTimeLen) {
+                        newZoomTimeLen = vv;
+                        break;
+                    }
+                }
+            }
+            var rightLen = (newZoomTimeLen * (1 - zoomPosRate)) | 0;
+            op.zoomTimeEnd = zoomPosTime + rightLen;
+            op.zoomTimeLen = newZoomTimeLen;
             md.mdClass.createScope();
+
         };
 
         var selem = document.createElement("canvas");
@@ -1127,6 +1189,13 @@ class MyNewScope {
                 var rate = st.grapSpeed * 0.0004;
                 var deltaTime = rate * op.zoomTimeLen;
                 op.zoomTimeEnd -= deltaTime;
+                var maxRight = (op.zoomTimeLen * 0.6) | 0;
+                var minLeft = st.maxRecordLenTime * (-1) - (op.zoomTimeLen * 0.6);
+                if (op.zoomTimeEnd > maxRight)
+                    op.zoomTimeEnd = maxRight;
+                if ((op.zoomTimeEnd - op.zoomTimeLen) < minLeft)
+                    op.zoomTimeEnd = minLeft + op.zoomTimeLen;
+
                 st.drawed_f = 1;
                 if (st.grapSpeedTime === undefined)
                     st.grapSpeedTime = 9999;
@@ -1370,7 +1439,7 @@ class MyNewScope {
         var st = md.stas;
         var ctx = st.ctx;
         self.drawAxe(1);
-        st.drawed_f=1;
+        st.drawed_f = 1;
 
     }
 
@@ -1899,6 +1968,30 @@ class MyNewScope {
 
 
 
+        var x = st.xyOffx + st.xAxeLen + 6;
+        var y = st.containerHeight - st.xyOffy - 22;
+        var w = 20;
+        var h = 20;
+
+        for (var i = 0; i < op.lines.length; i++) {
+            var opts = op.lines[i];
+            if(opts.offOn_f)
+                ctx.fillStyle = opts.color;
+            else
+                ctx.fillStyle = "#222";
+            ctx.strokeStyle = '#ccc';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.rect(x, y, w, h);
+            y-=30;
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        //ctx.fillStyle = 'blue';
+        //ctx.fillRect(x1, x2, y1, y2);
+        //    ctx.stroke();
+
 
         /*
          var fontSize = 12;
@@ -2013,7 +2106,7 @@ class MyNewScope {
         var lyMaps = md.lyMaps;
         var blocks = op.blocks;
         var layouts = op.layouts;
-        st.xScale = MyNewScope.transXScale(MyNewScope.xScaleTbl[op.xScale]);
+        //st.xScale = MyNewScope.transXScale(MyNewScope.xScaleTbl[op.xScale]);
         MyNewScope.transYScale(op);
         gr.wavePageObj = md;
         //======================================    
