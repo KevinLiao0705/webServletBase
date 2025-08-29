@@ -41,7 +41,7 @@ class MyNewScopeCtr {
         opts.xOffset = 0;
         opts.yOffsets = [0, -50, 50, 100];
         opts.yScales = [1, 2, 3, 4];
-        opts.gridDispInx = 0;
+        opts.netDispInx = 0;
         opts.xRealScale = 100000;
 
 
@@ -261,6 +261,7 @@ class MyNewScopeCtr {
                             lineObj.yScaleUnit = "mV";//
                             lineObj.offOn_f = 1;
                             lineObj.typeCnt = 0;
+                            lineObj.valueViewFixed = 2;
                             scope.opts.zoomTimeLen = 100 * 1000;
                             scope.opts.zoomTimeEnd = 0;
                             lineObj.name = "測試信號" + (op.signalModeInx + 1) + "-" + (i + 1);
@@ -275,6 +276,7 @@ class MyNewScopeCtr {
                             lineObj.yScaleFixed = 0;//
                             lineObj.yScaleUnit = "mV";//
                             lineObj.typeCnt = 0;
+                            lineObj.valueViewFixed = 2;
                             scope.opts.zoomTimeLen = 100 * 1000;
                             scope.opts.zoomTimeEnd = 0;
 
@@ -291,6 +293,7 @@ class MyNewScopeCtr {
                             lineObj.yScaleFixed = 0;//
                             lineObj.yScaleUnit = "mV";//
                             lineObj.typeCnt = 1;
+                            lineObj.valueViewFixed = 0;
                             scope.opts.zoomTimeLen = 100 * 1000;
                             scope.opts.zoomTimeEnd = 0;
                             lineObj.name = "測試信號" + (op.signalModeInx + 1) + "-" + (i + 1);
@@ -505,7 +508,7 @@ class MyNewScopeCtr {
         setOpts.image = "systemResource/icons8-grid-50.png";
         setOpts.max = 9;
         setOpts.min = 0;
-        setOpts.value = op.gridDispInx;
+        setOpts.value = op.netDispInx;
         setOpts.actButtons = ["inc", "dec"];
         setOptss.push(setOpts);
         //==========
@@ -725,6 +728,23 @@ class MyNewScope {
         return 500;
     }
 
+    static transTime(iv) {
+        var vstr = "";
+        if (iv > 1000000000) {
+            vstr = (iv / 1000000000).toFixed(3) + " S";
+            return vstr;
+        }
+        if (iv > 1000000) {
+            vstr = (iv / 1000000).toFixed(2) + " mS";
+            return vstr;
+        }
+        if (iv > 1000) {
+            vstr = (iv / 1000).toFixed(2) + " uS";
+            return vstr;
+        }
+        return(iv.toFixed(0));
+    }
+
     static transYScale(op) {
         return;
         for (var i = 0; i < op.lines.length; i++) {
@@ -750,28 +770,67 @@ class MyNewScope {
         }
     }
 
+    initRightTags(opts) {
+        opts.clearOn_f = 0;
+        opts.run_f = 0;
+        opts.trig_f = 0;
+        opts.cursor_f = 0;
+        opts.grid_f = 1;
+        opts.net_f = 1;
+
+
+        opts.rightTags = [];
+        opts.rightTags.push('CLEAR~' + opts.clearOn_f);
+        opts.rightTags.push('RUN~' + opts.run_f);
+        opts.rightTags.push('TRIG ' + (opts.trigInx + 1) + '~' + opts.trig_f);
+        opts.rightTags.push('CURSOR~' + opts.cursor_f);
+        opts.rightTags.push('GRID~' + opts.grid_f);
+        opts.rightTags.push('NET ' + opts.netDispInx + '~' + opts.net_f);
+
+        opts.rightTags.push('TST 1~0');
+        opts.rightTags.push('TST 2~0');
+        opts.rightTags.push('TST 3~0');
+        opts.rightTags.push('SIG1~0');
+        opts.rightTags.push('SIG2~0');
+        opts.rightTags.push('SIG3~0');
+        opts.rightTags.push('SIG4~0');
+
+
+
+    }
+
     initOpts(md) {
         var self = this;
         var opts = {};
         Block.setBaseOpts(opts);
 
-        opts.title = "OSCILLOSCOPE";
+        opts.title = "JOSN OSCILLOSCOPE";
         opts.baseColor = "#222";
-        opts.powerOn_f = 1;
-        opts.grid_f = 1;
-        opts.run_f = 1;
+        opts.clearOn_f = 0;
+        opts.run_f = 0;
         opts.trig_f = 0;
+        opts.trigViewTime = 0;
         opts.trigInx = 0;
+        opts.cursor_f = 0;
+        opts.grid_f = 1;
+        opts.net_f = 1;
+        opts.netDispInx = 4;
         opts.signalMode = 0;
         opts.signalCnt = 0;
         opts.displayType = 0;//main|roll
+
+        self.initRightTags(opts);
+
+
+
+
+
 
         opts.centerLine_f = 1;
         opts.axeWidth = 0.5;
         //===
         opts.mainAxeColor = "#aaa";
         opts.subAxeColorTbl = ["#000", "#111", "#222", "#333", "#444", "#555", "#666", "#777", "#888", "#999"];
-        opts.gridDispInx = 4;
 
         opts.centerLineColor = "#fff";
         //===============
@@ -779,8 +838,9 @@ class MyNewScope {
         opts.xScale = 8;//unit=ns;
         opts.xRealScale = 100000;//ns;
         //=====================
-        opts.xyOffx = 30;    //total 1000    //origin point x 
-        opts.xAxeLen = 940;  //total 1000    //x axile len rate    
+        opts.xyOffx = 32;    //total 1000    //origin point x 
+        opts.xAxeLen = 900;  //total 1000    //x axile len rate    
+        opts.rightTag_f = 1;
         //=====================
         opts.xAxeGridAmt = 10;
         opts.xSubAxeGridAmt = 5;
@@ -790,7 +850,7 @@ class MyNewScope {
         opts.xAxeTotalV = 500;
         opts.yAxeOffsV = -100;
         opts.yAxeTotalV = 200;
-
+        opts.trigOffset = 15;
 
         opts.xyOffy = 30;    //total 1000    //origin point y 
         opts.yAxeLen = 940;
@@ -839,6 +899,7 @@ class MyNewScope {
             lineObj.yScale = 20;//
             lineObj.yScaleFixed = 0;//
             lineObj.yScaleUnit = "mV";//
+            lineObj.trigOffset = 0;
 
 
             lineObj.yScaleSet = 4;//
@@ -850,6 +911,8 @@ class MyNewScope {
             lineObj.sampleRate = 200000000;
             lineObj.lineWidth = 1;
             lineObj.serialCnt = 0;
+            lineObj.valueViewFixed = 2;
+
 
             opts.lines.push(lineObj);
         }
@@ -891,13 +954,129 @@ class MyNewScope {
         selem.style.height = "100%";
         plotElem.appendChild(selem);
         st.canvas = selem;
-        if (!op.powerOn_f)
-            return;
         //=========================================
         var canvasClickFunc = function (iobj) {
             console.log(iobj);
         };
         var canvasPressFunc = function (iobj) {
+            var checkMouseUpFunc = function () {
+                if (gr.mouseDown_f) {
+                    setTimeout(checkMouseUpFunc, 100);
+                    return;
+                }
+                var plotObj = md.blockRefs["container"];
+                var plotElem = plotObj.elems["base"];
+                plotElem.style.cursor = "";
+                st.dragPosOn_f = 0;
+                st.noRectADragFlag = 0;
+                st.dutyBarRectDrag_f = 0;
+                st.zoomTimeDelta = 0;
+                op.clearOn_f = 0;
+                op.rightTags[0] = "CLEAR~" + op.clearOn_f;
+                st.drawAxe_f = 1;
+                st.drawBuf_f = 1;
+            };
+            setTimeout(checkMouseUpFunc, 100, md);
+
+            var rectPos = op.lines.length;
+            for (var i = 0; i < op.lines.length; i++) {
+                if (st.noRectAOnFlag & (1 << rectPos)) {
+                    op.lines[i].offOn_f ^= 1;
+                    st.drawAxe_f = 1;
+                    st.drawBuf_f = 1;
+                    return;
+                }
+                rectPos++;
+            }
+
+            if (st.noRectAOnFlag & (1 << rectPos)) {
+                self.initRightTags(op);
+                op.clearOn_f = 1;
+                op.rightTags[0] = "CLEAR~" + op.clearOn_f;
+                self.initLines(op);
+                st.drawAxe_f = 1;
+                st.drawBuf_f = 1;
+                return;
+            }
+
+            rectPos++;
+            if (st.noRectAOnFlag & (1 << rectPos)) {
+                op.run_f ^= 1;
+                op.rightTags[1] = "RUN~" + op.run_f;
+                st.drawAxe_f = 1;
+                return;
+            }
+
+            rectPos++;
+            if (st.noRectAOnFlag & (1 << rectPos)) {
+                op.trig_f ^= 1;
+                op.rightTags[2] = 'TRIG ' + (op.trigInx + 1) + '~' + op.trig_f;
+                st.drawAxe_f = 1;
+                return;
+            }
+
+            rectPos++;
+            if (st.noRectAOnFlag & (1 << rectPos)) {
+                op.cursor_f ^= 1;
+                op.rightTags[3] = "CURSOR~" + op.cursor_f;
+                st.drawAxe_f = 1;
+                return;
+            }
+
+            rectPos++;
+            if (st.noRectAOnFlag & (1 << rectPos)) {
+                op.grid_f ^= 1;
+                op.rightTags[4] = "GRID~" + op.grid_f;
+                st.drawAxe_f = 1;
+                return;
+            }
+
+            rectPos++;
+            if (st.noRectAOnFlag & (1 << rectPos)) {
+                op.net_f ^= 1;
+                op.rightTags[5] = 'NET ' + op.netDispInx + '~' + op.net_f;
+                st.drawAxe_f = 1;
+                return;
+            }
+            var ok_f = 0;
+            rectPos++;
+            for (var i = 0; i < 7; i++) {
+                var strA = op.rightTags[6 + i].split("~");
+                op.rightTags[6 + i] = strA[0] + '~' + 0;
+                if (st.noRectAOnFlag & (1 << rectPos)) {
+                    op.signalMode = i + 1;
+                    op.rightTags[6 + i] = strA[0] + '~' + 1;
+                    st.drawAxe_f = 1;
+                    ok_f = 1;
+                    self.initLines(op);
+                    if (i === 0) {
+                        op.signalMode = 1;
+                        op.signalModeInx = 0;
+                        self.setTest1Signal();
+                    }
+                    if (i === 1) {
+                        op.signalMode = 1;
+                        op.signalModeInx = 1;
+                        self.setTest2Signal();
+                    }
+                    if (i === 2) {
+                        op.signalMode = 1;
+                        op.signalModeInx = 2;
+                        self.setTest3Signal();
+                    }
+
+
+                    op.run_f = 1;
+                    op.rightTags[1] = "RUN~" + op.run_f;
+                    st.drawAxe_f = 1;
+                    st.drawBuf_f = 1;
+
+                }
+                rectPos++;
+            }
+            if (ok_f)
+                return;
+
             st.xAxeLen = op.xAxeLen * st.wRate;
             st.xyOffx = op.xyOffx * st.wRate;
             var zoomPosRateX = (iobj.offsetX - st.xyOffx) / st.xAxeLen;
@@ -912,8 +1091,8 @@ class MyNewScope {
                     grap_f = 1;
                 }
             }
-            if (st.noRectOnFlag) {
-                st.noRectDragFlag = st.noRectOnFlag;
+            if (st.noRectAOnFlag) {
+                st.noRectADragFlag = st.noRectAOnFlag;
                 grap_f = 1;
             }
             if (st.dutyBarRect_f) {
@@ -925,20 +1104,7 @@ class MyNewScope {
             if (!grap_f)
                 return;
 
-            var checkMouseUpFunc = function () {
-                if (gr.mouseDown_f) {
-                    setTimeout(checkMouseUpFunc, 100);
-                    return;
-                }
-                var plotObj = md.blockRefs["container"];
-                var plotElem = plotObj.elems["base"];
-                plotElem.style.cursor = "";
-                st.dragPosOn_f = 0;
-                st.noRectDragFlag = 0;
-                st.dutyBarRectDrag_f = 0;
-                st.zoomTimeDelta = 0;
-            };
-            setTimeout(checkMouseUpFunc, 100, md);
+
             var plotObj = md.blockRefs["container"];
             var plotElem = plotObj.elems["base"];
             plotElem.style.cursor = "grab";
@@ -948,7 +1114,7 @@ class MyNewScope {
             var plotObj = md.blockRefs["container"];
             var plotElem = plotObj.elems["base"];
             plotElem.style.cursor = "";
-            st.noRectDragFlag = 0;
+            st.noRectADragFlag = 0;
             if (st.dutyBarRectDrag_f) {
                 if (!st.zoomTimeDelta)
                     st.zoomTimeDelta = 0;
@@ -958,7 +1124,6 @@ class MyNewScope {
                 var deltaTime = md.stas.zoomPosRateDt * op.zoomTimeLen;
                 op.zoomTimeEnd -= deltaTime;
             }
-            st.noRectOnFlag = 0;
             st.dragPosOn_f = 0;
             st.dutyBarRectDrag_f = 0;
             st.zoomTimeDelta = 0;
@@ -967,27 +1132,36 @@ class MyNewScope {
         var canvasMoveFunc = function (iobj) {
             st.xAxeLen = op.xAxeLen * st.wRate;
             st.xyOffx = op.xyOffx * st.wRate;
-            var noRectOnFlag = 0;
-            for (var i = 0; i < st.noRectA.length; i++) {
-                var obj = st.noRectA[i];
-                if (obj.x === undefined)
-                    continue;
-                if (iobj.offsetX < obj.x)
-                    continue;
-                if (iobj.offsetX >= obj.xr)
-                    continue;
-                if (iobj.offsetY < obj.yt)
-                    continue;
-                if (iobj.offsetY >= obj.y)
-                    continue;
-                noRectOnFlag += (1 << i);
+            st.nowCurY = iobj.offsetY;
+            st.nowCurX = iobj.offsetX;
+            st.drawAxe_f = 1;
+            var noRectAOnFlag = 0;
+            if (st.noRectA) {
+                for (var i = 0; i < st.noRectA.length; i++) {
+                    var obj = st.noRectA[i];
+                    if (obj.xl === undefined)
+                        continue;
+                    if (iobj.offsetX < obj.xl)
+                        continue;
+                    if (iobj.offsetX >= obj.xr)
+                        continue;
+                    if (iobj.offsetY < obj.yt)
+                        continue;
+                    if (iobj.offsetY >= obj.yb)
+                        continue;
+                    noRectAOnFlag += (1 << i);
+                }
             }
-            if (st.noRectOnFlag === undefined)
-                st.noRectOnFlag = noRectOnFlag;
-            if (st.noRectOnFlag !== noRectOnFlag) {
-                st.noRectOnFlag = noRectOnFlag;
-                self.drawAxe(1);
+            if (st.noRectAOnFlag === undefined)
+                st.noRectAOnFlag = noRectAOnFlag;
+            if (st.noRectAOnFlag !== noRectAOnFlag) {
+                st.noRectAOnFlag = noRectAOnFlag;
+                st.drawAxe_f = 1;
             }
+
+
+
+
 
             st.dutyBarRect_f = 1;
             if (st.dutyBarRect) {
@@ -1001,22 +1175,39 @@ class MyNewScope {
                     st.dutyBarRect_f = 0;
             }
 
+            if (st.noRectAOnFlag & (1 << 21)) //trig
+                op.trigViewTime = 0;
 
-            if (st.noRectDragFlag) {
+            if (st.noRectADragFlag) {
                 var posRate = (iobj.offsetY - st.xyOffy) / st.yAxeLen;
                 if (posRate < 0)
                     posRate = 0;
                 if (posRate > 1)
                     posRate = 1;
+
+                if (st.noRectADragFlag & (1 << 21)) {//trig
+                    op.trigViewTime = 0;
+                    var kk = ((0.5 - posRate) * 100) | 0;
+                    var lineOpts = op.lines[op.trigInx];
+                    var ycen = st.containerHeight - st.xyOffy - st.yAxeLen / 2;
+                    var yGridLen = st.yAxeLen / op.yAxeGridAmt;
+                    var yOffset = st.yAxeLen * lineOpts.offset / 100;
+                    var ylen = ycen - yOffset - iobj.offsetY;
+                    lineOpts.trigOffset = ylen * lineOpts.yScale / yGridLen;
+                    st.drawAxe_f = 1;
+                    st.drawBuf_f = 1;
+                    return;
+                }
                 //console.log(posRate);
                 for (var i = 0; i < op.lines.length; i++) {
-                    if (st.noRectDragFlag & (1 << i)) {
+                    if (st.noRectADragFlag & (1 << i)) {
                         var kk = ((0.5 - posRate) * 100) | 0;
                         op.lines[i].offset = kk;
-                        break;
+                        st.drawAxe_f = 1;
+                        st.drawBuf_f = 1;
+                        return;
                     }
                 }
-                self.drawAxe(1);
             }
             if (st.dutyBarRectDrag_f) {
                 var deltaX = st.dutyBarPreX - iobj.offsetX;
@@ -1035,6 +1226,9 @@ class MyNewScope {
 
                     st.zoomTimeDelta = zoomTimeDelta;
                 }
+                st.drawAxe_f = 1;
+                st.drawBuf_f = 1;
+                return;
             }
 
             if (st.dragPosOn_f) {
@@ -1062,18 +1256,59 @@ class MyNewScope {
                 if (zoomTimeEnd - op.zoomTimeLen < minLeft) {
                     md.stas.zoomPosRateDt = (op.zoomTimeEnd - (minLeft + op.zoomTimeLen)) / op.zoomTimeLen;
                 }
+                st.drawAxe_f = 1;
+                st.drawBuf_f = 1;
+                return;
             }
-            self.reDrawBuf();
+            st.drawAxe_f = 1;
+            st.drawBuf_f = 1;
         };
 
         var canvasWheelFunc = function (iobj) {
-            if (st.noRectOnFlag) {
+
+            var rectPos = op.lines.length * 2 + 2;
+            if (st.noRectAOnFlag & (1 << rectPos)) {
+                if (iobj.deltaY < 0) {
+                    op.trigInx++;
+                    if (op.trigInx >= op.lines.length)
+                        op.trigInx = op.lines.length - 1;
+                    ;
+                } else {
+                    op.trigInx--;
+                    if (op.trigInx < 0)
+                        op.trigInx = 0;
+                }
+                op.rightTags[2] = 'TRIG ' + (op.trigInx + 1) + '~' + op.trig_f;
+
+                st.drawAxe_f = 1;
+                return;
+            }
+
+
+            var rectPos = op.lines.length * 2 + 5;
+            if (st.noRectAOnFlag & (1 << rectPos)) {
+                if (iobj.deltaY < 0) {
+                    op.netDispInx++;
+                    if (op.netDispInx > 9)
+                        op.netDispInx = 9;
+                } else {
+                    op.netDispInx--;
+                    if (op.netDispInx < 0)
+                        op.netDispInx = 0;
+                }
+                op.rightTags[5] = 'NET ' + op.netDispInx + '~' + op.net_f;
+                st.drawAxe_f = 1;
+                return;
+            }
+
+
+            if (st.noRectAOnFlag) {
                 if (iobj.deltaY > 0)
                     var rate = 1.2;
                 else
                     var rate = 0.8;
                 for (var i = 0; i < op.lines.length; i++) {
-                    if (st.noRectOnFlag & (1 << i)) {
+                    if (st.noRectAOnFlag & (1 << i)) {
                         var opts = op.lines[i];
                         for (var j = 0; j < MyNewScope.yScaleTbl.length; j++) {
                             if (iobj.deltaY > 0) {
@@ -1092,7 +1327,8 @@ class MyNewScope {
                         }
                     }
                 }
-                md.mdClass.createScope();
+                st.drawAxe_f = 1;
+                st.drawBuf_f = 1;
                 return;
             }
             st.xAxeLen = op.xAxeLen * st.wRate;
@@ -1123,12 +1359,30 @@ class MyNewScope {
             var rightLen = (newZoomTimeLen * (1 - zoomPosRate)) | 0;
             op.zoomTimeEnd = zoomPosTime + rightLen;
             op.zoomTimeLen = newZoomTimeLen;
-            md.mdClass.createScope();
-
+            st.drawAxe_f = 1;
+            st.drawBuf_f = 1;
         };
 
         var selem = document.createElement("canvas");
         selem.id = md.kid + "_canvasLy1";
+        selem.width = st.containerWidth;
+        selem.height = st.containerHeight;
+        selem.style.position = "absolute";
+        selem.style.left = 0 + "px";
+        selem.style.top = 0 + "px";
+        selem.style.zIndex = "1";
+        selem.style.width = "100%";
+        selem.style.height = "100%";
+        //selem.addEventListener("click", canvasClickFunc);
+        //selem.addEventListener("wheel", canvasWheelFunc);
+        //selem.addEventListener("mousedown", canvasPressFunc);
+        //selem.addEventListener("mouseup", canvasUpFunc);
+        //selem.addEventListener("mousemove", canvasMoveFunc);
+        plotElem.appendChild(selem);
+        st.canvasLy1 = selem;
+
+        var selem = document.createElement("canvas");
+        selem.id = md.kid + "_canvasLy2";
         selem.width = st.containerWidth;
         selem.height = st.containerHeight;
         selem.style.position = "absolute";
@@ -1142,17 +1396,22 @@ class MyNewScope {
         selem.addEventListener("mousedown", canvasPressFunc);
         selem.addEventListener("mouseup", canvasUpFunc);
         selem.addEventListener("mousemove", canvasMoveFunc);
-
         plotElem.appendChild(selem);
-        st.canvasLy1 = selem;
+        st.canvasLy2 = selem;
+
+
         //=========================================
         if (!st.canvas.getContext)
             return;
         if (!st.canvasLy1.getContext)
             return;
+        if (!st.canvasLy2.getContext)
+            return;
         st.ctx = st.canvas.getContext('2d');
         st.ctx1 = st.canvasLy1.getContext('2d');
-        this.createScope();
+        st.ctx2 = st.canvasLy2.getContext('2d');
+        st.drawAxe_f = 1;
+        st.drawBuf_f = 1;
         //===
         var iobj = {};
         iobj.act = "afterCreate";
@@ -1160,13 +1419,68 @@ class MyNewScope {
         KvLib.exe(op.actionFunc, iobj);
     }
 
-    chkWatch(optName) {
+    setTest1Signal() {
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
-        if (optName === "grid_f") {
-            this.drawAxe(1);
+        for (var i = 0; i < 4; i++) {
+            var lineObj = md.opts.lines[i];
+            lineObj.sampleRate = 200000000;
+            lineObj.yScale = 20;//
+            lineObj.yScaleFixed = 0;//
+            lineObj.yScaleUnit = "mV";//
+            lineObj.offOn_f = 1;
+            lineObj.typeCnt = 0;
+            lineObj.valueViewFixed = 2;
+            md.opts.zoomTimeLen = 100 * 1000;
+            md.opts.zoomTimeEnd = 0;
+            lineObj.name = "測試信號" + (op.signalModeInx + 1) + "-" + (i + 1);
         }
+    }
+
+    setTest2Signal() {
+        var md = this.md;
+        var op = md.opts;
+        var st = md.stas;
+        for (var i = 0; i < 4; i++) {
+            var lineObj = md.opts.lines[i];
+            lineObj.sampleRate = 20000000;
+            lineObj.offOn_f = 1;
+            lineObj.yScale = 10;//
+            lineObj.yScaleFixed = 0;//
+            lineObj.yScaleUnit = "mV";//
+            lineObj.typeCnt = 0;
+            lineObj.valueViewFixed = 2;
+            md.opts.zoomTimeLen = 100 * 1000;
+            md.opts.zoomTimeEnd = 0;
+
+            lineObj.name = "測試信號" + (op.signalModeInx + 1) + "-" + (i + 1);
+        }
+    }
+
+    setTest3Signal() {
+        var md = this.md;
+        var op = md.opts;
+        var st = md.stas;
+        for (var i = 0; i < 4; i++) {
+            var lineObj = md.opts.lines[i];
+            lineObj.sampleRate = 20000000;
+            lineObj.offOn_f = 1;
+            lineObj.yScale = 10;//
+            lineObj.yScaleFixed = 0;//
+            lineObj.yScaleUnit = "mV";//
+            lineObj.typeCnt = 1;
+            lineObj.valueViewFixed = 0;
+            md.opts.zoomTimeLen = 100 * 1000;
+            md.opts.zoomTimeEnd = 0;
+            lineObj.name = "測試信號" + (op.signalModeInx + 1) + "-" + (i + 1);
+        }
+    }
+
+    chkWatch() {
+        var md = this.md;
+        var op = md.opts;
+        var st = md.stas;
         this.frameTimer();
         gr.footBarStatus2 = ani.dispFs;
     }
@@ -1176,7 +1490,7 @@ class MyNewScope {
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
-        st.drawed_f = 1;
+        st.drawBuf_f = 1;
     }
 
     frameTimer() {
@@ -1184,6 +1498,7 @@ class MyNewScope {
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
+        op.trigViewTime++;
         if (!st.dragPosOn_f) {
             if (st.grapSpeed >= 2 || st.grapSpeed <= -2) {
                 var rate = st.grapSpeed * 0.0004;
@@ -1196,7 +1511,7 @@ class MyNewScope {
                 if ((op.zoomTimeEnd - op.zoomTimeLen) < minLeft)
                     op.zoomTimeEnd = minLeft + op.zoomTimeLen;
 
-                st.drawed_f = 1;
+                st.drawBuf_f = 1;
                 if (st.grapSpeedTime === undefined)
                     st.grapSpeedTime = 9999;
                 st.grapSpeedTime++;
@@ -1209,10 +1524,14 @@ class MyNewScope {
                 }
             }
         }
-        if (st.drawed_f) {
-            self.drawClear();
+        if (st.drawAxe_f) {
+            self.drawAxe();
+            st.drawAxe_f = 0;
+        }
+        if (st.drawBuf_f) {
+            self.clearBuf();
             var opts = op.lines[0];
-            self.drawBufs(opts, 1);
+            self.drawBufs(opts, 0);
             var opts = op.lines[1];
             self.drawBufs(opts, 0);
             var opts = op.lines[2];
@@ -1220,7 +1539,7 @@ class MyNewScope {
             var opts = op.lines[3];
             self.drawBufs(opts, 0);
             self.drawDutyBar();
-            st.drawed_f = 0;
+            st.drawBuf_f = 0;
         }
 
         if (!op.run_f)
@@ -1235,7 +1554,7 @@ class MyNewScope {
         gr.signalModeInx = op.signalModeInx;
 
         if (op.signalMode === 2) {
-            st.drawed_f = 1;
+            st.drawBuf_f = 1;
             var totalTime = op.xRealScale;
             var sampleTime = (totalTime * 10) / op.sampleAmt;
 
@@ -1325,7 +1644,7 @@ class MyNewScope {
                 var lineObj = op.lines[i];
                 if (!lineObj.offOn_f)
                     continue;
-                st.drawed_f = 1;
+                st.drawBuf_f = 1;
                 var bufSize = lineObj.buffer.length;
                 if (op.signalModeInx === 0) {
                     var angOff = 0;
@@ -1382,7 +1701,7 @@ class MyNewScope {
                 var lineObj = op.lines[i];
                 if (!lineObj.offOn_f)
                     continue;
-                st.drawed_f = 1;
+                st.drawBuf_f = 1;
                 if (op.signalModeInx === 0) {
                     if (!lineObj.sampleRest)
                         lineObj.sampleRest = 0;
@@ -1412,7 +1731,7 @@ class MyNewScope {
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
-        st.drawed_f = 1;
+        st.drawBuf_f = 1;
         var lineObj = op.lines[inx];
         for (var j = 0; j < buf.length; j++) {
             if (lineObj.recordLen >= (op.sampleAmt + 1)) {
@@ -1432,17 +1751,6 @@ class MyNewScope {
         }
     }
 
-    createScope(editObj) {
-        var self = this;
-        var md = this.md;
-        var op = md.opts;
-        var st = md.stas;
-        var ctx = st.ctx;
-        self.drawAxe(1);
-        st.drawed_f = 1;
-
-    }
-
     clearScr() {
         var st = this.md.stas;
         var ctx = st.ctx1;
@@ -1455,158 +1763,27 @@ class MyNewScope {
         var ctx = st.ctx;
         ctx.clearRect(0, 0, st.containerWidth, st.containerHeight);
         ctx1.clearRect(0, 0, st.containerWidth, st.containerHeight);
+        ctx2.clearRect(0, 0, st.containerWidth, st.containerHeight);
     }
 
-    drawClear() {
+    clearAxe() {
+        var st = this.md.stas;
+        var ctx = st.ctx;
+        ctx.clearRect(0, 0, st.containerWidth, st.containerHeight);
+    }
+    clearBuf() {
         var st = this.md.stas;
         var ctx = st.ctx1;
         ctx.clearRect(0, 0, st.containerWidth, st.containerHeight);
     }
 
-    drawBufsA(opts, clr) {
-        var op = this.md.opts;
-        var st = this.md.stas;
-        var ctx = st.ctx1;
-        if (clr)
-            ctx.clearRect(0, 0, st.containerWidth, st.containerHeight);
-        if (!opts.offOn_f)
-            return;
-        ctx.strokeStyle = opts.color;
-        ctx.lineWidth = opts.lineWidth;
-        ctx.beginPath();
-        var xzero = st.xyOffx;
-        var ycen = st.containerHeight - st.xyOffy - st.yAxeLen / 2;
-        var yGridLen = st.yAxeLen / op.yAxeGridAmt;
-        var yOffset = st.yAxeLen * opts.offset / 100;
-        //============================================
-        var maxY = st.containerHeight - st.xyOffy;
-        var minY = st.containerHeight - st.xyOffy - st.yAxeLen;
-
-        st.preStInx = opts.stInx;
-        st.zoomCenterInx = opts.stInx + parseInt(op.sampleAmt / 2);
-        var sampleTime = 1000000000 / opts.sampleRate;
-        st.zoomSize = (op.xRealScale * op.xAxeGridAmt / sampleTime) | 0;
-        var stepLenPerSamp = st.xAxeLen / st.zoomSize;//every sample pixel length
-        //=================================================
-        var xOffSetTime = (-1) * op.xRealScale * op.xAxeGridAmt * op.xAxeOffs / op.xAxeOffsAmt;
-        var xOffSetSamp = (xOffSetTime / sampleTime) | 0;
-        var zoomCenterInx = st.zoomCenterInx - xOffSetSamp;
-        //================================================
-        var viewSize = st.zoomSize;
-        var inx = zoomCenterInx - ((viewSize / 2) | 0);
-        var first_f = 0;
-        var xlen = 0;
-        var loopLim = 1;
-        var loopCnt = 0;
-        var vvBuf = 0;
-        if (viewSize > 2000)
-            loopLim = (viewSize / 2000) | 0;
-        var maxV = 0;
-        var minV = 0;
-        var preV = 0;
-        var chgCnt = 0;
-        var preLevel = 0;
-
-
-        for (var i = 0; i < viewSize; i++) {
-            if (inx < opts.stInx) {
-                var delta = opts.stInx - inx;
-                inx += delta;
-                xlen += stepLenPerSamp * delta;
-                if (xlen > st.xAxeLen)
-                    break;
-            }
-            if (inx >= opts.stInx + opts.recordLen)
-                break;
-            if (inx >= opts.stInx + op.sampleAmt) {
-                break;
-            }
-            /*
-             loopCnt++;
-             if ((opts.stInx + i) % loopLim) {
-             inx++;
-             xlen += stepLenPerSamp;
-             if (xlen >= st.xAxeLen)
-             break;
-             continue;
-             }
-             //vv=vvBuf/loopCnt;    
-             loopCnt = 0;
-             //vvBuf=0;
-             */
-
-            var rinx = inx;
-            for (; ; ) {
-                if (rinx < 0) {
-                    rinx += op.sampleBufSize;
-                    continue;
-                }
-                if (rinx >= op.sampleBufSize) {
-                    rinx -= op.sampleBufSize;
-                    continue;
-                }
-                break;
-            }
-
-
-            var vv = opts.buffer[rinx];
-            if (opts.digit_f) {
-                if (preV !== vv)
-                    chgCnt++;
-                preV = vv;
-                if (vv >= maxV)
-                    maxV = vv;
-            }
-
-            if ((rinx % loopLim) === 0) {
-                if (opts.digit_f) {
-                    if (chgCnt !== 0) {
-                        if (preLevel === 0)
-                            vv = maxV;
-                        else
-                            vv = 0;
-                        preLevel = vv;
-                    }
-                    chgCnt = 0;
-                    maxV = 0;
-                    minV = 0;
-                }
-                var ylen = vv * yGridLen / opts.yScale;
-                if (vv === 0)
-                    var tt = 0;
-
-                var realY = ycen - ylen - yOffset;
-                if (realY > maxY)
-                    realY = maxY;
-                if (realY < minY)
-                    realY = minY;
-                if (xlen >= 0) {
-                    if (!first_f)
-                        ctx.moveTo(xzero + xlen, realY);
-                    else
-                        ctx.lineTo(xzero + xlen, realY);
-                    first_f = 1;
-                }
-
-            }
-            inx++;
-            xlen += stepLenPerSamp;
-            if (xlen > st.xAxeLen)
-                break;
-        }
-        ctx.stroke();
-        return;
-    }
-
-    drawBufs(opts, clr) {
+    drawBufs(opts) {
         var op = this.md.opts;
         var st = this.md.stas;
         var md = this.md;
+        if (!opts.offOn_f)
+            return;
         var ctx = st.ctx1;
-        if (clr)
-            ctx.clearRect(0, 0, st.containerWidth, st.containerHeight);
-        //if (!opts.offOn_f)
-        //    return;
         ctx.strokeStyle = opts.color;
         ctx.lineWidth = opts.lineWidth;
         ctx.beginPath();
@@ -1660,11 +1837,16 @@ class MyNewScope {
         var nowTime = zoomTimeStart;
         var first_f = 0;
         if (opts.typeCnt === 0) {
+            var infDataA = [];
             for (var ii = 0; ii < lenX; ii++, nowTime += pointTime) {
-                if (nowTime < recTimeStart)
+                var infData = null;
+                if (nowTime < recTimeStart) {
+                    infDataA.push(infData);
                     continue;
+                }
                 if (nowTime >= recTimeEnd)
                     break;
+                infData = {};
                 var posRecTime = nowTime - recTimeStart;
                 var recInxPos = (posRecTime / recTimeLen) * recLen + recStartInx;
                 //================================================
@@ -1678,6 +1860,7 @@ class MyNewScope {
                 var vv0 = opts.buffer[recInx0];
                 var vv1 = opts.buffer[recInx1];
                 var vv = (vv1 - vv0) * restRate + vv0;
+                infData.value = vv;
                 var ylen = vv * yGridLen / opts.yScale;
                 var realY = ycen - ylen - yOffset;
                 if (realY > maxY)
@@ -1688,17 +1871,25 @@ class MyNewScope {
                     ctx.moveTo(xzero + ii, realY);
                 else
                     ctx.lineTo(xzero + ii, realY);
+                infData.x = xzero + ii;
+                infData.y = xzero + realY;
+                infData.nowTime = nowTime;
+                infDataA.push(infData);
                 first_f = 1;
             }
+            opts.infDataA = infDataA;
         }
 
 
         if (opts.typeCnt === 1) {
+            var infDataA = [];
+            var infData = null;
             for (var ii = 0; ii < lenX; ii++, nowTime += pointTime) {
                 if (nowTime < recTimeStart)
                     continue;
                 if (nowTime >= recTimeEnd)
                     break;
+                infData = {};
                 if (!first_f) {
                     var recInx = recStartInx;
                     var time = recTimeStart;
@@ -1713,6 +1904,7 @@ class MyNewScope {
                     }
                 }
                 var tValue = opts.buffer[recInx];
+                infData.value = tValue >> 1;
                 if (nowTime >= (time + (tValue >> 1))) {
                     time = time + (tValue >> 1);
                     recInx++;
@@ -1733,36 +1925,28 @@ class MyNewScope {
                     ctx.moveTo(xzero + ii, realY);
                 else
                     ctx.lineTo(xzero + ii, realY);
+                infData.x = xzero + ii;
+                infData.y = xzero + realY;
+                infData.nowTime = nowTime;
+                infDataA.push(infData);
                 first_f = 1;
             }
+            opts.infDataA = infDataA;
         }
 
         ctx.stroke();
         return;
     }
 
-    drawAxe(clr) {
+    drawAxe() {
         var op = this.md.opts;
         var st = this.md.stas;
         var ctx = st.ctx;
-        if (clr) {
-            st.axe_drawed_f = 0;
-            st.gripOn_f = 0;
-            st.xAxe_drawed_f = 0;
-            st.yAxe_drawed_f = 0;
-            ctx.clearRect(0, 0, st.containerWidth, st.containerHeight);
-
-        }
-
-        if (st.axe_drawed_f)
-            return;
-        st.axe_drawed_f = 1;
-
-
+        var ctx2 = st.ctx2;
+        ctx.clearRect(0, 0, st.containerWidth, st.containerHeight);
+        ctx2.clearRect(0, 0, st.containerWidth, st.containerHeight);
         op.messages = [];
         var mesObj = {};
-
-
         var mesObj = {};
         mesObj.x = -1 + st.xyOffx + st.xAxeLen / 2;
         mesObj.y = st.containerHeight - st.xyOffy - st.yAxeLen - 4;
@@ -1821,7 +2005,7 @@ class MyNewScope {
             vStr += opts.yScaleUnit;
             mesObj.x = x;
             mesObj.y = st.containerHeight - st.xyOffy - st.yAxeLen - 4;
-            mesObj.text = (i + 1) + " " + vStr + "/";
+            mesObj.text = vStr;
             mesObj.color = opts.color;
             mesObj.font = "12px sans-serif";
             op.messages.push(mesObj);
@@ -1863,20 +2047,18 @@ class MyNewScope {
             }
         }
 
-        ctx.strokeStyle = op.subAxeColorTbl[op.gridDispInx ];
 
         //===============================
-        ctx.lineWidth = op.axeWidth;
-        ctx.beginPath();
-        var x = st.xyOffx;
-        var y = st.containerHeight - st.xyOffy;
-
-        var xSubAmt = op.xAxeGridAmt * op.xSubAxeGridAmt;
-        var ySubAmt = op.yAxeGridAmt * op.ySubAxeGridAmt;
-
-        var xadd = st.xAxeLen / xSubAmt;
-        var yadd = st.yAxeLen / ySubAmt;
-        if (op.grid_f) {
+        if (op.net_f) {
+            ctx.strokeStyle = op.subAxeColorTbl[op.netDispInx ];
+            ctx.lineWidth = op.axeWidth;
+            ctx.beginPath();
+            var x = st.xyOffx;
+            var y = st.containerHeight - st.xyOffy;
+            var xSubAmt = op.xAxeGridAmt * op.xSubAxeGridAmt;
+            var ySubAmt = op.yAxeGridAmt * op.ySubAxeGridAmt;
+            var xadd = st.xAxeLen / xSubAmt;
+            var yadd = st.yAxeLen / ySubAmt;
             for (var i = 0; i < ySubAmt + 1; i++) {
                 ctx.moveTo(x, y - i * yadd);
                 ctx.lineTo(x + st.xAxeLen, y - i * yadd);
@@ -1885,11 +2067,8 @@ class MyNewScope {
                 ctx.moveTo(x + xadd * i, y);
                 ctx.lineTo(x + xadd * i, y - st.yAxeLen);
             }
-
-
-
+            ctx.stroke();
         }
-        ctx.stroke();
         //===============================
         ctx.strokeStyle = op.mainAxeColor;
         ctx.lineWidth = op.axeWidth;
@@ -1899,16 +2078,20 @@ class MyNewScope {
         var xadd = st.xAxeLen / op.xAxeGridAmt;
         var yadd = st.yAxeLen / op.yAxeGridAmt;
         for (var i = 0; i < op.xAxeGridAmt + 1; i++) {
+            if (!op.grid_f && i !== 0 && i !== op.xAxeGridAmt)
+                continue;
             ctx.moveTo(x + xadd * i, y);
             ctx.lineTo(x + xadd * i, y - st.yAxeLen);
         }
         for (var i = 0; i < op.yAxeGridAmt + 1; i++) {
+            if (!op.grid_f && i !== 0 && i !== op.xAxeGridAmt)
+                continue;
             ctx.moveTo(x, y - i * yadd);
             ctx.lineTo(x + st.xAxeLen, y - i * yadd);
         }
         ctx.stroke();
         //===============================
-        if (op.centerLine_f) {
+        if (op.centerLine_f && op.grid_f) {
             ctx.strokeStyle = op.centerLineColor;
             ctx.lineWidth = op.axeWidth;
             ctx.beginPath();
@@ -1921,6 +2104,10 @@ class MyNewScope {
             ctx.moveTo(x, y - 1 * yadd);
             ctx.lineTo(x + st.xAxeLen, y - 1 * yadd);
             ctx.stroke();
+
+
+
+
         }
         //===============================
         /*
@@ -1929,98 +2116,258 @@ class MyNewScope {
 
 
 
-
+        //draw 1> 2> 3> 4> 
         st.noRectA = [];
-        for (var i = 0; i < 4; i++) {
+        var nextPos = 0;
+        for (var i = 0; i < op.lines.length; i++) {
             var noRect = {};
             if (op.lines[i].offOn_f) {
-                var fontSize = 12;
+                var fontSize = 16;
                 ctx.font = "" + fontSize + "px monospace";
                 ctx.fillStyle = op.lines[i].color;
                 var str = (i + 1) + "\u27a4";
                 var size = ctx.measureText(str);
-                if (st.noRectOnFlag) {
-                    if (st.noRectOnFlag & (1 << i))
-                        str = ">>>";
-                }
-                if (st.noRectDragFlag) {
-                    if (st.noRectDragFlag & (1 << i))
-                        str = ">>>";
-                }
+                if (st.noRectAOnFlag & (1 << nextPos))
+                    ctx.fillStyle = "#fff";
                 var offset = op.lines[i].offset;
                 if (offset > 50)
                     offset = 50;
                 if (offset < -50)
                     offset = -50;
-                var xx = x - size.width - 2;
-                var yy = y - st.yAxeLen / 2 + fontSize / 2 - 2 - offset * st.yAxeLen / 100;
-                ctx.fillText(str, x - size.width - 2, y - st.yAxeLen / 2 + fontSize / 2 - 2 - offset * st.yAxeLen / 100);
+                var fh = size.actualBoundingBoxAscent + size.actualBoundingBoxDescent;
+                var xx = st.xyOffx - 2;
+                var yy = st.containerHeight - st.xyOffy - st.yAxeLen / 2 - offset * st.yAxeLen / 100;
+                var yd = 0;
+                ctx.fillText(str, xx - size.width, yy + fh / 2 + yd);
+
                 noRect.width = size.width;
                 noRect.height = size.height;
-                noRect.x = xx - 10;
-                noRect.y = yy + 10;
-                noRect.xr = xx + size.width + 10;
-                noRect.yt = yy - fontSize - 10;
+                noRect.xl = xx - size.width - 10;
+                noRect.yb = yy + fh / 2 + yd + 10;
+                noRect.xr = xx + 10;
+                noRect.yt = yy - fh / 2 + yd - 10;
 
             }
+            nextPos++;
             st.noRectA.push(noRect);
         }
-
-
-
-        var x = st.xyOffx + st.xAxeLen + 6;
-        var y = st.containerHeight - st.xyOffy - 22;
-        var w = 20;
-        var h = 20;
-
+        //==========================================
+        if (!op.rightTag_f)
+            return;
+        //onoff square
+        var tagX = st.xyOffx + st.xAxeLen + 6;
+        var tagW = st.containerWidth - tagX - 4;
+        var tagM = 10;
+        var tagY = st.containerHeight - st.xyOffy - 22;
+        var tagH = 20;
         for (var i = 0; i < op.lines.length; i++) {
             var opts = op.lines[i];
-            if(opts.offOn_f)
+            ctx.strokeStyle = '#000';
+            if (opts.offOn_f) {
                 ctx.fillStyle = opts.color;
-            else
+                if (st.noRectAOnFlag & (1 << (nextPos)))
+                    ctx.strokeStyle = "#fff";
+            } else
                 ctx.fillStyle = "#222";
-            ctx.strokeStyle = '#ccc';
-            ctx.lineWidth = 1;
+
+            ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.rect(x, y, w, h);
-            y-=30;
+            ctx.rect(tagX, tagY, tagW, tagH);
+            var noRect = {};
+            noRect.width = tagW;
+            noRect.height = tagH;
+            noRect.xl = tagX;
+            noRect.yt = tagY;
+            noRect.xr = tagX + tagW;
+            noRect.yb = tagY + tagH;
+            st.noRectA.push(noRect);
             ctx.fill();
             ctx.stroke();
+            tagY -= tagM + tagH;
+            nextPos++;
         }
 
-        //ctx.fillStyle = 'blue';
-        //ctx.fillRect(x1, x2, y1, y2);
-        //    ctx.stroke();
+        //===========================================
+        //draw tags
+        tagY = st.xyOffy;
+        var tagS = 14;
+
+        for (var i = 0; i < op.rightTags.length; i++) {
+            var fontHeight = 14;
+            ctx.font = "" + fontHeight + "px monospace";
+            var strA = op.rightTags[i].split("~");
+            var size = ctx.measureText(strA[0]);
+            var fh = size.actualBoundingBoxAscent + size.actualBoundingBoxDescent;
+            var tagH = fh + tagS;
+            ctx.strokeStyle = '#000';
+            if (st.noRectAOnFlag & (1 << (nextPos)))
+                ctx.strokeStyle = "#fff";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.strokeRect(tagX, tagY, tagW, tagH);
+            ctx.fill();
+            ctx.stroke();
 
 
-        /*
-         var fontSize = 12;
-         ctx.font = "" + fontSize + "px monospace";
-         ctx.fillStyle = "#ccc";
-         var str = "▼";
-         var x = -3 + st.xyOffx + st.xAxeLen / 2;
-         var y = st.containerHeight - st.xyOffy - st.yAxeLen + 7;
-         ctx.fillText(str, x, y);
-         */
+            var noRect = {};
+            noRect.width = tagW;
+            noRect.height = tagH;
+            noRect.xl = tagX;
+            noRect.yt = tagY;
+            noRect.xr = tagX + tagW;
+            noRect.yb = tagY + tagH;
+            st.noRectA.push(noRect);
+            if (strA[1] === "1")
+                ctx.fillStyle = '#fff';
+            else
+                ctx.fillStyle = '#666';
 
-        /*
-         var xoff = st.xAxeLen * xOffset / (op.xRealScale * 10);
-         xoff += st.xAxeLen * 5 / 10;
-         if (xoff < 0)
-         xoff = 0;
-         if (xoff > st.xAxeLen)
-         xoff = st.xAxeLen;
-         var fontSize = 12;
-         ctx.font = "" + fontSize + "px monospace";
-         ctx.fillStyle = "#fff";
-         var str = "▼";
-         var x = -3 + st.xyOffx + xoff;
-         var y = st.containerHeight - st.xyOffy - st.yAxeLen + 7;
-         ctx.fillText(str, x, y);
-         */
+            ctx.fillText(strA[0], tagX + (tagW - size.width) / 2, tagY + (tagH / 2) + (fh / 2));
+            tagY += tagM + tagH;
+            if (i === 5)
+                tagY += tagM + tagH;
+
+            nextPos++;
+        }
+        //==========================================
+
+        //draw trig
+        op.trigOffset = 20;
+        if (op.lines[op.trigInx].offOn_f && op.trig_f) {
+            var lineOpts = op.lines[op.trigInx];
+            var tagX = st.xyOffx;
+            var fontSize = 16;
+            ctx.font = "" + fontSize + "px monospace";
+            ctx.fillStyle = lineOpts.color;
 
 
-        return;
+
+
+            var str = "T⬆︎";
+            var size = ctx.measureText(str);
+            var fh = size.actualBoundingBoxAscent + size.actualBoundingBoxDescent;
+
+            if (st.noRectAOnFlag & (1 << nextPos))
+                ctx.fillStyle = "#fff";
+
+            var ycen = st.containerHeight - st.xyOffy - st.yAxeLen / 2;
+            var yGridLen = st.yAxeLen / op.yAxeGridAmt;
+            var yOffset = st.yAxeLen * lineOpts.offset / 100;
+            var vv = lineOpts.trigOffset;
+            var ylen = vv * yGridLen / lineOpts.yScale;
+            var realY = ycen - ylen - yOffset;
+            if (realY > (st.yAxeLen + st.xyOffy))
+                realY = st.yAxeLen + st.xyOffy;
+            if (realY < st.xyOffy)
+                realY = st.xyOffy;
+            var tagY = realY;
+            ctx.fillText(str, tagX, tagY + fh / 2 - 1);
+            var noRect = {};
+            noRect.width = size.width;
+            noRect.height = fh + 20;
+            noRect.xl = tagX - 10;
+            noRect.yb = tagY + fh / 2 + 10;
+            noRect.xr = tagX + size.width + 10;
+            noRect.yt = tagY - fh / 2 - 10;
+            st.noRectA.push(noRect);
+            nextPos++;
+
+            if (op.trigViewTime < 60) {
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(tagX + size.width, tagY);
+                ctx.lineTo(tagX + st.xAxeLen, tagY);
+                ctx.stroke();
+            }
+
+        }
+
+
+
+
+
+
+
+        var ctx = st.ctx2;
+        if (op.cursor_f && !op.run_f) {
+            if (st.nowCurY !== undefined) {
+                ctx.beginPath();
+                ctx.strokeStyle = "#ccc";
+                ctx.lineWidth = 1;
+                ctx.moveTo(0, st.nowCurY);
+                ctx.lineTo(st.containerWidth, st.nowCurY);
+                ctx.moveTo(st.nowCurX, 0);
+                ctx.lineTo(st.nowCurX, st.containerHeight);
+                ctx.stroke();
+            }
+
+            var first_f = 0;
+            for (var i = 0; i < op.lines.length; i++) {
+                var infDataA = op.lines[i].infDataA;
+                if (!infDataA)
+                    continue;
+                var infData = infDataA[st.nowCurX - (st.xyOffx | 0)];
+                if (!infData)
+                    continue;
+                if (!op.lines[i].offOn_f)
+                    continue;
+                if (op.lines[i].typeCnt === 0)
+                    var textStr = infData.value.toFixed(op.lines[i].valueViewFixed);
+                if (op.lines[i].typeCnt === 1)
+                    var textStr = MyNewScope.transTime(infData.value);
+                ctx.font = "12px monospace";
+                var size = ctx.measureText(textStr);
+                var fh = size.actualBoundingBoxAscent + size.actualBoundingBoxDescent;
+                var tagH = fh + 4;
+                var tagW = size.width + 8;
+
+                ctx.strokeStyle = '#000';
+                ctx.fillStyle = op.lines[i].color;
+                ctx.lineWidth = 1;
+                var tagX = st.nowCurX + 4;
+                if (st.nowCurX > (st.xyOffx + st.xAxeLen / 2))
+                    var tagX = st.nowCurX - tagW - 4;
+                tagY = infData.y - st.xyOffy - 1;
+                tagH = fh + 8;
+                ctx.beginPath();
+                ctx.rect(tagX, tagY - tagH / 2, tagW, tagH);
+                ctx.fill();
+                ctx.stroke();
+                ctx.fillStyle = "#222";
+                ctx.fillText(textStr, tagX + (tagW - size.width) / 2, tagY + fh / 2);
+                //=======================================
+                continue;
+
+                if (!first_f) {
+                    first_f = 1;
+                    var iv = (infData.nowTime * -1);
+                    if (iv > 0) {
+                        var textStr = MyNewScope.transTime(iv);
+                        ctx.font = "12px monospace";
+                        var size = ctx.measureText(textStr);
+                        var h = 12;
+                        var w = size.width + 4;
+                        ctx.strokeStyle = '#000';
+                        ctx.fillStyle = '#fff';
+                        ctx.lineWidth = 1;
+                        x = st.nowCurX + 10;
+                        if (st.nowCurX > (st.xyOffx + st.xAxeLen / 2))
+                            x = st.nowCurX - w - 10;
+                        y = st.xyOffy + 2;
+                        ctx.beginPath();
+                        ctx.rect(x - 2, y - 2, w + 4, h + 4);
+                        ctx.fill();
+                        ctx.stroke();
+                        ctx.fillStyle = "#222";
+                        ctx.fillText(textStr, x + 2, y + h - 2);
+                    }
+                }
+
+            }
+
+        }
+
 
 
 
@@ -2035,13 +2382,13 @@ class MyNewScope {
     drawDutyBar() {
         var op = this.md.opts;
         var st = this.md.stas;
-        var ctx = st.ctx;
+        var ctx = st.ctx2;
 
         ctx.strokeStyle = "#888";
         ctx.lineWidth = 6;
         ctx.beginPath();
         var x = st.xyOffx;
-        var y = st.containerHeight - st.xyOffy - 3;
+        var y = st.containerHeight - st.xyOffy - 2;
         ctx.moveTo(x, y);
         x += st.xAxeLen;
         ctx.lineTo(x, y);
@@ -2071,9 +2418,9 @@ class MyNewScope {
                 endPos = startPos + 20;
 
             if (st.dutyBarRect_f)
-                ctx.strokeStyle = "#88f";
-            else
                 ctx.strokeStyle = "#fff";
+            else
+                ctx.strokeStyle = "#88f";
 
             ctx.lineWidth = 6;
             ctx.beginPath();
@@ -2150,33 +2497,38 @@ class MyNewScope {
         opts.actionFunc = function (iobj) {
             console.log(iobj);
             if (iobj.act === "signalChanged") {
-                self.createScope();
+                st.drawAxe_f = 1;
+                st.drawBuf_f = 1;
                 return;
             }
             if (iobj.act === "gridValueChanged") {
-                op.gridDispInx = iobj.value;
-                self.drawAxe(1);
+                op.netDispInx = iobj.value;
+                st.drawAxe_f = 1;
                 return;
             }
             if (iobj.act === "xScaleChanged") {
                 op.xScale = iobj.value;
                 op.xAxeOffs = iobj.offsetValue;
-                self.createScope();
+                st.drawAxe_f = 1;
+                st.drawBuf_f = 1;
                 return;
             }
             if (iobj.act === "xOffsetChanged") {
                 op.xAxeOffs = iobj.value;
-                self.createScope();
+                st.drawAxe_f = 1;
+                st.drawBuf_f = 1;
                 return;
             }
             if (iobj.act === "yScaleChanged") {
                 op.lines[iobj.chInx].yScaleSet = iobj.value;
-                self.createScope();
+                st.drawAxe_f = 1;
+                st.drawBuf_f = 1;
                 return;
             }
             if (iobj.act === "yOffsetChanged") {
                 op.lines[iobj.chInx].offset = iobj.value;
-                self.createScope();
+                st.drawAxe_f = 1;
+                st.drawBuf_f = 1;
                 return;
             }
 
@@ -2188,6 +2540,7 @@ class MyNewScope {
                 }
                 if (iobj.buttonId === "trig") {
                     md.opts.trig_f ^= 1;
+                    st.drawAxe_f = 1;
                     return;
                 }
             }
@@ -2209,7 +2562,8 @@ class MyNewScope {
                         op.lines[0].offOn_f = 1;
                     else
                         op.lines[0].offOn_f = 0;
-                    self.drawAxe(1);
+                    st.drawAxe_f = 1;
+                    st.drawBuf_f = 1;
                     return;
                 }
                 if (iobj.buttonId === "ch2") {
@@ -2217,7 +2571,8 @@ class MyNewScope {
                         op.lines[1].offOn_f = 1;
                     else
                         op.lines[1].offOn_f = 0;
-                    self.drawAxe(1);
+                    st.drawAxe_f = 1;
+                    st.drawBuf_f = 1;
                     return;
                 }
                 if (iobj.buttonId === "ch3") {
@@ -2225,7 +2580,8 @@ class MyNewScope {
                         op.lines[2].offOn_f = 1;
                     else
                         op.lines[2].offOn_f = 0;
-                    self.drawAxe(1);
+                    st.drawAxe_f = 1;
+                    st.drawBuf_f = 1;
                     return;
                 }
                 if (iobj.buttonId === "ch4") {
@@ -2233,7 +2589,8 @@ class MyNewScope {
                         op.lines[3].offOn_f = 1;
                     else
                         op.lines[3].offOn_f = 0;
-                    self.drawAxe(1);
+                    st.drawAxe_f = 1;
+                    st.drawBuf_f = 1;
                     return;
                 }
 
@@ -2256,7 +2613,7 @@ class MyNewScope {
             opts.yScales.push(op.lines[i].yScaleSet);
             opts.yOffsets.push(op.lines[i].offset);
         }
-        opts.gridDispInx = op.gridDispInx;
+        opts.netDispInx = op.netDispInx;
         opts.run_f = op.run_f;
         opts.typeCnt = 0;
         opts.trig_f = 0;
