@@ -68,6 +68,8 @@ class MyWebSocket {
     }
 
     sendSocket(obj) {
+        if(!gr.webSocketEnable_f)
+            return;
         var self = this;
         if (!self.wsok) {
             self.webSocketConnTime++;

@@ -19,14 +19,26 @@ class GlobalRes {
             self.appType = "Model~MdaMdTest~base.sys0";
         }
 
+        if (self.appName === "sipphoneWeb") {
+            self.appType = "Model~SipphoneWeb~base.sys0";
+        }
+        if (self.appName === "sipphoneUiWeb") {
+            self.appType = "Model~SipphoneUiWeb~base.sys0";
+        }
+
+
     }
     constructor() {
         this.debug_f = 1;
         this.version = "1.0";
+        
         //this.appName = "webBuilder";
-        this.appName = "sync";
+        //this.appName = "sync";
+        //this.appName = "sipphoneWeb";
+        this.appName = "sipphoneUiWeb";
         this.appId = 3;
         //=================================
+        this.webSocketEnable_f=0;
         this.showLogo_f = 1;
         this.showLogoTime = 1000;//ms
         this.logoImage = "systemResource/dummyTargetLogo.png";

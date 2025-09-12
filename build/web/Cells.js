@@ -533,7 +533,7 @@ class Cells {
                     var setOpts = opts.setOpts = {};
                     setOpts.setType = "inputText";
                     setOpts.dataType = "str";
-                    setOpts.checkType = "ipStr";
+                    setOpts.checkType = "ip";
                     setOpts.value = 0;
                     setOpts.titleWidth = 200;
                     setOpts.title = strA[1];

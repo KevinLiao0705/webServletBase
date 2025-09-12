@@ -6,7 +6,7 @@ class Macro {
         var opts;
         var obj = {};
         obj["act"] = "readFile";
-        obj["type"] = "action";
+        obj["type"] = "command";
         var retOpts = obj["retOpts"] = {};
         retOpts["cmdInx"] = sv.cmdInx;
         retOpts["responseType"] = "responseError";
@@ -20,6 +20,26 @@ class Macro {
         opts["outName"] = outName;
         sv.callServer(JSON.stringify(obj));
     }
+
+    readServerFile(fileName) {
+        var opts;
+        var obj = {};
+        obj["act"] = "readFile";
+        obj["type"] = "command";
+        var retOpts = obj["retOpts"] = {};
+        retOpts["cmdInx"] = sv.cmdInx;
+        retOpts["responseType"] = "responseError";
+        retOpts["messageTime"] = 1000;//(ms)
+        retOpts["callBackFunc"] = "";
+        retOpts["responseAction"] = "exeCallBackFunc";
+        obj["opts"] = {};
+        opts = obj["opts"];
+        //=================================
+        opts["fileName"] = fileName;
+        sv.callServer(JSON.stringify(obj));
+    }
+
+
 
     messageEditor(md) {
         var st = md.stas;
@@ -62,6 +82,21 @@ class Macro {
         var fileName = "paraSet";
         var content = JSON.stringify(gr.paraSet);
         sv.saveStringToFile("responseDialogError", "null", fileName, content);
+    }
+    
+    saveSetOpts(ksObjss,paraSet){
+            for(var i=0;i<ksObjss.length;i++){
+                var ksObjs=ksObjss[i];
+                for(var j=0;j<ksObjs.length;j++){
+                    var ksObj=ksObjs[j];
+                    var setOpts=ksObj.opts.setOpts;
+                    if(setOpts.paraSetName){
+                        if(paraSet[setOpts.paraSetName]!==undefined){
+                            paraSet[setOpts.paraSetName]=setOpts.value;
+                        }
+                    }
+                }
+            }
     }
 
     saveFileToLocal(fileName, outName) {
@@ -529,6 +564,7 @@ class Macro {
         kopts.headTitleXArr = op.headTitleXArr;
         kopts.ksObjss = op.ksObjss;
         kopts.ksObjWs = op.ksObjWs;
+        kopts.ksObjWsR = op.ksObjWsR;
         //=================
         return {type: "Model~MdaBox~base.sys0", opts: opts};
     }
@@ -725,14 +761,25 @@ class KvSetOpts {
             case "natureStr":
                 var opts = sopt.getOptsNature();
                 opts.dataType = "str";
+                opts.checkType = "intStr";
+                opts.actButtons = ["pad"];
                 opts.nullErr_f = 0;
                 opts.value = "0";
                 return opts;
 
+            case "ip":
+                var opts = sopt.getOptsFloat();
+                opts.dataType = "str";
+                opts.checkType="ip";
+                opts.nullErr_f = 0;
+                opts.value = "0.0.0.0";
+                return opts;
+            
             case "intStr":
                 var opts = sopt.getOptsInt();
                 opts.dataType = "str";
                 opts.nullErr_f = 0;
+                opts.actButtons = ["pad"];
                 opts.value = "0";
                 return opts;
 
@@ -744,21 +791,16 @@ class KvSetOpts {
                 return opts;
             case "floatStrA":
                 return sopt.getOptsFloatStrA();
-            case "floatAStrA":
-                var opts = sopt.getOptsFloat();
-                opts.dataType = "str";
-                opts.checkType = "floatAStr";
-                opts.setType = "textArea";
-                opts.actButtons = ["pad"];
-                opts.array = 1;
-                opts.value = "0";
-                return sopt.getOptsFloatAStrA();
             case "intEnum":
                 return sopt.getOptsIntEnum();
             case "incEnum":
                 return sopt.getOptsIncEnum();
+            case "pullEnum":
+                return sopt.getOptsPullEnum();
             case "strEnum":
                 return sopt.getOptsStrEnum();
+            case "select":
+                return sopt.getSelect();
             case "buttonRadio":
                 return sopt.getOptsButtonRadio();
             case "button":
@@ -773,13 +815,17 @@ class KvSetOpts {
                 return sopt.getOptsLabelViews();
             case "view":
                 return sopt.getOptsView();
+            case "intView":
+                return sopt.getOptsIntView();
+            case "strView":
+                return sopt.getOptsStrView();
             case "led":
                 return sopt.getOptsLed();
             case "ledView":
                 return sopt.getOptsLedView();
             case "leds":
                 return sopt.getOptsLeds();
-            case "lcdView":
+            case "ledView":
                 return sopt.getOptsLcdView();
             default:
                 return sopt.getOptsStr();
@@ -1009,19 +1055,6 @@ class KvSetOpts {
         return opts;
     }
 
-    getOptsFloatAStrA() {
-        var opts = sopt.getOptsFloat();
-        var opts = {};
-        opts.dataType = "str";
-        opts.checkType = "floatAStr";
-        opts.setType = "textArea";
-        opts.nullErr_f = 1;
-        opts.actButtons = ["pad"];
-        opts.nullErr_f = 0;
-        opts.array = 1;
-        opts.value = "0";
-        return opts;
-    }
 
     getOptsStrEnum() {
         var opts = sopt.getOptsStr();
@@ -1046,6 +1079,15 @@ class KvSetOpts {
         return opts;
     }
 
+
+    getOptsPullEnum() {
+        var opts = sopt.getOptsNature();
+        opts.setType = "pullEnum";
+        opts.actButtons = ["pull"];
+        opts.enum = ["xxx", "string2", "string3", "string4", "string5"];
+        return opts;
+    }
+
     getOptsButtonRadio() {
         var setOpts = {};
         setOpts.setType = "buttonRadio";
@@ -1055,7 +1097,6 @@ class KvSetOpts {
         setOpts.xm = 4;
         setOpts.lm = 0;
         setOpts.fontSize = 24;
-        setOpts.titleFontSize = 25;
         setOpts.titleWidth = 0;
         return setOpts;
     }
@@ -1239,6 +1280,7 @@ class KvSetOpts {
             if (dscObj) {
                 if (dscObj.getType) {
                     kopts = sopt.getOptsPara(dscObj.getType);
+                    kopts.paraSetName=op.paraSetName;
                     KvLib.deepCoverObject(kopts, dscObj);
                     kopts.value = gr.paraSet[op.paraSetName];
                 }
@@ -1309,6 +1351,24 @@ class KvSetOpts {
         return setOpts;
     }
 
+    getOptsIntView(op) {
+        var setOpts = {};
+        setOpts.setType = "inputText";
+        setOpts.dataType = "int";
+        setOpts.checkType = "int";
+        setOpts.value = 0;
+        setOpts.min = 0;
+        setOpts.titleFontSize = 20;
+        setOpts.actButtons = [];
+        setOpts.readOnly_f = 1;
+        setOpts.editBaseColor = "#eeeeff";
+        if (op) {
+            KvLib.deepCoverObject(setOpts, op);
+        }
+        return setOpts;
+    }
+
+
     getOptsLedView(op) {
         var setOpts = {};
         setOpts.setType = "ledView";
@@ -1319,6 +1379,21 @@ class KvSetOpts {
         setOpts.actButtons = [];
         setOpts.readOnly_f = 1;
         setOpts.editBaseColor = "#eeeeff";
+        if (op) {
+            KvLib.deepCoverObject(setOpts, op);
+        }
+        return setOpts;
+    }
+    getOptsStrView(op) {
+        var setOpts = {};
+        setOpts.setType = "inputText";
+        setOpts.dataType = "str";
+        setOpts.checkType = "str";
+        setOpts.value = "";
+        setOpts.titleFontSize = "0.5rh";
+        setOpts.actButtons = [];
+        setOpts.readOnly_f = 1;
+        setOpts.editBaseColor = "#e8e8ff";
         if (op) {
             KvLib.deepCoverObject(setOpts, op);
         }
@@ -1734,14 +1809,6 @@ class KvBox {
         this.intHexPadBox(op);
     }
 
-    floatAStrABox(_op) {
-        var op = {};
-        op.setOpts = dsc.optsCopy.float;
-        KvLib.deepCoverObject(op, _op);
-        op.headButtons = ["ESC"];
-        op.headButtonIds = ["esc"];
-        this.intHexPadBox(op);
-    }
 
     intHexPadBox(_op) {
         var op = {};
@@ -2068,14 +2135,6 @@ class KvBox {
         return box.containerPageBox(op1, op2);
 
 
-        var opts = {};
-        opts.containerType = "Model~MdaContainer~base.free";
-        opts.title = "Object Free Table";
-        op.ksObjWs = [150, 200, 300, 400];
-        KvLib.deepCoverObject(opts, op);
-        var obj = mac.containerBoxOpts(opts);
-        var kvObj = new Block("containerPgeBox", obj.type, obj.opts);
-        return mda.popObj(opts.w, opts.h, kvObj);
     }
 
     containerTableBox(_op1, _op2) {
@@ -2271,17 +2330,7 @@ class KvBox {
                     var obj = iobj.ksObjss[i][0];
                     var setOpts = obj.opts.setOpts;
                     var checkType = setOpts.checkType;
-                    if (checkType === "floatAStr" || checkType === "intAStr" || checkType === "objStr") {
-                        var strA = setOpts.value.split(",");
-                        var strB = [];
-                        for (var j = 0; j < strA.length; j++) {
-                            var str = strA[j].trim();
-                            var str = str.slice(1, str.length - 1);
-                            strB.push(str);
-                        }
-                        paraSet[setOpts.id] = strB;
-                    } else
-                        paraSet[setOpts.id] = setOpts.value;
+                    paraSet[setOpts.id] = setOpts.value;
                 }
                 var obj = {};
                 obj.act = "paraSetOk";

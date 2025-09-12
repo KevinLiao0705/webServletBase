@@ -63,117 +63,17 @@ class MySystem {
             return;
         }
         if (gr.appPageCnt === 2) {
-            gr.mdMain = new Block("mdMain", gr.nowAppType, {});
+            var opts = {};
+            opts.actionFunc = function (iobj) {
+                console.log(iobj);
+            };
+            gr.mdMain = new Block("mdMain", gr.nowAppType, opts);
             gr.mdMain.create("rootBody");
             return;
         }
 
 
-        return;
 
-
-        if (!gr.appOpened_f) {
-            gr.appOpened_f = 1;
-            if (gr.showLogo_f) {
-                var opts = {};
-                opts.actionFunc = function () {
-                    console.log("logoTimeUp");
-                };
-                gr.mdMain = mac.showLogo(opts);
-            }
-            gr.mdMain = new Block("mdMain", gr.nowApp, {});
-        }
-
-
-
-
-        //gr.webPage = "josnPage";
-        if (pageName)
-            gr.webPage = pageName;
-        else
-            gr.webPage = gr.systemName + "Page";
-        self.webInit();
-        console.log("gr.webPage= " + gr.webPage);
-        var page = gr.webPage;
-        if (gr.showLogo_f) {
-            page = "showLogo";
-        }
-        switch (page) {
-            case "showLogo":
-                var opts = {};
-                opts.actionFunc = function () {
-                    console.log("logoTimeUp");
-                };
-                gr.mdMain = mac.showLogo(opts);
-                gr.mdMain.create("rootBody");
-                break;
-
-
-
-                gr.mdMain = new Block("test", "Model~MdTest~base.sys0", {}, {});
-                gr.mdMain.create("rootBody");
-                break;
-
-
-                gr.mdMain = new Model("showLogo", "Md_logoBox~sys", {}, {});
-                gr.mdMain.build();
-                gr.mdMain.create("rootBody");
-                break;
-
-
-                gr.mdMain = new Model("showLogo", "Md_logoBox~sys", {}, {});
-                gr.mdMain.build();
-                gr.mdMain.create("rootBody");
-                break;
-            case "loginBox":
-                gr.mdMain = new Model("loginBox", "Md_loginBox~sys", {}, {});
-                gr.mdMain.build();
-                gr.mdMain.create("rootBody");
-                break;
-            case "webFramePage":
-                gr.mdMain = new Model("mdTest", "Md_test~a", {}, {});
-                gr.mdMain.build();
-                gr.mdMain.create("rootBody");
-                break;
-            case "syncPage":
-                opts = {};
-                opts.pageInx = 0;
-                opts.engMode_f = 0;
-                gr.mdMain = new Model("mdSync", "Md_sync~sys", opts, {});
-                gr.mdMain.build();
-                gr.mdMain.create("rootBody");
-                break;
-            case "webIcsPage":
-                opts = {};
-                opts.pageInx = 0;
-                opts.engMode_f = 0;
-                gr.mdMain = new Model("mdWebIcs", "Md_webIcs~sys", opts, {});
-                gr.mdMain.build();
-                gr.mdMain.create("rootBody");
-                break;
-            case "futuresPage":
-                gr.mdMain = new Model("mdFutures", "Md_futures~sys", {}, {});
-                gr.mdMain.build();
-                gr.mdMain.create("rootBody");
-                break;
-            case "keyboardOledPage":
-                var modelSet = "Model";
-                var templateSet = "Md_keyboardOled";
-                var typeSet = mac.getSaveType(modelSet, templateSet);
-                var opts = {};
-                opts.keyMode = 0;
-                opts.typeSet = typeSet;
-                opts.nowPage = 0;
-                gr.mdMain = new Model("mdKeyboardOled", "Md_keyboardOled~" + typeSet, opts, {});
-                gr.mdMain.build();
-                gr.mdMain.create("rootBody");
-                break;
-
-
-
-        }
-        gr.mdSystem = new Block("mdSystem", "Model~MdaPopWin~sys0", {});
-        gr.mdSystem.create("rootBody", -1000, -1000, 0, 0);
 
 
     }
@@ -214,8 +114,8 @@ class MySystem {
     //period= Animate.period, unit: ms, about 16ms.
     baseTimer() {
         var self = window.sys;
-        if(!self.baseTimerCnt)
-            self.baseTimerCnt=0;
+        if (!self.baseTimerCnt)
+            self.baseTimerCnt = 0;
         self.baseTimerCnt++;
         self.baseTimerFlag = self.baseTimerCnt ^ self.baseTimerBuf;
         self.baseTimerBuf = self.baseTimerCnt;
@@ -242,9 +142,9 @@ class MySystem {
 
 
         self.repaint(0);
-        
+
         gr.gbcs.timer();
-        
+
         if (gr.mdMain) {
             gr.mdMain.chkWatch();
         }
@@ -348,9 +248,9 @@ class MySystem {
             self.watch["_sysReDraw_f"] = 1;
         self.watch[optsName] = 1;
         /*
-        if (value !== undefined)
-            self.opts[optsName] = value;
-        */                            
+         if (value !== undefined)
+         self.opts[optsName] = value;
+         */
     }
     setReDraw(self, optsName, value) {
         self.watch["_sysReDraw_f"] = 1;

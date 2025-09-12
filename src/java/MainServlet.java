@@ -436,11 +436,13 @@ public final class MainServlet extends HttpServlet {
         String[] strA;
         RetClass retc;
         File file;
-
+        //outJo act,message,status,opts,type
         try {
             action = inJo.get("act").toString();
             inOptsJo = new JSONObject(inJo.get("opts").toString());
             kj.wStr(outJo, "act", action);
+            kj.wStr(outJo, "type", "response");
+            kj.wStr(outJo, "status", "error");
             //====================================================================
             switch (action) {
                 case "login":
@@ -541,8 +543,30 @@ public final class MainServlet extends HttpServlet {
                     kj.wObj(outJo, "opts", outOptsJo);
                     kj.wStr(outJo, "status", "ok");
                     kj.wStr(outJo, "message", "Login OK.");
-
                     break;
+                    
+                case "readFile":
+                    kj.wStr(outJo, "message", "login Error !!!");
+                    kj.jobj = inOptsJo;
+                    if (kj.rStr("fileName")) {
+                        return;
+                    }
+                    fileName = GB.webRootPath + kj.valueStr;
+                    //=======================================================
+                    retc = Lib.readFileToString(fileName);
+                    if (retc.errorF) {
+                        kj.wStr(outJo, "message", "Read '"+fileName+"' error !!!");
+                        return;
+                    }
+                    String fileContent = retc.valueStr;
+                    //=======================================================                    
+                    kj.wStr(outOptsJo, "fileContent", fileContent);
+                    kj.wObj(outJo, "opts", outOptsJo);
+                    kj.wStr(outJo, "status", "ok");
+                    kj.wStr(outJo, "message", "Read File OK.");
+                    break;
+                    
+                    
 //=============================================================================================================================                    
                 case "saveStringToFile":
                     kj.wStr(outJo, "message", "Command Format Error !!!");
@@ -767,7 +791,7 @@ public final class MainServlet extends HttpServlet {
                     }
 
                     break;
-                case "readFile":
+                case "readFilexxx":
                     putJoO(outJo, "responseMessage", "Read File Error!");
                     if (!geJoToRetStr(inOptsJo, "fileName")) {
                         break;
