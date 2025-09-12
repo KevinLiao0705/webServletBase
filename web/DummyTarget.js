@@ -358,7 +358,7 @@ class DummyTargetMaster {
                                         setLineObj.opts.setOpts.enum[0] = gr.paraSet["localPulseWidthParas"][iobj.selectInx];
                                         setLineObj.reCreate();
                                     }
-                                    MdaPopWin.popOff(2);
+                                    //MdaPopWin.popOff(2);
                                 };
                                 box.selectBox(opts);
                                 return;
@@ -601,6 +601,7 @@ class DummyTargetMaster {
                     opts.setNames.push("pulseDutyMax");
                     opts.setNames.push("pulseFreqMin");
                     opts.setNames.push("pulseFreqMax");
+                    opts.setNames.push("localPulseGenCh");
                 }
                 if (iobj.selectText === "同步參數設定") {
                     if (gr.appId === 0) {
@@ -962,8 +963,8 @@ class DummyTargetMaster {
                 opts.kvTexts = [];
                 opts.kvTexts.push("放大器電源 開啟");
                 opts.kvTexts.push("放大器電源 關閉");
-                opts.kvTexts.push("輻射 開啟");
-                opts.kvTexts.push("輻射 關閉");
+                opts.kvTexts.push("脈波 開啟");
+                opts.kvTexts.push("脈波 關閉");
                 opts.kvTexts.push("系統 重置");
                 opts.actionFunc = function (iobj) {
                     console.log(iobj);
@@ -2340,7 +2341,7 @@ class SubRadarPane {
                     gr.gbcs.command({'act': preText + "AllSspaModuleOnOff"});
                     return;
                 }
-                if (iobj.buttonText === "輻射輸出") {
+                if (iobj.buttonText === "脈波輸出") {
                     //gr.gbcs.command({'act': preText + "RadiationOnOff"});
                     var opts = {};
                     opts.title = iobj.buttonText;
@@ -2556,8 +2557,8 @@ class SubRadarPane {
             }
             if (i === inx++) {
                 var setOpts = opts.setOpts = sopt.getOptsPara("button");
-                opts.title = "輻射輸出";
-                setOpts.enum = ["輻射輸出"];
+                opts.title = "脈波輸出";
+                setOpts.enum = ["脈波輸出"];
                 var watchDatas = setOpts.watchDatas = [];
                 watchDatas.push(["directReg", regName2 + "#2", "baseColor", 1]);
             }
@@ -3158,8 +3159,8 @@ class SubRadarPane1 {
             }
             if (i === inx++) {
                 var setOpts = opts.setOpts = sopt.getOptsPara("button");
-                opts.title = "輻射輸出";
-                setOpts.enum = ["輻射輸出"];
+                opts.title = "脈波輸出";
+                setOpts.enum = ["脈波輸出"];
                 var watchDatas = setOpts.watchDatas = [];
                 watchDatas.push(["directReg", regName + "#2", "baseColor", 1]);
             }
@@ -5748,6 +5749,8 @@ class DummyTargetCtrPane {
             var value = gr.radarData["sspaPowerV32iAA"][i];
             value -= gr.paraSet[preText + "SspaPowerV32iOffs"];
             value *= gr.paraSet[preText + "SspaPowerV32iGain"];
+            if(value<0)
+                value=0;
             cur += value;
         }
         wa[9] = "" + cur.toFixed(1);
@@ -5766,6 +5769,7 @@ class DummyTargetCtrPane {
         var wac = md.stas.meterColorA = ["#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd"];
         var wb = md.stas.ledStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         var wc = md.stas.buttonColorA = ["#888", "#888", "#888", "#888"];
+        var wd = md.stas.selectValueA = [0, 0, 0, 0];
         if (gr.appId === 3)
             var preText = "ctr1";
         if (gr.appId === 4)
@@ -5850,6 +5854,12 @@ class DummyTargetCtrPane {
             var emergencyOn = (gr.radarData.systemStatus0 >> 31) & 1;
         if (emergencyOn)
             wc[3] = "#fcc";
+
+        var remoteLocal = (gr.radarData.systemStatus1 >> 26) & 1;
+        wd[0]=remoteLocal;
+        var remoteLocal = (gr.radarData.systemStatus1 >> 27) & 1;
+        wd[1]=remoteLocal;
+
 
         mac.messageEditor(md);
     }
@@ -6186,6 +6196,9 @@ class DummyTargetCtrPane {
                 opts.title = "脈波來源";
                 setOpts.fontSize = "0.5rh";
                 setOpts.enum = ["遙控脈波", "本機脈波"];
+                var regName = "self.fatherMd.fatherMd.stas.selectValueA";
+                var watchDatas = setOpts.watchDatas = [];
+                watchDatas.push(["directReg", regName+"#0" , "value", 1]);
                 setOpts.value = para.value;
                 setOpts.fontSize = "0.4rh";
             }
@@ -6196,6 +6209,9 @@ class DummyTargetCtrPane {
                 setOpts.enum = para.enum;
                 setOpts.enumColors = ["#eef", "#ffc"];
                 setOpts.value = para.value;
+                var regName = "self.fatherMd.fatherMd.stas.selectValueA";
+                var watchDatas = setOpts.watchDatas = [];
+                watchDatas.push(["directReg", regName+"#1" , "value", 1]);
                 setOpts.fontSize = "0.4rh";
             }
             if (i === inx++) {
@@ -6224,8 +6240,8 @@ class DummyTargetCtrPane {
             }
             if (i === inx++) {
                 var setOpts = opts.setOpts = sopt.getOptsPara("button");
-                opts.title = "輻射輸出";
-                setOpts.enum = ["輻射輸出"];
+                opts.title = "脈波輸出";
+                setOpts.enum = ["脈波輸出"];
                 var watchDatas = setOpts.watchDatas = [];
                 watchDatas.push(["directReg", regName + "#2", "baseColor", 1]);
             }
@@ -7670,12 +7686,12 @@ class Emulate {
         if (iobj.act === preText + "RadiationOn") {
             if ((ready_f !== 2) || emergency)
                 return;
-            gr.logMessage.messages.push({type: "cmd", text: "輻射開啟"});
+            gr.logMessage.messages.push({type: "cmd", text: "脈波開啟"});
             gr.radarData.systemStatus0 |= (1 << (shift + 3));
             return;
         }
         if (iobj.act === preText + "RadiationOff") {
-            gr.logMessage.messages.push({type: "cmd", text: "輻射關閉"});
+            gr.logMessage.messages.push({type: "cmd", text: "脈波關閉"});
             gr.radarData.systemStatus0 &= (1 << (shift + 3)) ^ 0xffffffff;
             return;
         }
@@ -8074,12 +8090,12 @@ class SyncGloble {
                 return;
             }
             if (iobj.act === "mastCtr1RadiationOn") {
-                gr.logMessage.messages.push({type: "cmd", text: "副控1輻射開啟"});
+                gr.logMessage.messages.push({type: "cmd", text: "副控1脈波開啟"});
                 ws.cmd(iobj.act);
                 return;
             }
             if (iobj.act === "mastCtr1RadiationOff") {
-                gr.logMessage.messages.push({type: "cmd", text: "副控1輻射關閉"});
+                gr.logMessage.messages.push({type: "cmd", text: "副控1脈波關閉"});
                 ws.cmd(iobj.act);
                 return;
             }
@@ -8099,12 +8115,12 @@ class SyncGloble {
                 return;
             }
             if (iobj.act === "mastCtr2RadiationOn") {
-                gr.logMessage.messages.push({type: "cmd", text: "副控2輻射開啟"});
+                gr.logMessage.messages.push({type: "cmd", text: "副控2脈波開啟"});
                 ws.cmd(iobj.act);
                 return;
             }
             if (iobj.act === "mastCtr2RadiationOff") {
-                gr.logMessage.messages.push({type: "cmd", text: "副控2輻射關閉"});
+                gr.logMessage.messages.push({type: "cmd", text: "副控2脈波關閉"});
                 ws.cmd(iobj.act);
                 return;
             }
@@ -8159,7 +8175,7 @@ class SyncGloble {
             if (iobj.index >= 0)
                 gr.logMessage.messages.push({type: "cmd", text: "開啟電源模組 " + iobj.index});
             else
-                gr.logMessage.messages.push({type: "cmd", text: "開啟全部電源模組"});
+                gr.logMessage.messages.push({type: "cmd", text: "關閉全部電源模組"});
             ws.cmd(iobj.act, [iobj.index]);
             return;
         }
@@ -8213,13 +8229,13 @@ class SyncGloble {
         if (iobj.act === preText + "RadiationOn") {
             if ((ready_f !== 2) || emergency)
                 return;
-            gr.logMessage.messages.push({type: "cmd", text: "輻射開啟"});
+            gr.logMessage.messages.push({type: "cmd", text: "脈波開啟"});
             ws.cmd(iobj.act, iobj.paras);
             return;
         }
 
         if (iobj.act === preText + "RadiationOff") {
-            gr.logMessage.messages.push({type: "cmd", text: "輻射關閉"});
+            gr.logMessage.messages.push({type: "cmd", text: "脈波關閉"});
             ws.cmd(iobj.act, iobj.paras);
             return;
         }

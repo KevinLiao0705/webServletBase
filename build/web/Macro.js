@@ -825,7 +825,7 @@ class KvSetOpts {
                 return sopt.getOptsLedView();
             case "leds":
                 return sopt.getOptsLeds();
-            case "ledView":
+            case "lcdView":
                 return sopt.getOptsLcdView();
             default:
                 return sopt.getOptsStr();
