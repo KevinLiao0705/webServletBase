@@ -38,7 +38,7 @@ class DummyTargetMaster {
             opts.textAlign = "left";
             opts.lpd = 10;
             opts.kvTexts = [];
-            opts.selectEsc_f=0;
+            opts.selectEsc_f = 0;
             if (gr.appId === 0) {
                 opts.kvTexts.push("雷達信號參數設定");
                 opts.kvTexts.push("同步參數設定");
@@ -85,9 +85,9 @@ class DummyTargetMaster {
                     MdaPopWin.popOff(2);
                     gr.gbcs.command({'act': "closeUi"});
                     return;
-                    
-                    
-                }    
+
+
+                }
 
                 if (iobj.selectText === "數位波形群組") {
                     var opts = {};
@@ -130,9 +130,9 @@ class DummyTargetMaster {
                     var op1 = {};
                     op1.title = iobj.selectText;
                     var op2 = {};
-                    
-                    
-                    
+
+
+
                     op2.ksObjWs = [9999];
                     op2.rowAmt = 32;
                     op2.eym = 2;
@@ -151,9 +151,9 @@ class DummyTargetMaster {
                             var kopts = ksObj.opts = {};
                             if (j === 0) {
                                 kopts.baseColor = "#ccc";
-                                kopts.innerText="" + (i >> 1) + "#" + ((i & 1) * 8);
+                                kopts.innerText = "" + (i >> 1) + "#" + ((i & 1) * 8);
                                 ksObj.name = "" + (i >> 1) + "#" + ((i & 1) * 8);
-                                
+
                             } else {
                                 kopts.baseColor = "#cff";
                                 var watchReg = "gr.viewDatas#" + inx;
@@ -171,7 +171,7 @@ class DummyTargetMaster {
                         gr.viewDatas_f = 0;
                     };
                     gr.viewDatas_f = 1;
-                    box.containerPageBox(op1,op2);
+                    box.containerPageBox(op1, op2);
                     return;
                 }
                 if (iobj.selectText === "脈波寬度設定") {
@@ -589,6 +589,7 @@ class DummyTargetMaster {
                     //
                     opts.setNames.push(preText + "Attenuator");
                     opts.setNames.push("sp4tCnt");
+                    opts.setNames.push("rfDriverOutChannel");
 
 
 
@@ -602,6 +603,10 @@ class DummyTargetMaster {
                     opts.setNames.push("pulseFreqMin");
                     opts.setNames.push("pulseFreqMax");
                     opts.setNames.push("localPulseGenCh");
+                    opts.setNames.push("preTrigTime");
+                    opts.setNames.push("preRfOutTime");
+                    opts.setNames.push("afterRfOutTime");
+                    opts.setNames.push("wgProtectFlag");
                 }
                 if (iobj.selectText === "同步參數設定") {
                     if (gr.appId === 0) {
@@ -2024,6 +2029,7 @@ class DummyTargetSub {
                         MdaPopWin.popOff(2);
                 };
                 var kvObj = new Block("scope", "Model~MyNewScope~base.sys0", opts);
+                gr.scope = kvObj;
                 var mesObj = mda.popObj(0, 0, kvObj);
                 return;
             }
@@ -5360,17 +5366,34 @@ class DummyTargetCtr {
                 }
             }
             var rd = gr.radarData;
-            //rd.pulseFormAddBufA0=[160*250*2+1,160*37*2+1,160*13*2+1,160*250*2+0,160*150*2+0,160*300*2+0];
+            //rd.pulseFormAddBufA0=[90*1000*2+0,10*1000*2+1];
             if (rd.pulseFormAddBufA0) {
-                for (var i = 0; i < rd.pulseFormAddBufA0.length; i++) {
-                    gr.pulseFormInxA[0]++;
-                    if (gr.pulseFormInxA[0] > gr.pulseFormLenA[0])
-                        gr.pulseFormLenA[0] = gr.pulseFormInxA[0];
-                    if (gr.pulseFormInxA[0] >= gr.pulseFormAA[0].length)
-                        gr.pulseFormInxA[0] = 0;
-                    gr.pulseFormAA[0][gr.pulseFormInxA[0]] = (rd.pulseFormAddBufA0[i] >> 1) * 1000 / 160;
-                    gr.pulseLevelAA[0][gr.pulseFormInxA[0]] = (rd.pulseFormAddBufA0[i] & 1) * 3300;
+                if (gr.scope) {
+                    if (gr.scope.opts.signalMode === 2 && gr.scope.opts.signalModeInx === 0) {
+                        var len=rd.pulseFormAddBufA0.length;
+                        if (rd.pulseFormAddBufA0.length) {
+                            var values=[]; 
+                            for(var i=0;i<len;i++){
+                                var vv=rd.pulseFormAddBufA0[i];
+                                var hf=vv&1;
+                                var tt=((vv>>1)*6.25)|0;
+                                values.push(tt*2+hf);
+                            }    
+                            gr.scope.mdClass.addBuf(0, values);
+                        }
+                    }
                 }
+                /*
+                 for (var i = 0; i < rd.pulseFormAddBufA0.length; i++) {
+                 gr.pulseFormInxA[0]++;
+                 if (gr.pulseFormInxA[0] > gr.pulseFormLenA[0])
+                 gr.pulseFormLenA[0] = gr.pulseFormInxA[0];
+                 if (gr.pulseFormInxA[0] >= gr.pulseFormAA[0].length)
+                 gr.pulseFormInxA[0] = 0;
+                 gr.pulseFormAA[0][gr.pulseFormInxA[0]] = (rd.pulseFormAddBufA0[i] >> 1) * 1000 / 160;
+                 gr.pulseLevelAA[0][gr.pulseFormInxA[0]] = (rd.pulseFormAddBufA0[i] & 1) * 3300;
+                 }
+                 */
             }
 
 
@@ -5394,17 +5417,17 @@ class DummyTargetCtr {
             if (gr.signalMode === 3) {
                 //<<debug
                 /*
-                var rand = Math.round(20 * Math.random() - 10);
-                rd.meterStatusAA[0] = 855 + rand;
-                var rand = Math.round(10 * Math.random() - 10);
-                rd.meterStatusAA[3] = 755 + rand;
-                var rand = Math.round(10 * Math.random() - 10);
-                rd.meterStatusAA[4] = 555 + rand;
-                var rand = Math.round(10 * Math.random() - 10);
-                rd.meterStatusAA[5] = 655 + rand;
-                */
-                
-                
+                 var rand = Math.round(20 * Math.random() - 10);
+                 rd.meterStatusAA[0] = 855 + rand;
+                 var rand = Math.round(10 * Math.random() - 10);
+                 rd.meterStatusAA[3] = 755 + rand;
+                 var rand = Math.round(10 * Math.random() - 10);
+                 rd.meterStatusAA[4] = 555 + rand;
+                 var rand = Math.round(10 * Math.random() - 10);
+                 rd.meterStatusAA[5] = 655 + rand;
+                 */
+
+
                 var wa = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"];
                 var wac = ["#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd"];
                 DummyTargetCtrPane.getMeterStatus(wa, wac);
@@ -5413,7 +5436,7 @@ class DummyTargetCtr {
                 gr.plotValue[2] = wa[4];
                 gr.plotValue[3] = wa[5];
             }
-            if(gr.degug_f)
+            if (gr.degug_f)
                 console.log("radarData");
 
         };
@@ -5552,6 +5575,8 @@ class DummyTargetCtr {
                 var kvObj = new Block("scope", "Model~MyNewScope~base.sys0", opts);
                 //var mesObj = mda.popObj(0, 0, kvObj);
                 opts.kvObj = kvObj;
+                gr.scope = kvObj;
+                
                 kvObj.opts.popStackCnt = gr.mdSystem.mdClass.stackCnt;
                 MdaPopWin.popObj(opts);
                 return;
@@ -5669,7 +5694,7 @@ class DummyTargetCtrPane {
             if (value < gr.paraSet[preText + name + "Zero"])
                 value = 0;
             //========================================
-            if (dinx!==undefined) {
+            if (dinx !== undefined) {
                 var rd = gr.radarData;
                 rd.meterFiterAA[dinx][rd.meterFiterInxA[dinx]] = value;
                 var inx = rd.meterFiterInxA[dinx];
@@ -5684,31 +5709,30 @@ class DummyTargetCtrPane {
                     inx--;
                 }
                 value = sum / filterLen;
-                var delayLen=10;
-                if(rd.meterPreValueA[dinx]<value){
+                var delayLen = 10;
+                if (rd.meterPreValueA[dinx] < value) {
                     rd.meterDelayCntA[dinx]++;
-                    if(rd.meterDelayCntA[dinx]>=delayLen){
-                        rd.meterDelayCntA[dinx]=0;
-                        rd.meterPreValueA[dinx]+=0.1;
+                    if (rd.meterDelayCntA[dinx] >= delayLen) {
+                        rd.meterDelayCntA[dinx] = 0;
+                        rd.meterPreValueA[dinx] += 0.1;
                     }
-                }
-                else if(rd.meterPreValueA[dinx]>value){
+                } else if (rd.meterPreValueA[dinx] > value) {
                     rd.meterDelayCntA[dinx]++;
-                    if(rd.meterDelayCntA[dinx]>=delayLen){
-                        rd.meterDelayCntA[dinx]=0;
-                        rd.meterPreValueA[dinx]-=0.1;
+                    if (rd.meterDelayCntA[dinx] >= delayLen) {
+                        rd.meterDelayCntA[dinx] = 0;
+                        rd.meterPreValueA[dinx] -= 0.1;
                     }
-                }else{
-                    rd.meterDelayCntA[dinx]=0;
+                } else {
+                    rd.meterDelayCntA[dinx] = 0;
                 }
-                var sumV=rd.meterPreValueA[dinx];    
-                
-                
+                var sumV = rd.meterPreValueA[dinx];
+
+
             }
-            
-            
-            
-            
+
+
+
+
 
 
             //========================================
@@ -5723,24 +5747,24 @@ class DummyTargetCtrPane {
             return [valueStr, valueColor, value];
         };
         //======================================
-        var va = prg(da[0], "InRfpow", 1,0);
+        var va = prg(da[0], "InRfpow", 1, 0);
         wa[0] = va[0];
         wac[0] = va[1];
         //======================================
         //======================================
-        var va = prg(da[2], "PreAmpOutRfpow", 1,2);
+        var va = prg(da[2], "PreAmpOutRfpow", 1, 2);
         wa[2] = va[0];
         wac[2] = va[1];
         //======================================
-        var va = prg(da[3], "DriverAmpOutRfpow", 1,3);
+        var va = prg(da[3], "DriverAmpOutRfpow", 1, 3);
         wa[3] = va[0];
         wac[3] = va[1];
         //======================================
-        var va = prg(da[4], "CwAmpOutRfpow", 1,4);
+        var va = prg(da[4], "CwAmpOutRfpow", 1, 4);
         wa[4] = va[0];
         wac[4] = va[1];
         //======================================
-        var va = prg(da[5], "CcwAmpOutRfpow", 1,5);
+        var va = prg(da[5], "CcwAmpOutRfpow", 1, 5);
         wa[5] = va[0];
         wac[5] = va[1];
         //======================================
@@ -5749,8 +5773,8 @@ class DummyTargetCtrPane {
             var value = gr.radarData["sspaPowerV32iAA"][i];
             value -= gr.paraSet[preText + "SspaPowerV32iOffs"];
             value *= gr.paraSet[preText + "SspaPowerV32iGain"];
-            if(value<0)
-                value=0;
+            if (value < 0)
+                value = 0;
             cur += value;
         }
         wa[9] = "" + cur.toFixed(1);
@@ -5856,9 +5880,9 @@ class DummyTargetCtrPane {
             wc[3] = "#fcc";
 
         var remoteLocal = (gr.radarData.systemStatus1 >> 26) & 1;
-        wd[0]=remoteLocal;
+        wd[0] = remoteLocal;
         var remoteLocal = (gr.radarData.systemStatus1 >> 27) & 1;
-        wd[1]=remoteLocal;
+        wd[1] = remoteLocal;
 
 
         mac.messageEditor(md);
@@ -5989,7 +6013,6 @@ class DummyTargetCtrPane {
                     opts.kvTexts.push("停止");
                     opts.actionFunc = function (iobj) {
                         console.log(iobj);
-                        MdaPopWin.popOff(2);
                         if (iobj.act === "selected") {
                             if (iobj.selectText === "隨機脈波") {
                                 gr.gbcs.command({'act': preText + "RadiationOn", "paras": [255]});
@@ -6009,8 +6032,6 @@ class DummyTargetCtrPane {
                             var pri = Math.round(pw * 100 / duty);
                             gr.gbcs.command({'act': preText + "RadiationOn", "paras": [selectNo[iobj.selectInx]]});
                             return;
-
-
                         }
 
                     };
@@ -6198,7 +6219,7 @@ class DummyTargetCtrPane {
                 setOpts.enum = ["遙控脈波", "本機脈波"];
                 var regName = "self.fatherMd.fatherMd.stas.selectValueA";
                 var watchDatas = setOpts.watchDatas = [];
-                watchDatas.push(["directReg", regName+"#0" , "value", 1]);
+                watchDatas.push(["directReg", regName + "#0", "value", 1]);
                 setOpts.value = para.value;
                 setOpts.fontSize = "0.4rh";
             }
@@ -6211,7 +6232,7 @@ class DummyTargetCtrPane {
                 setOpts.value = para.value;
                 var regName = "self.fatherMd.fatherMd.stas.selectValueA";
                 var watchDatas = setOpts.watchDatas = [];
-                watchDatas.push(["directReg", regName+"#1" , "value", 1]);
+                watchDatas.push(["directReg", regName + "#1", "value", 1]);
                 setOpts.fontSize = "0.4rh";
             }
             if (i === inx++) {
@@ -8158,8 +8179,8 @@ class SyncGloble {
                 gr.gbcs.command({'act': preText + "EmergencyOn"});
             return;
         }
-        
-        
+
+
         //=====================================================================
         if (iobj.act === preText + "SspaPowerOn") {
             if ((ready_f !== 2) || emergency)
