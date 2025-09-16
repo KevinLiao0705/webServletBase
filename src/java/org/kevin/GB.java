@@ -14,14 +14,17 @@ import java.util.Map;
  * @author kevin
  */
 public class GB {
-
+    public static int osInx = 0;//0 for window 1:for linux
+    public static String setAppName="syncSet";
+    //public static String setAppName="sipphoneSet";
+    //public static String setAppName="sipphoneUiSet";
+    //==
+    public static String winAppPath="e:/kevin/myCode/";
+    public static String linuxAppPath="/home/kevin/myCode/";
+    //=====================================
     public static int min_js_f = 0;
     static public String appName = "webServeletBase";
     public static Map<String,Object> paraSetMap=new HashMap();
-
-    
-    // Select 1 ====================================
-    public static int osInx = 0;
     public static String sourceDir = "web/";          //for debug use
     //public static String sourceDir="webapps/ROOT/";     //for deplyment use
     public static String paraSetPath = "e:/kevin/myCode/syncSet";
@@ -52,6 +55,14 @@ public class GB {
     public static HashMap<String, String> userParaMap = new HashMap();
 
     public static void init() {
+        if(GB.osInx==0){
+            sourceDir = "web/";
+            paraSetPath=winAppPath+setAppName;
+        }
+        else{
+            sourceDir="webapps/ROOT/";
+            paraSetPath=linuxAppPath+setAppName;
+        }
 
     }
 }

@@ -73,6 +73,7 @@ class DummyTargetMaster {
                 opts.kvTexts.push("即時資料");
                 opts.kvTexts.push("數位波形群組");
                 opts.kvTexts.push("關閉UI介面");
+                opts.kvTexts.push("邏輯分析儀");
             }
             opts.actionFunc = function (iobj) {
                 console.log(iobj);
@@ -89,6 +90,11 @@ class DummyTargetMaster {
 
                 }
 
+                if (iobj.selectText === "邏輯分析儀") {
+                    MdaPopWin.popOff(2);
+                    gr.gbcs.command({'act': "exeLogic"});
+                    return;
+                }
                 if (iobj.selectText === "數位波形群組") {
                     var opts = {};
                     opts.paraSet = gr.paraSet;
@@ -8272,6 +8278,11 @@ class SyncGloble {
         }
         if (iobj.act === "closeUi") {
             gr.logMessage.messages.push({type: "cmd", text: "closeUi"});
+            ws.cmd(iobj.act);
+            return;
+        }
+        if (iobj.act === "exeLogic") {
+            gr.logMessage.messages.push({type: "cmd", text: "exeLogic"});
             ws.cmd(iobj.act);
             return;
         }
