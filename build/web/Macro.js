@@ -116,7 +116,7 @@ class Macro {
         input.type = 'file';
         input.onchange = e => {
             var files = e.target.files;
-            var reader = new FileReader()
+            var reader = new FileReader();
             reader.readAsText(input.files[0], 'utf8'); // input.files[0]为第一个文件
             reader.onload = () => {
                 var content = reader.result;  // reader.result为获取结果
@@ -569,6 +569,32 @@ class Macro {
         return {type: "Model~MdaBox~base.sys0", opts: opts};
     }
 
+    modelBoxOpts(_op,_sonOpts){
+        var opts = {};
+        opts.title = "Model Box";
+        opts.headButtons = ["ESC"];
+        opts.headButtonIds = ["esc"];
+        opts.modelType="Model~MdaSelector~base.sys0";
+        KvLib.deepCoverObject(opts, _op);
+        var ksObj = opts.ksObj = {};
+        var sonOpts = ksObj.opts = {};
+        ksObj.name = "ksObj";
+        ksObj.type = opts.modelType;
+        KvLib.deepCoverObject(sonOpts, _sonOpts);
+        opts.actionFunc = function (iobj) {
+            console.log(iobj);
+            if(iobj.act==="mouseClick"){
+                if(iobj.kvObj.opts.id==="esc"){
+                    MdaPopWin.popOff(2);
+                    return;
+                }
+            }
+            KvLib.exeFunc(_op.actionFunc);
+        };
+        return {type: "Model~MdaBox~base.sys0", opts: opts};
+    }
+    
+    
     blockSelectsBoxOpts(_op) {
         var op = {};
         KvLib.deepCoverObject(op, _op);

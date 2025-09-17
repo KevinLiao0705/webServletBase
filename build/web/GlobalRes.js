@@ -33,12 +33,12 @@ class GlobalRes {
         this.version = "1.0";
         
         //this.appName = "webBuilder";
-        this.appName = "sync";
-        //this.appName = "sipphoneWeb";
+        //this.appName = "sync";
+        this.appName = "sipphoneWeb";
         //this.appName = "sipphoneUiWeb";
         this.appId = 3;
         //=================================
-        this.webSocketEnable_f=1;
+        this.webSocketEnable_f=0;
         this.showLogo_f = 1;
         this.showLogoTime = 1000;//ms
         this.logoImage = "systemResource/dummyTargetLogo.png";
@@ -47,6 +47,8 @@ class GlobalRes {
         this.logoImageHeight = 630;
         //=================================
         this.enabelLogin_f = 1;
+        this.defaultUserName = "";
+        this.defaultUserPassword = "";
         this.defaultUserName = "kevinAdmin";
         this.defaultUserPassword = "16020039";
         this.clearCookie_f = 0;

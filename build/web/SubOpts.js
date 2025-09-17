@@ -444,8 +444,8 @@ class SubOpts {
             opts.borderWidth = 3;
             //=================
             opts.baseColor="#ccc";
-            opts.altColors=["#888","#f88","#0f0","#88f","#ff0","#fff"];
-            opts.altColorInx=1;
+            opts.altColors=["#444","#f88","#0f0","#88f","#ff0","#fff"];
+            opts.altColorInx=0;
             opts.insideShadowBlur = "0.8rh";
             opts.borderType="normal";
             opts.outsideShadowOffx=0;
@@ -471,11 +471,16 @@ class SubOpts {
             opts.altColorInx=1;
             opts.backgroundInx=1;
             opts.backgroundImagePosition="extend";
-            //opts.baseColor="rgba(0,0,0,0)";
-              
-             
         }
-
+        if ("Component~Cp_base~led.sys2"){
+            var opts = gr.blockSubOpts["Component~Cp_base~led.sys2"] = {};
+            KvLib.deepCoverObject(opts, gr.blockSubOpts["Component~Cp_base~led.sys0"]);
+            opts.baseColor="#444";
+            opts.borderRadius = 4;
+            opts.borderWidth = 5;
+            opts.iw=null;
+            opts.ih=null;
+        }    
     }
 }
 SubOpts.init();

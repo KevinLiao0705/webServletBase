@@ -26,6 +26,8 @@ class SipphoneWeb {
 
     }
 
+
+
     initOpts(md)
     {
         var self = this;
@@ -56,6 +58,9 @@ class SipphoneWeb {
         opts.ksObjWs = [9999];
 
         if (title === "電話使用介面") {
+            var opts={};
+            var kvObj = new Block("phoneBox", "Model~PhoneBox~base.sys0", opts);
+            mda.popObj(800,9999, kvObj);
             return;
 
         }
@@ -117,10 +122,6 @@ class SipphoneWeb {
             opts.ksObjWsR.r5 = ["0.7rw", 9999];
             opts.ksObjWsR.r6 = ["0.7rw", 9999];
             opts.ksObjWsR.r7 = ["0.7rw", 9999];
-            setOptsA.push(sopt.getParaSetOpts({paraSetName: "key1HotLine"}));
-            setOptsA.push(sopt.getParaSetOpts({paraSetName: "key2HotLine"}));
-            setOptsA.push(sopt.getParaSetOpts({paraSetName: "key3HotLine"}));
-            setOptsA.push(sopt.getParaSetOpts({paraSetName: "key4HotLine"}));
         }
 
 
@@ -168,8 +169,6 @@ class SipphoneWeb {
 
         };
         box.setLineBox(opts);
-
-
     }
 
     build() {
@@ -889,3 +888,6 @@ class NamesMenu {
         blocks[cname] = {name: "setLineBox", type: obj.type, opts: obj.opts};
     }
 }
+
+
+

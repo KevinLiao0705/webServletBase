@@ -791,3 +791,373 @@ class MdbChart {
         return;
     }
 }
+
+
+class PhoneBox {
+    constructor() {
+        this.flashTime=0;
+    }
+    initOpts(md) {
+        var self = this;
+        var opts = {};
+        Block.setBaseOpts(opts);
+        opts.baseColor = "#222";
+        opts.lcdLpd = 10;
+        opts.lcdMargin = 20;
+        opts.lcdMarginTop = 40;
+        opts.lcdMarginBottom = 40;
+        opts.lcdFontSize = 24;
+        opts.hotlines = ["Line 1", "Line 2", "Line 3", "Line 4"];
+
+        return opts;
+    }
+
+    chkWatch() {
+        var self = this;
+        var md = self.md;
+        var op = md.opts;
+        var st = md.stas;
+
+        var sipData = {};
+        sipData.sipName = "";
+        sipData.sipNo = "";
+        sipData.reDirection_f = 0;
+        sipData.nowLine = 0;
+        sipData.phoneSta = 0;  //0 no raspberryPi,1:raspberry pi ready,2:linphonec load,3:pbx registed
+        sipData.lineFlag = 255;   //0:mute, 1:syssec, 2:nowLine, 3:dtmf, 4:hold, 7:reDirection
+        sipData.lineSta = 2;     //0:ready, 1: ring out, 2:ring in, 3:connect, 4:hold  4bit:4bit
+        sipData.handSta = 1;     //0:ready, 1: earphone, 2:epeaker  4bit:4bit
+        sipData.lineNoA = ["", ""];
+        sipData.lineNameA = ["", ""];
+        sipData.lineMessageA = ["", ""];
+        sipData.lineConnectTimeA = ["", ""];
+        sipData.status = "status";
+        sipData.action = "action";
+        st.sipData=sipData;
+        if(st.sipData.nowLine===0){
+            st.line1Color="#00f";
+            st.line2Color="#000";
+        }
+        else{
+            st.line1Color="#000";
+            st.line2Color="#00f";
+        }
+        if(st.sipData.lineFlag&0x01)
+            st.muteColor="#f00";
+        else
+            st.muteColor="#000";
+        if(st.sipData.lineFlag&0x10)
+            st.holdColor="#f00";
+        else
+            st.holdColor="#000";
+        if(st.sipData.lineFlag&0x80)
+            st.reDirectColor="#f00";
+        else
+            st.reDirectColor="#000";
+        
+        
+        var nowLine=(st.lineFlag>>2)&1;
+        var handSta=st.sipData.handSta&3;
+        if(nowLine)
+            handSta=(st.sipData.handSta>>4)&3;
+        if(handSta===0){
+            st.earPhoneColor="#ccf";
+            var setPhoneColor="#ccf";
+        }    
+        if(handSta===1){
+            st.earPhoneColor="#ffc";
+            st.setPhoneColor="#ccf";
+        }    
+        if(handSta===2){
+            st.earPhoneColor="#ccf";
+            st.setPhoneColor="#ff0";
+        }    
+        var lineSta=st.sipData.lineSta&7;
+        if(nowLine)
+            lineSta=(st.sipData.lineSta>>4)&7;
+        if(++self.flashTime>60)
+            self.flashTime=0;
+            
+        if(lineSta !== 2)
+            st.ringLedCnt=0;
+        else{
+            if(self.flashTime>30)
+                st.ringLedCnt=1;
+            else
+                st.ringLedCnt=0;
+        }    
+        
+    }
+    afterCreate() {
+        var self = this;
+        var md = self.md;
+    }
+
+    keyClick(iobj) {
+        var md = iobj.kvObj.fatherMd;
+        if (md.opts.actionFunc) {
+            var obj = {};
+            obj.act = "phoneKeyClick";
+            obj.key = iobj.kvObj.opts.itemId;
+            md.opts.actionFunc(obj);
+        }
+    }
+
+    keyClick(iobj) {
+        console.log(iobj);
+
+    }
+
+    build(md) {
+        var self = this;
+        var md = self.md;
+        var op = md.opts;
+        var lyMaps = md.lyMaps;
+        var blocks = op.blocks;
+        var layouts = op.layouts;
+        //======================================    
+        var cname = "c";
+        var opts = {};
+        //md.setPns(opts);
+        layouts[cname] = {name: cname, type: "Layout~Ly_base~array.sys0", opts: opts};
+        lyMaps["body"] = cname;
+        //==
+        var opts = {};
+        md.setPns(opts);
+        blocks[cname] = {name: "basePanel", type: "Component~Cp_base~plate.none", opts: opts};
+        //======================================    
+        var cname = lyMaps["body"] + "~" + 0;
+        var opts = {};
+        opts.yArr = [50, 9999];
+        opts.xyArr = [[9999], [9999, 0]];
+        opts.ym = 10;
+        opts.margin = 4;
+        layouts[cname] = {name: cname, type: "Layout~Ly_base~xyArray.sys0", opts: opts};
+        lyMaps["mainBody"] = cname;
+        //==============================
+        var cname = lyMaps["mainBody"] + "~" + 0;
+        var excActionPrg = function (iobj) {
+            console.log(iobj);
+            MdaPopWin.popOff(2);
+            return;
+
+            //iobj.act = "esc";
+            //KvLib.exe(op.actionFunc, iobj);
+        };
+        mac.setHeadTitleBar(md, cname, "語音通話", excActionPrg);
+
+        var cname = lyMaps["mainBody"] + "~" + 1;
+        var opts = {};
+        opts.whr = 0.75;
+        opts.margin = 20;
+        layouts[cname] = {name: cname, type: "Layout~Ly_base~array.sys0", opts: opts};
+        lyMaps["phoneBody"] = cname;
+
+
+        var cname = lyMaps["phoneBody"] + "~" + 0;
+        var opts = {};
+        opts.yArr = ["0.2rh", "0.25rh", 9999, "0.1rh", "0.02rh"];
+        opts.ym = 10;
+        opts.xm = 10;
+        opts.margin = 20;
+        layouts[cname] = {name: cname, type: "Layout~Ly_base~xyArray.sys0", opts: opts};
+        lyMaps["phoneMainBody"] = cname;
+
+        var cname = lyMaps["phoneMainBody"] + "~" + 0;
+        var opts = {};
+        opts.yc = 2;
+        opts.ym = 2;
+        opts.margin = op.lcdMargin;
+        opts.tm = op.lcdMarginTop;
+        opts.bm = op.lcdMarginBottom;
+        layouts[cname] = {name: cname, type: "Layout~Ly_base~array.sys0", opts: opts};
+        lyMaps["lcdLineBody"] = cname;
+
+
+
+        var cname = lyMaps["phoneMainBody"] + "~" + 1;
+        var opts = {};
+        opts.xc = 6;
+        opts.yc = 3;
+        opts.xm = 6;
+        opts.ym = 6;
+        layouts[cname] = {name: cname, type: "Layout~Ly_base~array.sys0", opts: opts};
+        lyMaps["functionKeyBody"] = cname;
+
+
+
+
+        var cname = lyMaps["phoneMainBody"] + "~" + 2;
+        var opts = {};
+        opts.xArr = [9999, "0.3rw"];
+        opts.xm = 10;
+        layouts[cname] = {name: cname, type: "Layout~Ly_base~xyArray.sys0", opts: opts};
+        lyMaps["centerBody"] = cname;
+
+        var cname = lyMaps["centerBody"] + "~" + 0;
+        var opts = {};
+        opts.xc = 3;
+        opts.yc = 4;
+        opts.xm = 6;
+        opts.ym = 6;
+        layouts[cname] = {name: cname, type: "Layout~Ly_base~array.sys0", opts: opts};
+        lyMaps["phoneKeyBody"] = cname;
+
+        var cname = lyMaps["centerBody"] + "~" + 1;
+        var opts = {};
+        opts.xc = 1;
+        opts.yc = 6;
+        opts.ym = 8;
+        layouts[cname] = {name: cname, type: "Layout~Ly_base~array.sys0", opts: opts};
+        lyMaps["hotKeyBody"] = cname;
+
+
+        var cname = lyMaps["phoneMainBody"] + "~" + 3;
+        var opts = {};
+        opts.xc = 3;
+        opts.xm = 10;
+        layouts[cname] = {name: cname, type: "Layout~Ly_base~array.sys0", opts: opts};
+        lyMaps["handKeyBody"] = cname;
+
+        //==========================================================================
+        var cname = lyMaps["phoneBody"] + "~" + 0;
+        var opts = {};
+        opts.backgroundImageUrls = ['systemResource/metal.bmp'];
+        opts.backgroundImagePosition = "extend";
+        opts.insideShadowBlur = "0.2rh";
+        opts.borderRadius = "20px";
+        opts.borderWidth = 2;
+        opts.borderColor = "#ccc";
+        blocks[cname] = {name: "startLed", type: "Component~Cp_base~icons.sys0", opts: opts};
+        //============
+        var cname = lyMaps["phoneMainBody"] + "~" + 0;
+        var opts = {};
+        opts.backgroundImageUrls = ['systemResource/lcd1.bmp'];
+        opts.backgroundImagePosition = "extend";
+        opts.insideShadowBlur = "0.2rh";
+        opts.borderRadius = "10px";
+        opts.borderWidth = 1;
+        opts.borderColor = "#777";
+        blocks[cname] = {name: "startLed", type: "Component~Cp_base~icons.sys0", opts: opts};
+
+        var cname = lyMaps["lcdLineBody"] + "~" + 0;
+        var opts = {};
+        opts.innerText = "";
+        opts.textAlign = "left";
+        opts.lpd = op.lcdLpd;
+        opts.fontSize = op.lcdFontSize;
+        var watchReg = "self.fatherMd.stas.sipData.status";
+        md.setInputWatch(opts, "directReg", watchReg, "innerText", 1);
+
+        blocks[cname] = {name: "lcdLine1", type: "Component~Cp_base~plate.none", opts: opts};
+        var cname = lyMaps["lcdLineBody"] + "~" + 1;
+        var opts = {};
+        opts.innerText = "";
+        opts.textAlign = "left";
+        opts.lpd = op.lcdLpd;
+        opts.fontSize = op.lcdFontSize;
+        var watchReg = "self.fatherMd.stas.sipData.action";
+        md.setInputWatch(opts, "directReg", watchReg, "innerText", 1);
+        blocks[cname] = {name: "lcdLine2", type: "Component~Cp_base~plate.none", opts: opts};
+
+
+
+        var texts = [
+            "✖", '▲', "✔", "♫+", "♫-", '<i class="gf">&#xe0e0</i>'
+                    , "◀", "▼︎", "▶︎︎︎", '', '<i class="gf">&#xe61c</i>', '<i class="gf">&#xf233</i>'
+                    , "Ⅰ", "Ⅱ", '<i class="gf">&#xe620</i>', '<i class="gf">&#xe02b</i>', '<i class="gf">&#xe9ba</i>', '<i class="gf">&#xebba</i>'
+        ];
+        var ids = [
+            "cancle", "up", "ok", "+", "-", "set"
+                    , "left", "down", "right", "meet", "transfer", "meetInf"
+                    , "line1", "line2", "hold", "mute", "reDirect", "broadInf"
+        ];
+
+        for (var i = 0; i < 18; i++) {
+            var cname = lyMaps["functionKeyBody"] + "~" + i;
+            var opts = {};
+            opts.innerText = texts[i];
+            opts.fontSize = "0.8rh";
+            opts.actionFunc = self.keyClick;
+            opts.buttonId = ids[i];
+            if(i===12){
+                var watchReg = "self.fatherMd.stas.line1Color";
+                md.setInputWatch(opts, "directReg", watchReg, "innerTextColor", 1);
+            }    
+            if(i===13){
+                var watchReg = "self.fatherMd.stas.line2Color";
+                md.setInputWatch(opts, "directReg", watchReg, "innerTextColor", 1);
+            }    
+            if(i===14){
+                var watchReg = "self.fatherMd.stas.holdColor";
+                md.setInputWatch(opts, "directReg", watchReg, "innerTextColor", 1);
+            }    
+            if(i===15){
+                var watchReg = "self.fatherMd.stas.muteColor";
+                md.setInputWatch(opts, "directReg", watchReg, "innerTextColor", 1);
+            }    
+            if(i===16){
+                var watchReg = "self.fatherMd.stas.reDirectColor";
+                md.setInputWatch(opts, "directReg", watchReg, "innerTextColor", 1);
+            }    
+            blocks[cname] = {name: "fnButton#" + i, type: "Component~Cp_base~button.sys0", opts: opts};
+        }
+
+
+        var texts = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "0", "#"];
+        var inx = 0;
+        for (var i = 0; i < 12; i++) {
+            var cname = lyMaps["phoneKeyBody"] + "~" + i;
+            var opts = {};
+            opts.innerText = texts[i];
+            opts.fontSize = "0.8rh";
+            opts.actionFunc = self.keyClick;
+            opts.buttonId = texts[i];
+            blocks[cname] = {name: "numButton#" + i, type: "Component~Cp_base~button.sys0", opts: opts};
+        }
+
+        var texts = ["hotLine1", "hotLine2", "hotLine3", "hotLine4", "hotLine5", "hotLine6"];
+        for (var i = 0; i < 6; i++) {
+            var cname = lyMaps["hotKeyBody"] + "~" + i;
+            var opts = {};
+            opts.innerText = texts[i];
+            opts.fontSize = "0.8rh";
+            opts.actionFunc = self.keyClick;
+            opts.buttonId = texts[i];
+            ;
+            blocks[cname] = {name: "hotLineButton#" + i, type: "Component~Cp_base~button.sys0", opts: opts};
+        }
+
+        var texts = [];
+        texts.push('<i class="gf">&#xe0b1</i>');
+        texts.push('<i class="gf">&#xe61d</i>');
+        texts.push('<i class="gf">&#xe050</i>');
+        var ids = ['hangon', 'hangoff', 'speaker'];
+        for (var i = 0; i < 3; i++) {
+            var cname = lyMaps["handKeyBody"] + "~" + i;
+            var opts = {};
+            opts.innerText = texts[i];
+            opts.fontSize = "0.8rh";
+            opts.actionFunc = self.keyClick;
+            opts.buttonId = ids[i];
+            if(i===1){
+                var watchReg = "self.fatherMd.stas.earPhoneColor";
+                md.setInputWatch(opts, "directReg", watchReg, "baseColor", 1);
+            }    
+            if(i===2){
+                var watchReg = "self.fatherMd.stas.setPhoneColor";
+                md.setInputWatch(opts, "directReg", watchReg, "baseColor", 1);
+            }    
+            blocks[cname] = {name: "handKeyButton#" + i, type: "Component~Cp_base~button.sys0", opts: opts};
+        }
+
+        var cname = lyMaps["phoneMainBody"] + "~" + 4;
+        var opts = {};
+        opts.altColorInx = 0;
+        var watchReg = "self.fatherMd.stas.ringLedCnt";
+        md.setInputWatch(opts, "directReg", watchReg, "altColorInx", 1);
+        blocks[cname] = {name: "ringLed", type: "Component~Cp_base~led.sys2", opts: opts};
+
+
+    }
+}

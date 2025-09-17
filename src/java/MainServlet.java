@@ -238,7 +238,7 @@ public final class MainServlet extends HttpServlet {
     public HashMap<String, Object> getParas() {
         HashMap<String, Object> paraMap = new HashMap();
         //String fileName = GB.webRootPath + "user-" + "webIcs" + "/paraSet.json";
-        String fileName = GB.paraSetPath + "/paraSet.json";
+        String fileName = GB.paraSetPath + "/"+GB.paraSetName;
         File file = new File(fileName);
         if (file.exists() && !file.isDirectory()) {
             String jsonStr = Lib.readStringFile(fileName);
@@ -434,6 +434,7 @@ public final class MainServlet extends HttpServlet {
         String typeStr;
         String initDir;
         String[] strA;
+        String str;
         RetClass retc;
         File file;
         //outJo act,message,status,opts,type
@@ -477,26 +478,27 @@ public final class MainServlet extends HttpServlet {
                     }
                     String userSetContent = retc.valueStr;
                     //=======================================================                    
-                    fileName = GB.paraSetPath +  "/paraSet.json";
+                    fileName = GB.paraSetPath +  "/"+GB.paraSetName;
                     retc = Lib.readFileToString(fileName);
                     if (retc.errorF) {
-                        kj.wStr(outJo, "message", "Read 'paraSet.json' error !!!");
+                        kj.wStr(outJo, "message", "Read 'paraSet' error !!!");
                         return;
                     }
                     String paraSetContent = retc.valueStr;
-                    //=======================================================                    
-                    fileName = GB.webRootPath + "user-" + appName + "/paraSet.json";
-                    retc = Lib.readFileToString(fileName);
-                    if (retc.errorF) {
-                        kj.wStr(outJo, "message", "Read 'paraSet.json' error !!!");
-                        return;
-                    }
-                    //=======================================================                    
+                    GB.paraSetMap = this.getParas();
                     
+                    
+                    //=======================================================                    
                     JSONObject systemSetJo = new JSONObject(systemSetContent);
                     JSONObject paraSetJo = new JSONObject(paraSetContent);
                     JSONObject userSetJo = new JSONObject(userSetContent);
                     ArrayList<String> acounts = new ArrayList<String>();
+                    Object nameObj=GB.paraSetMap.get("adminName");
+                    Object passwordObj=GB.paraSetMap.get("adminPassword");
+                    if(nameObj!=null && passwordObj !=null){
+                        str=nameObj.toString()+"~0~"+passwordObj.toString();
+                        acounts.add(str);
+                    }
                     kj.jobj = systemSetJo;
                     if (!kj.rStrA("systemAcounts")) {
                         for (int i = 0; i < kj.strAL.size(); i++) {
@@ -536,7 +538,6 @@ public final class MainServlet extends HttpServlet {
                         kj.wStr(outJo, "message", "Password Error !!!");
                         return;
                     }
-                    GB.paraSetMap = this.getParas();
                     kj.wObj(outOptsJo, "userSet", userSetJo);
                     kj.wStr(outOptsJo, "paraSet", paraSetContent);
                     kj.wObj(outOptsJo, "webIp", GB.nowIp_str);
@@ -580,7 +581,7 @@ public final class MainServlet extends HttpServlet {
                     }
                     fileName = kj.valueStr;
                     if("paraSet".equals(fileName))
-                        fileName=GB.paraSetPath+"/"+"paraSet.json";
+                        fileName=GB.paraSetPath+"/"+GB.paraSetName;
                     if (kj.rStr("content")) {
                         return;
                     }

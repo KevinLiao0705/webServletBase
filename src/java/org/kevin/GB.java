@@ -15,12 +15,14 @@ import java.util.Map;
  */
 public class GB {
     public static int osInx = 0;//0 for window 1:for linux
-    public static String setAppName="syncSet";
-    //public static String setAppName="sipphoneSet";
-    //public static String setAppName="sipphoneUiSet";
-    //==
-    public static String winAppPath="e:/kevin/myCode/";
-    public static String linuxAppPath="/home/kevin/myCode/";
+    //public static String setAppName="syncSet";
+    public static String setAppName="josnSipSet";
+    //public static String paraSetName="paraSet.json";
+    public static String paraSetName="paraSetSip.json";
+    //public static String paraSetName="paraSetUi.json";
+    //==============================================
+    public static String winAppPath="e:/kevin/myCode";
+    public static String linuxAppPath="/home/kevin";
     //=====================================
     public static int min_js_f = 0;
     static public String appName = "webServeletBase";
@@ -57,11 +59,11 @@ public class GB {
     public static void init() {
         if(GB.osInx==0){
             sourceDir = "web/";
-            paraSetPath=winAppPath+setAppName;
+            paraSetPath=winAppPath+"/"+setAppName;
         }
         else{
             sourceDir="webapps/ROOT/";
-            paraSetPath=linuxAppPath+setAppName;
+            paraSetPath=linuxAppPath+"/"+setAppName;
         }
 
     }
