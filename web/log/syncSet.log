@@ -794,3 +794,6 @@
 2025-09-16 09:06:23 INFO  Base3:89 - syncSet process start ...
 2025-09-16 09:06:23 WARN  Base3:90 - test warnning
 2025-09-16 09:06:23 ERROR Base3:91 - test error
+2025-09-17 21:32:49 INFO  Base3:89 - syncSet process start ...
+2025-09-17 21:32:49 WARN  Base3:90 - test warnning
+2025-09-17 21:32:49 ERROR Base3:91 - test error
