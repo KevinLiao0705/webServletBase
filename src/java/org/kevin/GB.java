@@ -14,11 +14,11 @@ import java.util.Map;
  * @author kevin
  */
 public class GB {
-    public static int osInx = 1;//0 for window 1:for linux
-    public static String setAppName="syncSet";
-    //public static String setAppName="josnSipSet";
-    public static String paraSetName="paraSet.json";
-    //public static String paraSetName="paraSetSip.json";
+    public static int osInx = 0;//0 for window 1:for linux
+    //public static String setAppName="syncSet";
+    public static String setAppName="josnSipSet";
+    //public static String paraSetName="paraSet.json";
+    public static String paraSetName="paraSetSip.json";
     //public static String paraSetName="paraSetUi.json";
     //==============================================
     public static String winAppPath="e:/kevin/myCode";

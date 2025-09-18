@@ -57,6 +57,15 @@ class MyWebSocket {
                     gr.socketRetPrgTbl["tick"](recObj.syncData);
                 }
             }
+            if (recObj.sipphoneData) {
+                if (gr.socketRetPrgTbl["tick"]) {
+                    gr.socketRetPrgTbl["tick"](recObj.sipphoneData);
+                }
+            }
+            
+            
+            
+            
         };
         return;
     }
@@ -79,7 +88,7 @@ class MyWebSocket {
             }
             return;
         }
-        obj.deviceId = "dummyTarget";
+        obj.deviceId = gr.deviceId;
         obj.userName = gr.userName;
         try {
             if (self.wsok.readyState)

@@ -2,6 +2,7 @@ class GlobalRes {
 
     static initApp(self) {
         if (self.appName === "sync") {
+            self.deviceId="syncSet";
             if (self.appId === 0)
                 self.appType = "Model~DummyTargetMaster~base.sys0";
             if (self.appId === 1)
@@ -20,9 +21,11 @@ class GlobalRes {
         }
 
         if (self.appName === "sipphoneWeb") {
+            self.deviceId="sipphoneSet";
             self.appType = "Model~SipphoneWeb~base.sys0";
         }
         if (self.appName === "sipphoneUiWeb") {
+            self.deviceId="sipphoneUiSet";
             self.appType = "Model~SipphoneUiWeb~base.sys0";
         }
 
@@ -33,8 +36,8 @@ class GlobalRes {
         this.version = "1.0";
         
         //this.appName = "webBuilder";
-        this.appName = "sync";
-        //this.appName = "sipphoneWeb";
+        //this.appName = "sync";
+        this.appName = "sipphoneWeb";
         //this.appName = "sipphoneUiWeb";
         this.appId = 3;
         //=================================
@@ -45,6 +48,7 @@ class GlobalRes {
         //this.logoImage = 'systemResource/robot_aiot_1920x1080.jpg';
         this.logoImageWidth = 1000;
         this.logoImageHeight = 630;
+        this.deviceId="";
         //=================================
         this.enabelLogin_f = 1;
         this.defaultUserName = "";

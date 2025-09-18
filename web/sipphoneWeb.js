@@ -1,26 +1,23 @@
 class SipphoneWeb {
     constructor() {
         gr.hideWavePageElem = null;
-        gr.socketRetPrgTbl["tick"] = function (radarData) {
-            var keys = Object.keys(radarData);
+        gr.sipphoneData={};
+        gr.socketRetPrgTbl["tick"] = function (sipphoneData) {
+            var keys = Object.keys(sipphoneData);
             for (var i = 0; i < keys.length; i++) {
                 var strA = keys[i].split("#");
                 if (strA.length === 1) {
-                    gr.radarData[keys[i]] = radarData[keys[i]];
+                    gr.sipphoneData[keys[i]] = sipphoneData[keys[i]];
                     continue;
                 }
                 if (strA.length === 2) {
                     var inx0 = KvLib.toInt(strA[1], 0);
-                    gr.radarData[strA[0]][inx0] = radarData[keys[i]];
+                    gr.sipphoneData[strA[0]][inx0] = sipphoneData[keys[i]];
                     continue;
                 }
             }
-            if (gr.viewDatas_f) {
-                for (var i = 0; i < 8; i++) {
-                    gr.viewDatas[i] = KvLib.trsIntToHexStr(gr.radarData.viewDatas[i]);
-                }
-            }
-            console.log("radarData");
+            
+            console.log("sipphoneData");
         };
 
 
@@ -43,7 +40,11 @@ class SipphoneWeb {
         var st = md.stas;
         if (gr.paraSet.emulate !== 1)
             ws.tick();
-
+        st.watchDataA=[""];
+        if(gr.sipphoneData){
+            st.watchDataA[0]=gr.sipphoneData.realSipphoneIp;
+            st.watchDataA[1]=gr.sipphoneData.realSipphoneMac;
+        }
 
 
 
@@ -230,11 +231,21 @@ class SipphoneWeb {
 
         var cname = lyMaps["mainBody"] + "~" + 2;
         //==============================
+        var regName = "self.fatherMd.fatherMd.fatherMd.fatherMd.stas.watchDataA";
         var setOptsA = [];
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemName"}));
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "version"}));
-        setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemIpAddress"}));
-        setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemMacAddress"}));
+        //
+        var setOpts=sopt.getParaSetOpts({paraSetName: "systemIpAddress"});
+        var watchDatas = setOpts.watchDatas = [];
+        watchDatas.push(["directReg", regName + "#0", "editValue", 1]);
+        setOptsA.push(setOpts);
+        
+        var setOpts=sopt.getParaSetOpts({paraSetName: "systemMacAddress"});
+        var watchDatas = setOpts.watchDatas = [];
+        watchDatas.push(["directReg", regName + "#1", "editValue", 1]);
+        setOptsA.push(setOpts);
+        
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemId"}));
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipName"}));
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipNumber"}));
