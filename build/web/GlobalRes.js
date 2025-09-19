@@ -36,8 +36,8 @@ class GlobalRes {
         this.version = "1.0";
         
         //this.appName = "webBuilder";
-        //this.appName = "sync";
-        this.appName = "sipphoneWeb";
+        this.appName = "sync";
+        //this.appName = "sipphoneWeb";
         //this.appName = "sipphoneUiWeb";
         this.appId = 3;
         //=================================

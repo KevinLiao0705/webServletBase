@@ -1,0 +1,27 @@
+[Desktop Action new-private-window]
+Exec=/usr/bin/google-chrome-stable --incognito
+Name[zh_TW]=新增無痕式視窗
+Name=New Incognito Window
+
+[Desktop Action new-window]
+Exec=/usr/bin/google-chrome-stable
+Name[zh_TW]=開新視窗
+Name=New Window
+
+[Desktop Entry]
+Actions=new-window;new-private-window;
+Categories=Network;WebBrowser;
+Comment[zh_TW]=連線到網際網路
+Comment=Access the Internet
+;Exec=/usr/bin/google-chrome-stable %U
+Exec=/usr/bin/google-chrome-stable --kiosk http://127.0.0.1
+GenericName[zh_TW]=網頁瀏覽器
+GenericName=Web Browser
+Icon=google-chrome
+MimeType=application/pdf;application/rdf+xml;application/rss+xml;application/xhtml+xml;application/xhtml_xml;application/xml;image/gif;image/jpeg;image/png;image/webp;text/html;text/xml;x-scheme-handler/http;x-scheme-handler/https;
+Name=Google Chrome
+StartupNotify=true
+Terminal=false
+Type=Application
+Version=1.0
+
