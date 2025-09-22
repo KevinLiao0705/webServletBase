@@ -1,7 +1,7 @@
 class SipphoneWeb {
     constructor() {
         gr.hideWavePageElem = null;
-        gr.sipphoneData={};
+        gr.sipphoneData = {};
         gr.socketRetPrgTbl["tick"] = function (sipphoneData) {
             var keys = Object.keys(sipphoneData);
             for (var i = 0; i < keys.length; i++) {
@@ -16,14 +16,12 @@ class SipphoneWeb {
                     continue;
                 }
             }
-            
+            gr.sipphoneData.rxed_f = 1;
             console.log("sipphoneData");
         };
 
 
     }
-
-
 
     initOpts(md)
     {
@@ -38,12 +36,14 @@ class SipphoneWeb {
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
-        if (gr.paraSet.emulate !== 1)
-            ws.tick();
-        st.watchDataA=[""];
-        if(gr.sipphoneData){
-            st.watchDataA[0]=gr.sipphoneData.realSipphoneIp;
-            st.watchDataA[1]=gr.sipphoneData.realSipphoneMac;
+        ws.tick();
+        st.watchDataA = ["", "", "", "", ""];
+        if (gr.sipphoneData) {
+            st.watchDataA[0] = gr.sipphoneData.realSipphoneIp;
+            st.watchDataA[1] = gr.sipphoneData.realSipphoneMac;
+            st.watchDataA[2] = gr.sipphoneData.sipName;
+            st.watchDataA[3] = gr.sipphoneData.sipNo;
+            st.watchDataA[4] = gr.sipphoneData.sipServerIp;
         }
 
 
@@ -59,11 +59,45 @@ class SipphoneWeb {
         opts.ksObjWs = [9999];
 
         if (title === "電話使用介面") {
-            var opts={};
-            var kvObj = new Block("phoneBox", "Model~PhoneBox~base.sys0", opts);
-            mda.popObj(800,9999, kvObj);
-            return;
+            var opts = {};
+            opts.actionFunc = function (iobj) {
+                console.log(iobj);
+                var strA = iobj.key.split('#');
+                if (strA[0] === "reDirect") {
+                    if (gr.sipphoneData.phoneFlag & 1) {
+                        var sipCmd = "Redirect -a off\n";
+                        ws.cmd("sipCommandDirect", [sipCmd]);
+                        return;
+                    }
 
+
+                    var opts = {};
+                    opts.title = "無條件轉接號碼";
+                    opts.actionFunc = function (iobj) {
+                        console.log(iobj);
+                        if (iobj.act === "padEnter") {
+                            if (iobj.inputText.length !== 0) {
+                                var sipCmd = "Redirect -t always " + iobj.inputText + "\n";
+                                ws.cmd("sipCommandDirect", [sipCmd]);
+                                return;
+                            }
+                        }
+                        /*
+                         sipCommand = "Redirect -t always " + Input.ret_str + "\n";
+                         } else {
+                         sipCommand = "Redirect -a off\n";
+                         */
+
+
+                    };
+                    box.intPadBox(opts);
+                    return;
+                }
+                ws.cmd("phoneCommand", [iobj.key]);
+            };
+            var kvObj = new Block("phoneBox", "Model~MdbPhoneBox~base.sys0", opts);
+            mda.popObj(800, 9999, kvObj);
+            return;
         }
 
         if (title === "電話設定") {
@@ -93,7 +127,6 @@ class SipphoneWeb {
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "adminPassword"}));
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "ntpServerAddress"}));
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "ntpAdjTime"}));
-            setOptsA.push(sopt.getParaSetOpts({paraSetName: "uiInterfaceIp"}));
 
         }
 
@@ -200,9 +233,12 @@ class SipphoneWeb {
         var cname = lyMaps["mainBody"] + "~" + 0;
         var actionPrg = function (iobj) {
             console.log(iobj);
-
+            if (iobj.kvObj.opts.itemId === "save")
+                mac.saveParaSetAll("responseDialogOk");
+            if (iobj.kvObj.opts.itemId === "esc")
+                window.close();
         };
-        mac.setHeadTitleBar(md, cname, "JOSN SIP 電話系統", actionPrg);
+        mac.setHeadTitleBar(md, cname, "JOSN SIP 電話系統", actionPrg, ["save"]);
         //==============================
         var cname = lyMaps["mainBody"] + "~" + 3;
         mac.setFootBar(md, cname);
@@ -236,20 +272,33 @@ class SipphoneWeb {
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemName"}));
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "version"}));
         //
-        var setOpts=sopt.getParaSetOpts({paraSetName: "systemIpAddress"});
+        var setOpts = sopt.getParaSetOpts({paraSetName: "systemIpAddress"});
         var watchDatas = setOpts.watchDatas = [];
         watchDatas.push(["directReg", regName + "#0", "editValue", 1]);
         setOptsA.push(setOpts);
-        
-        var setOpts=sopt.getParaSetOpts({paraSetName: "systemMacAddress"});
+
+        var setOpts = sopt.getParaSetOpts({paraSetName: "systemMacAddress"});
         var watchDatas = setOpts.watchDatas = [];
         watchDatas.push(["directReg", regName + "#1", "editValue", 1]);
         setOptsA.push(setOpts);
-        
+
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemId"}));
-        setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipName"}));
-        setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipNumber"}));
-        setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipServerAddress"}));
+
+        var setOpts = sopt.getParaSetOpts({paraSetName: "sipName"});
+        var watchDatas = setOpts.watchDatas = [];
+        watchDatas.push(["directReg", regName + "#2", "editValue", 1]);
+        setOptsA.push(setOpts);
+
+        var setOpts = sopt.getParaSetOpts({paraSetName: "sipNumber"});
+        var watchDatas = setOpts.watchDatas = [];
+        watchDatas.push(["directReg", regName + "#3", "editValue", 1]);
+        setOptsA.push(setOpts);
+
+        var setOpts = sopt.getParaSetOpts({paraSetName: "sipServerAddress"});
+        var watchDatas = setOpts.watchDatas = [];
+        watchDatas.push(["directReg", regName + "#4", "editValue", 1]);
+        setOptsA.push(setOpts);
+
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "ntpServerAddress"}));
         var setObjs = [];
         var inx = 0;
@@ -344,15 +393,57 @@ class SipphoneUiWeb {
 
     }
 
-    setPrg(title) {
+    setPrg(id, setId) {
         var self = this;
         var md = self.md;
         var op = md.opts;
         var opts = {};
         var setOptsA = [];
         opts.ksObjWs = [9999];
+        if (id === "電話使用介面") {
+            var opts = {};
+            opts.actionFunc = function (iobj) {
+                console.log(iobj);
+                var strA = iobj.key.split('#');
+                if (strA[0] === "reDirect") {
+                    if (gr.sipphoneData.phoneFlag & 1) {
+                        var sipCmd = "Redirect -a off\n";
+                        ws.cmd("sipCommandDirect", [sipCmd]);
+                        return;
+                    }
 
-        if (title === "車型設定") {
+
+                    var opts = {};
+                    opts.title = "無條件轉接號碼";
+                    opts.actionFunc = function (iobj) {
+                        console.log(iobj);
+                        if (iobj.act === "padEnter") {
+                            if (iobj.inputText.length !== 0) {
+                                var sipCmd = "Redirect -t always " + iobj.inputText + "\n";
+                                ws.cmd("sipCommandDirect", [sipCmd]);
+                                return;
+                            }
+                        }
+                        /*
+                         sipCommand = "Redirect -t always " + Input.ret_str + "\n";
+                         } else {
+                         sipCommand = "Redirect -a off\n";
+                         */
+
+
+                    };
+                    box.intPadBox(opts);
+                    return;
+                }
+                ws.cmd("phoneCommand", [iobj.key]);
+            };
+            var kvObj = new Block("phoneBox", "Model~MdbPhoneBox~base.sys0", opts);
+            mda.popObj(800, 9999, kvObj);
+            return;
+        }
+
+
+        if (id === "車型設定") {
             var opts = {};
             opts.actionFunc = function (iobj) {
                 console.log(iobj);
@@ -361,7 +452,6 @@ class SipphoneUiWeb {
                     var fileName = "paraSet";
                     var content = JSON.stringify(gr.paraSet);
                     sv.saveStringToFile("responseDialogError", null, fileName, content);
-
                     MdaPopWin.popOffTo(iobj.sender.opts.popStackCnt);
                     return;
 
@@ -374,26 +464,139 @@ class SipphoneUiWeb {
                 }
             };
             opts.names = gr.paraSet.carTypeNames;
-            opts.title=title;
+            opts.title = id;
+            opts.itemName = "車型名稱";
             var kvObj = new Block("mdaBox", "Model~NamesMenu~base.sys0", opts);
             mda.popObj(800, 600, kvObj);
             return;
 
         }
 
-        if (title === "車號設定") {
+        if (id === "車號設定") {
+            var opts = {};
+            opts.kvTexts = gr.paraSet.carTypeNames;
+            opts.actionFunc = function (iobj) {
+                console.log(iobj);
+                if (iobj.act === "selected") {
+                    var carTypeNos = "carTypeNos#" + iobj.selectText;
+                    var carTypeName = iobj.selectText;
+                    var opts = {};
+                    opts.actionFunc = function (iobj) {
+                        console.log(iobj);
+                        if (iobj.act === "actButtonClick") {
+                            var carNo = iobj.kvObj.opts.setOpts.value;
+                            self.setPrg("車號內容設定", "content#"+carTypeName + "#" + carNo);
+                            return;
+                        }
+                        if (iobj.act === "save") {
+                            gr.paraSet[carTypeNos] = iobj.names;
+                            MdaPopWin.popOffTo(iobj.sender.opts.popStackCnt);
+                            return;
+                        }
+                        if (iobj.senderName === "setHeadTitleBar") {
+                            if (iobj.act === "mouseClick") {
+                                if (iobj.kvObj.opts.itemId === "esc")
+                                    MdaPopWin.popOffTo(iobj.sender.opts.popStackCnt);
+                            }
+                        }
+                    };
+                    opts.names = gr.paraSet[carTypeNos];
+                    opts.title = iobj.selectText + " 車號設定";
+                    opts.itemName = "車號名稱";
+                    opts.actAble_f = 1;
+                    var kvObj = new Block("mdaBox", "Model~NamesMenu~base.sys0", opts);
+                    mda.popObj(800, 600, kvObj);
+                    return;
+
+
+
+
+                }
+            };
+            box.selectBox(opts);
+            return;
+
+
         }
 
-        if (title === "系統設定") {
+        if (id === "系統設定") {
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "adminName"}));
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "adminPassword"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemIpAddress"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipphoneIpAddress"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipServerAddress"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "switchIpAddress"}));
+
+
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "ntpServerAddress"}));
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "ntpAdjTime"}));
-            setOptsA.push(sopt.getParaSetOpts({paraSetName: "uiInterfaceIp"}));
+        }
+
+        if (id === "車號內容設定") {
+            var values = gr.paraSet[setId];
+            if (!values)
+                values = ["100", "192.168.0.0", "192.168.0.0", "192.168.0.0", "192.168.0.0", "192.168.0.0"];
+
+            var setOpts = sopt.getOptsPara("natureStr");
+            setOpts.title = ["電話號碼"];
+            setOpts.value = values[0];
+            setOptsA.push(setOpts);
+
+            var setOpts = sopt.getOptsPara("ipStr");
+            setOpts.title = ["本機 IP"];
+            setOpts.value = values[1];
+            setOptsA.push(setOpts);
+
+            var setOpts = sopt.getOptsPara("ipStr");
+            setOpts.title = ["SIP電話 IP"];
+            setOpts.value = values[2];
+            setOptsA.push(setOpts);
+
+            var setOpts = sopt.getOptsPara("ipStr");
+            setOpts.title = ["閘道器 IP"];
+            setOpts.value = values[3];
+            setOptsA.push(setOpts);
+
+            var setOpts = sopt.getOptsPara("ipStr");
+            setOpts.title = ["SIP Server IP"];
+            setOpts.value = values[4];
+            setOptsA.push(setOpts);
+
+            var setOpts = sopt.getOptsPara("ipStr");
+            setOpts.title = ["NTP Server IP"];
+            setOpts.value = values[5];
+            setOptsA.push(setOpts);
+
 
         }
 
-
+        if (id === "快撥鍵設定") {
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "hotLineName#1"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "hotLineNumber#1"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "hotLineName#2"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "hotLineNumber#2"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "hotLineName#3"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "hotLineNumber#3"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "hotLineName#4"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "hotLineNumber#4"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "hotLineName#5"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "hotLineNumber#5"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "hotLineName#6"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "hotLineNumber#6"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "hotLineName#7"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "hotLineNumber#7"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "hotLineName#8"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "hotLineNumber#8"}));
+            opts.ksObjWsR = {};
+            opts.ksObjWsR.r0 = ["0.7rw", 9999];
+            opts.ksObjWsR.r1 = ["0.7rw", 9999];
+            opts.ksObjWsR.r2 = ["0.7rw", 9999];
+            opts.ksObjWsR.r3 = ["0.7rw", 9999];
+            opts.ksObjWsR.r4 = ["0.7rw", 9999];
+            opts.ksObjWsR.r5 = ["0.7rw", 9999];
+            opts.ksObjWsR.r6 = ["0.7rw", 9999];
+            opts.ksObjWsR.r7 = ["0.7rw", 9999];
+        }
 
         var setObjs = [];
         var inx = 0;
@@ -427,7 +630,7 @@ class SipphoneUiWeb {
             if (j >= 1)
                 opts.ksObjss.push(ksObjs);
         }
-        opts.title = title;
+        opts.title = id;
         opts.w = "0.9rw";
         opts.h = "0.9rh";
         opts.actionFunc = function (iobj) {
@@ -435,7 +638,19 @@ class SipphoneUiWeb {
                 return;
             if (iobj.buttonId !== "ok")
                 return;
-            mac.saveSetOpts(iobj.ksObjss, gr.paraSet);
+            if (id === "車號內容設定") {
+                var values = [];
+                for (var i = 0; i < iobj.ksObjss.length; i++) {
+                    var ksObjs = iobj.ksObjss[i];
+                    for (var j = 0; j < ksObjs.length; j++) {
+                        var ksObj = ksObjs[j];
+                        var setOpts = ksObj.opts.setOpts;
+                        values.push(setOpts.value);
+                    }
+                }
+                gr.paraSet[setId]=values;
+            } else
+                mac.saveSetOpts(iobj.ksObjss, gr.paraSet);
 
         };
         box.setLineBox(opts);
@@ -473,29 +688,64 @@ class SipphoneUiWeb {
             console.log(iobj);
 
         };
-        mac.setHeadTitleBar(md, cname, "車載二合一 電話系統", actionPrg);
+        var actionPrg = function (iobj) {
+            console.log(iobj);
+            if (iobj.kvObj.opts.itemId === "save")
+                var keys=Object.keys(gr.paraSet);
+                for(var i=0;i<keys.length;i++){
+                    var strA=keys[i].split("#");
+                    if(strA[0]!=="content")
+                        continue;
+                    var names=gr.paraSet["carTypeNames"];
+                    var yes_f=0;
+                    for(var j=0;j<names.length;j++){
+                        if(names[j]===strA[1]){
+                            yes_f=1;
+                            break;
+                        }
+                    }
+                    if(!yes_f){
+                        delete gr.paraSet[keys[i]];
+                        continue;
+                    }    
+                    
+                    var names=gr.paraSet["carTypeNos#"+strA[1]];
+                    var yes_f=0;
+                    for(var j=0;j<names.length;j++){
+                        if(names[j]===strA[2]){
+                            yes_f=1;
+                            break;
+                        }
+                    }
+                    if(!yes_f){
+                        delete gr.paraSet[keys[i]];
+                        continue;
+                    }    
+                }
+                
+                mac.saveParaSetAll("responseDialogOk");
+            if (iobj.kvObj.opts.itemId === "esc")
+                window.close();
+        };
+        mac.setHeadTitleBar(md, cname, "車載二合一 電話系統", actionPrg, ["save"]);
+
         //==============================
         var cname = lyMaps["mainBody"] + "~" + 3;
         mac.setFootBar(md, cname);
 
         var cname = lyMaps["mainBody"] + "~" + 1;
         var opts = {};
-        opts.buttons = ["車輛型號設定", "車號設定","系統設定"];
+        opts.buttons = ["系統設定", "車型設定", "車號設定", "快撥鍵設定", "電話使用介面"];
         opts.buttonIds = ["sipphoneSet", "sysSet", "hotlineSet", "phoneUi"];
         opts.actionFunc = function (iobj) {
             if (iobj.act !== "mouseClick")
                 return;
             console.log(iobj);
-
-
             self.setPrg(iobj.buttonText);
-            return;
-            gr.appType = "Model~MdaMdTest~base.sys0";
-            sys.dispWebPage();
             return;
 
         };
-        opts.buttonAmt = 3;
+        opts.buttonAmt = 5;
         opts.fontSize = "0.5rh";
         blocks[cname] = {name: "headButtons", type: "Model~MdaButtons~base.sys0", opts: opts};
         //==============================
@@ -505,14 +755,35 @@ class SipphoneUiWeb {
         var setOptsA = [];
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemName"}));
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "version"}));
-        setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemMacAddress"}));
+        //===============
+        var regName = "self.fatherMd.fatherMd.fatherMd.fatherMd.stas.watchDataA";
+        var setOpts = sopt.getParaSetOpts({paraSetName: "systemMacAddress"});
+        var watchDatas = setOpts.watchDatas = [];
+        watchDatas.push(["directReg", regName + "#1", "editValue", 1]);
+        setOptsA.push(setOpts);
+
+
+
+
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemId"}));
-        setOptsA.push(sopt.getParaSetOpts({paraSetName: "nowCarGroupNo"}));
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "nowCarTypeName"}));
+        setOptsA.push(sopt.getParaSetOpts({paraSetName: "nowCarTypeNo"}));
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemIpAddress"}));
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipphoneIpAddress"}));
-        setOptsA.push(sopt.getParaSetOpts({paraSetName: "switchIpAddress"}));
+        var setOpts = sopt.getParaSetOpts({paraSetName: "sipName"});
+        var watchDatas = setOpts.watchDatas = [];
+        watchDatas.push(["directReg", regName + "#2", "editValue", 1]);
+        setOptsA.push(setOpts);
+
+        var setOpts = sopt.getParaSetOpts({paraSetName: "sipNumber"});
+        var watchDatas = setOpts.watchDatas = [];
+        watchDatas.push(["directReg", regName + "#3", "editValue", 1]);
+        setOptsA.push(setOpts);
+
+
+
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipServerAddress"}));
+        setOptsA.push(sopt.getParaSetOpts({paraSetName: "switchIpAddress"}));
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "ntpServerAddress"}));
         var setObjs = [];
         var inx = 0;
@@ -577,6 +848,7 @@ class NamesMenu {
         opts.titleWidth = 200;
         opts.dispNo_f = 1;
         opts.editAble_f = 1;
+        opts.actAble_f = 0;
         opts.col = 1;
         opts.wsA = [9999];
         opts.checkWidth = 40;
@@ -604,8 +876,11 @@ class NamesMenu {
             sopts.no = no;
         }
         sopts.editBaseColor = "#e8e8ff";
+        sopts.actButtons = [];
         if (op.editAble_f)
-            sopts.actButtons = ["edit"];
+            sopts.actButtons.push("edit");
+        if (op.actAble_f)
+            sopts.actButtons.push("act");
         return sopts;
 
     }
@@ -642,7 +917,7 @@ class NamesMenu {
             iobj.sender = md;
             KvLib.exe(op.actionFunc, iobj);
         };
-        mac.setHeadTitleBar(md, cname, "車型設定", actionPrg);
+        mac.setHeadTitleBar(md, cname, op.title, actionPrg);
         //==============================
 
         var cname = lyMaps["mainBody"] + "~" + 1;
@@ -807,9 +1082,9 @@ class NamesMenu {
                             ksObj.type = "Model~MdaSetLine~base.sys0";
                             ksObj.name = "setLine#" + containerObj.opts.ksObjss.length + ".0";
                             ksObj.opts = {};
-                            ksObj.opts.setOpts = self.newSetOpts(iobj.inputText,containerObj.opts.ksObjss.length + 1);
+                            ksObj.opts.setOpts = self.newSetOpts(iobj.inputText, containerObj.opts.ksObjss.length + 1);
 
-                            
+
                             containerObj.opts.ksObjss.push([ksObj]);
                             setLineBoxObj.opts.ksObj.opts.ksObjss = containerObj.opts.ksObjss;
                             var rowStart = containerObj.stas.allLine - containerObj.stas.pageElemAmt + 1;
@@ -841,13 +1116,13 @@ class NamesMenu {
                             ksObjss.push([newSetLine]);
                         }
                     }
-                    if(ksObjss.length)
+                    if (ksObjss.length === setLineAA.length)
                         return;
-                    var opts={};
-                    opts.kvTexts=["Delete All Selection ?"];
-                    opts.actionFunc=function(iobj){
+                    var opts = {};
+                    opts.kvTexts = ["Delete All Selection ?"];
+                    opts.actionFunc = function (iobj) {
                         console.log(iobj);
-                        if(iobj.kvObj.name==="ok"){
+                        if (iobj.kvObj.name === "ok") {
                             setLineBoxObj.opts.ksObj.opts.ksObjss = ksObjss;
                             setLineBoxObj.reCreate();
                         }
@@ -873,7 +1148,7 @@ class NamesMenu {
         for (var i = 0; i < row; i++) {
             var setOptsA = [];
             for (var j = 0; j < op.col; j++) {
-                setOptsA.push(self.newSetOpts(op.names[inx],inx+1));
+                setOptsA.push(self.newSetOpts(op.names[inx], inx + 1));
                 inx++;
             }
             setOptsAA.push(setOptsA);
@@ -896,6 +1171,12 @@ class NamesMenu {
         }
         var obj = mac.setLineBoxOpts(opts);
         obj.opts.title = "";
+        opts.actionFunc = function (iobj) {
+            console.log(iobj);
+            iobj.sender = md;
+            KvLib.exe(op.actionFunc, iobj);
+
+        };
         blocks[cname] = {name: "setLineBox", type: obj.type, opts: obj.opts};
     }
 }

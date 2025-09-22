@@ -14,22 +14,23 @@ import java.util.Map;
  * @author kevin
  */
 public class GB {
-    public static int osInx = 1;//0 for window 1:for linux
-    public static String setAppName="syncSetExe";
+    public static int osInx = 0;//0 for window 1:for linux
+    //==
+    //public static String setAppName="syncSetExe";
     //public static String setAppName="josnSipSet";
-    public static String paraSetName="paraSet.json";
-    //public static String paraSetName="paraSetSip.json";
-    //public static String paraSetName="paraSetUi.json";
+    public static String setAppName="josnSipUi";
     //==============================================
-    public static String winAppPath="e:/kevin/myCode";
-    public static String linuxAppPath="/home/admintx";
+    //public static String winParaSetFullName="e:/kevin/myCode/josnSipSet/paraSetSip.json";
+    //public static String linuxParaSetFullName="/home/pi/kevin/sipphone/paraSetSip.json";
+    public static String winParaSetFullName="e:/kevin/myCode/josnSipSet/paraSetUi.json";
+    public static String linuxParaSetFullName="/home/pi/kevin/sipphone/paraSetUi.json";
     //=====================================
     public static int min_js_f = 0;
     static public String appName = "webServeletBase";
     public static Map<String,Object> paraSetMap=new HashMap();
     public static String sourceDir = "web/";          //for debug use
     //public static String sourceDir="webapps/ROOT/";     //for deplyment use
-    public static String paraSetPath = "e:/kevin/myCode/syncSet";
+    public static String paraSetFullName = "";
     //public static String paraSetPath = "e:/kevin/myCode/webSet";
     //public static String paraSetPath = "/home/admintx/syncSetExe";
     //public static String paraSetPath = "e:/kevin/myCode/sipphoneSet";
@@ -59,11 +60,11 @@ public class GB {
     public static void init() {
         if(GB.osInx==0){
             sourceDir = "web/";
-            paraSetPath=winAppPath+"/"+setAppName;
+            paraSetFullName=winParaSetFullName;
         }
         else{
             sourceDir="webapps/ROOT/";
-            paraSetPath=linuxAppPath+"/"+setAppName;
+            paraSetFullName=linuxParaSetFullName;
         }
 
     }

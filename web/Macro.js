@@ -39,8 +39,6 @@ class Macro {
         sv.callServer(JSON.stringify(obj));
     }
 
-
-
     messageEditor(md) {
         var st = md.stas;
         if (st.messageCnt === undefined)
@@ -83,20 +81,28 @@ class Macro {
         var content = JSON.stringify(gr.paraSet);
         sv.saveStringToFile("responseDialogError", "null", fileName, content);
     }
-    
-    saveSetOpts(ksObjss,paraSet){
-            for(var i=0;i<ksObjss.length;i++){
-                var ksObjs=ksObjss[i];
-                for(var j=0;j<ksObjs.length;j++){
-                    var ksObj=ksObjs[j];
-                    var setOpts=ksObj.opts.setOpts;
-                    if(setOpts.paraSetName){
-                        if(paraSet[setOpts.paraSetName]!==undefined){
-                            paraSet[setOpts.paraSetName]=setOpts.value;
-                        }
+
+    saveParaSetAll(responseType) {
+        var fileName = "paraSet";
+        var content = JSON.stringify(gr.paraSet);
+        if (!responseType)
+            responseType = "responseDialogError";
+        sv.saveStringToFile(responseType, "null", fileName, content);
+    }
+
+    saveSetOpts(ksObjss, paraSet) {
+        for (var i = 0; i < ksObjss.length; i++) {
+            var ksObjs = ksObjss[i];
+            for (var j = 0; j < ksObjs.length; j++) {
+                var ksObj = ksObjs[j];
+                var setOpts = ksObj.opts.setOpts;
+                if (setOpts.paraSetName) {
+                    if (paraSet[setOpts.paraSetName] !== undefined) {
+                        paraSet[setOpts.paraSetName] = setOpts.value;
                     }
                 }
             }
+        }
     }
 
     saveFileToLocal(fileName, outName) {
@@ -222,6 +228,8 @@ class Macro {
                 opts.innerText = "ESC";
             if (buttons[i] === "set")
                 opts.innerText = '<i class="gf">&#xe8b8;</i>';
+            if (buttons[i] === "save")
+                opts.innerText = 'SAVE';
             opts.itemId = buttons[i];
             opts.actionFunc = actionPrg;
             blocks[cname] = {name: "buttn#" + i, type: "Component~Cp_base~button.sys0", opts: opts};
@@ -392,7 +400,7 @@ class Macro {
             opts.h = op.height;
             opts.buttons = ["OK"];
             opts.buttonIds = ["ok"];
-            
+
             opts.eBaseColor = "#ccc";
             opts.actionFunc = function (iobj) {
                 console.log(iobj);
@@ -569,12 +577,12 @@ class Macro {
         return {type: "Model~MdaBox~base.sys0", opts: opts};
     }
 
-    modelBoxOpts(_op,_sonOpts){
+    modelBoxOpts(_op, _sonOpts) {
         var opts = {};
         opts.title = "Model Box";
         opts.headButtons = ["ESC"];
         opts.headButtonIds = ["esc"];
-        opts.modelType="Model~MdaSelector~base.sys0";
+        opts.modelType = "Model~MdaSelector~base.sys0";
         KvLib.deepCoverObject(opts, _op);
         var ksObj = opts.ksObj = {};
         var sonOpts = ksObj.opts = {};
@@ -583,8 +591,8 @@ class Macro {
         KvLib.deepCoverObject(sonOpts, _sonOpts);
         opts.actionFunc = function (iobj) {
             console.log(iobj);
-            if(iobj.act==="mouseClick"){
-                if(iobj.kvObj.opts.id==="esc"){
+            if (iobj.act === "mouseClick") {
+                if (iobj.kvObj.opts.id === "esc") {
                     MdaPopWin.popOff(2);
                     return;
                 }
@@ -593,8 +601,7 @@ class Macro {
         };
         return {type: "Model~MdaBox~base.sys0", opts: opts};
     }
-    
-    
+
     blockSelectsBoxOpts(_op) {
         var op = {};
         KvLib.deepCoverObject(op, _op);
@@ -787,20 +794,21 @@ class KvSetOpts {
             case "natureStr":
                 var opts = sopt.getOptsNature();
                 opts.dataType = "str";
-                opts.checkType = "intStr";
+                opts.checkType = "int";
                 opts.actButtons = ["pad"];
                 opts.nullErr_f = 0;
                 opts.value = "0";
                 return opts;
 
             case "ip":
+            case "ipStr":
                 var opts = sopt.getOptsFloat();
                 opts.dataType = "str";
-                opts.checkType="ip";
+                opts.checkType = "ip";
                 opts.nullErr_f = 0;
                 opts.value = "0.0.0.0";
                 return opts;
-            
+
             case "intStr":
                 var opts = sopt.getOptsInt();
                 opts.dataType = "str";
@@ -1081,7 +1089,6 @@ class KvSetOpts {
         return opts;
     }
 
-
     getOptsStrEnum() {
         var opts = sopt.getOptsStr();
         opts.readOnly_f = 1;
@@ -1104,7 +1111,6 @@ class KvSetOpts {
         opts.enum = ["xxx", "string2", "string3", "string4", "string5"];
         return opts;
     }
-
 
     getOptsPullEnum() {
         var opts = sopt.getOptsNature();
@@ -1306,7 +1312,7 @@ class KvSetOpts {
             if (dscObj) {
                 if (dscObj.getType) {
                     kopts = sopt.getOptsPara(dscObj.getType);
-                    kopts.paraSetName=op.paraSetName;
+                    kopts.paraSetName = op.paraSetName;
                     KvLib.deepCoverObject(kopts, dscObj);
                     kopts.value = gr.paraSet[op.paraSetName];
                 }
@@ -1393,7 +1399,6 @@ class KvSetOpts {
         }
         return setOpts;
     }
-
 
     getOptsLedView(op) {
         var setOpts = {};
@@ -1835,7 +1840,6 @@ class KvBox {
         this.intHexPadBox(op);
     }
 
-
     intHexPadBox(_op) {
         var op = {};
         op.title = "InputTitle";
@@ -1849,8 +1853,8 @@ class KvBox {
         op.setOpts = {};
         KvLib.deepCoverObject(op.setOpts, dsc.optsCopy.int);
         KvLib.deepCoverObject(op, _op);
-        op.setOpts.title="";
-        op.setOpts.titleWidth=0;
+        op.setOpts.title = "";
+        op.setOpts.titleWidth = 0;
         //=====================================
         if (op.setOpts.setType === "textArea")
             op.h = 600;
@@ -2167,7 +2171,7 @@ class KvBox {
         var op1 = {};
         var op2 = {};
         op1.innerType = "Model~MdaContainer~base.table";
-        op2.ksObjWs = [150, 200, 150, 500, 100,300,200];
+        op2.ksObjWs = [150, 200, 150, 500, 100, 300, 200];
         KvLib.deepCoverObject(op1, _op1);
         KvLib.deepCoverObject(op2, _op2);
         return box.containerPageBox(op1, op2);
@@ -2186,7 +2190,7 @@ class KvBox {
                 ksObj.name = "name#" + i + "." + j;
                 ksObj.type = "Component~Cp_base~button.sys0";
                 ksObj.opts = {};
-                ksObj.opts.innerText=ksObj.name;
+                ksObj.opts.innerText = ksObj.name;
                 ksObjs.push(ksObj);
             }
             op2.ksObjss.push(ksObjs);
@@ -2196,7 +2200,7 @@ class KvBox {
         var opts = mac.setContainerBoxOpts(op1, op2);
         opts.actionFunc = function (iobj) {
             if (iobj.act === "mouseClick") {
-                if(iobj.kvObj.opts.id==="esc")
+                if (iobj.kvObj.opts.id === "esc")
                     MdaPopWin.popOffTo(iobj.sender.opts.popStackCnt);
                 if (op1)
                     KvLib.exeFunc(op1.actionFunc, iobj);

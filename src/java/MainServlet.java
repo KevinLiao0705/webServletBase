@@ -95,7 +95,8 @@ public final class MainServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String filePath;
-        boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+        //boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+        boolean isMultipart =false;
         JSONObject webInJo = new JSONObject();
         JSONObject webOutJo = new JSONObject();
         if (isMultipart) {
@@ -238,7 +239,7 @@ public final class MainServlet extends HttpServlet {
     public HashMap<String, Object> getParas() {
         HashMap<String, Object> paraMap = new HashMap();
         //String fileName = GB.webRootPath + "user-" + "webIcs" + "/paraSet.json";
-        String fileName = GB.paraSetPath + "/"+GB.paraSetName;
+        String fileName = GB.paraSetFullName;
         File file = new File(fileName);
         if (file.exists() && !file.isDirectory()) {
             String jsonStr = Lib.readStringFile(fileName);
@@ -478,7 +479,7 @@ public final class MainServlet extends HttpServlet {
                     }
                     String userSetContent = retc.valueStr;
                     //=======================================================                    
-                    fileName = GB.paraSetPath +  "/"+GB.paraSetName;
+                    fileName = GB.paraSetFullName;
                     retc = Lib.readFileToString(fileName);
                     if (retc.errorF) {
                         kj.wStr(outJo, "message", "Read 'paraSet' error !!!");
@@ -581,7 +582,7 @@ public final class MainServlet extends HttpServlet {
                     }
                     fileName = kj.valueStr;
                     if("paraSet".equals(fileName))
-                        fileName=GB.paraSetPath+"/"+GB.paraSetName;
+                        fileName=GB.paraSetFullName;
                     if (kj.rStr("content")) {
                         return;
                     }

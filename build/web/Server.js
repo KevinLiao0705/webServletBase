@@ -175,9 +175,9 @@ class Server {
             case "responseNone":
                 return;
             case "responseDialogOk":
-                if (mes.status === "ok")
-                    box.errorBox({kvTexts: [mes.message]});
                 if (mes.status === "error")
+                    box.errorBox({kvTexts: [mes.message]});
+                if (mes.status === "ok")
                     box.okBox({kvTexts: [mes.message]});
                 return;
             case "responseDialogError":

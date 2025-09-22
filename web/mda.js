@@ -1545,14 +1545,14 @@ class MdaContainer {
         opts.yArr = [op.headTitleHeight, 9999, hScrollWidth];
         var lyObj = md.newLayout(cname, opts, "Layout~Ly_base~xyArray.sys0", "listBody");
 
-        if(!op.ksObjss[0])
-            var xcLen=1;
+        if (!op.ksObjss[0])
+            var xcLen = 1;
         else
-            var xcLen=op.ksObjss[0].length;
+            var xcLen = op.ksObjss[0].length;
 
         var cname = md.lyMaps["listBody"] + "~" + 0;
         var opts = {};
-        
+
         opts.xc = xcLen;
         opts.lm = op.elm;
         opts.rm = op.erm;
@@ -1770,8 +1770,8 @@ class MdaScroll {
         var cname = md.lyMaps["main"] + "~" + 1;
         md.clear(cname, 1);
         var posRate = op.posRate;
-        if(posRate>=1)    
-            posRate=1;
+        if (posRate >= 1)
+            posRate = 1;
         var posObj = md.getRectObj(cname, md.layouts);
         if (op.vhScroll_f)
             st.cursorH = posObj.h * op.winRate;
@@ -2505,14 +2505,14 @@ class MdaBox {
                 var kvObj = md.blockRefs["pageView"];
                 if (kvObj) {
                     var endRow = iobj.rowStart + iobj.pageRowAmt;
-                    if (endRow >= iobj.totalRow){
+                    if (endRow >= iobj.totalRow) {
                         endRow = iobj.totalRow;
                         var disB = 1;
-                    }    
+                    }
                     var str = (iobj.rowStart + 1) + "~" + endRow;
                     kvObj.opts.innerText = str + " / " + (iobj.totalRow);
-                    if(iobj.totalRow === 0)
-                        kvObj.opts.innerText =  "0 / 0";
+                    if (iobj.totalRow === 0)
+                        kvObj.opts.innerText = "0 / 0";
                     kvObj.reCreate();
                 }
                 if (iobj.yPosRate === 0)
@@ -3122,11 +3122,11 @@ class MdaSetLine {
 
     actButtonAction(iobj) {
         console.log(iobj);
-        var self=this;
-        var md=self.md;
-        var op=md.opts;
-        var setOpts=md.opts.setOpts;
-        
+        var self = this;
+        var md = self.md;
+        var op = md.opts;
+        var setOpts = md.opts.setOpts;
+
         var dt = setOpts.dataType;
         if (iobj.buttonId === "value") {//for range use
             var sop = op.setOpts;
@@ -3240,8 +3240,12 @@ class MdaSetLine {
                 box.pickColorBox(opts);
                 return;
             }
-
+            iobj.sender=md;
+            iobj.kvObj=md;
+            iobj.act="actButtonClick";
+            KvLib.exe(md.opts.actionFunc,iobj);
         }
+        
         if (iobj.buttonId === "pad" || iobj.buttonId === "edit") {
             var sop = md.opts.setOpts;
             var kobj = md.blockRefs["inputText"];
@@ -3254,18 +3258,18 @@ class MdaSetLine {
                 if (setOpts.fixed)
                     kobj.opts.editValue = setOpts.value.toFixed(setOpts.fixed);
             }
-            
+
             var opts = {};
             opts.actionFunc = function (iiobj) {
                 console.log(iiobj);
                 if (iiobj.act === "padEnter") {
-                    if(iobj.actionFunc){
+                    if (iobj.actionFunc) {
                         KvLib.exeFunc(iobj.actionFunc, iiobj);
                         return;
                     }
-                    
-                    
-                    
+
+
+
                     var inputTextObj = md.blockRefs["inputText"];
                     if (inputTextObj) {
                         var elem = inputTextObj.elems["inputText"];
@@ -3279,7 +3283,7 @@ class MdaSetLine {
                         box.errorBox({kvTexts: errStrs});
                         return;
                     }
-                    var oobj={};
+                    var oobj = {};
                     oobj.sender = md;
                     oobj.setOptsObj = md;
                     oobj.act = "pressEnter";
@@ -3287,7 +3291,7 @@ class MdaSetLine {
                     KvLib.exeFunc(op.actionFunc, oobj);
                     return;
                 }
-                var oobj={};
+                var oobj = {};
                 oobj.sender = md;
                 oobj.setOptsObj = md;
                 oobj.act = "pressEnter";
@@ -3312,19 +3316,23 @@ class MdaSetLine {
                 box.colorPadBox(opts);
                 return;
             }
-            if (sop.dataType === "float") {
+            if (sop.checkType === "float") {
                 box.floatPadBox(opts);
                 return;
             }
-            if (sop.dataType === "int") {
-                if (sop.checkType === "hex") {
-                    box.hexPadBox(opts);
-                    return;
-                }
-                if (sop.checkType === "intHex") {
-                    box.intHexPadBox(opts);
-                    return;
-                }
+            if (sop.checkType === "hex") {
+                box.hexPadBox(opts);
+                return;
+            }
+            if (sop.checkType === "intHex") {
+                box.intHexPadBox(opts);
+                return;
+            }
+            if (sop.checkType === "int") {
+                box.intPadBox(opts);
+                return;
+            }
+            if (sop.checkType === "nature") {
                 box.intPadBox(opts);
                 return;
             }
@@ -3645,8 +3653,8 @@ class MdaSetLine {
                 console.log(iobj);
                 var dt = setOpts.dataType;
                 var strA = iobj.kvObj.name.split("#");
-                var obj={};
-                obj.buttonId=strA[1];
+                var obj = {};
+                obj.buttonId = strA[1];
                 self.actButtonAction(obj);
                 return;
                 if (strA[1] === "value") {//for range use
@@ -4600,6 +4608,10 @@ class MdaPad {
                 "1", "2", "3", "null", "left", "right",
                 "+-", "0", "null", "null", "clr", 'enter'
             ];
+            if (checkType === "ip") {
+                opts.numTbl[18] = "";
+                opts.numIds[18] = "null";
+            }
             if (setOpts.min >= 0) {
                 opts.numTbl[18] = "";
                 opts.numIds[18] = "null";
@@ -4747,7 +4759,7 @@ class MdaPad {
                 gr.serverCallBack = function (iobj) {
                     console.log("fdf");
                     var strA = iobj.opts.fileContent.split("\n");
-                    gr.juingTbl=strA;
+                    gr.juingTbl = strA;
                 };
                 mac.readServerFile("juing_tbl.txt");
             }

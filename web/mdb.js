@@ -793,7 +793,7 @@ class MdbChart {
 }
 
 
-class PhoneBox {
+class MdbPhoneBox {
     constructor() {
         this.flashTime=0;
     }
@@ -802,11 +802,11 @@ class PhoneBox {
         var opts = {};
         Block.setBaseOpts(opts);
         opts.baseColor = "#222";
-        opts.lcdLpd = 10;
+        opts.lcdLpd = 16;
         opts.lcdMargin = 20;
         opts.lcdMarginTop = 40;
-        opts.lcdMarginBottom = 40;
-        opts.lcdFontSize = 24;
+        opts.lcdMarginBottom = 35;
+        opts.lcdFontSize = 32;
         opts.hotlines = ["Line 1", "Line 2", "Line 3", "Line 4"];
 
         return opts;
@@ -817,24 +817,37 @@ class PhoneBox {
         var md = self.md;
         var op = md.opts;
         var st = md.stas;
+        st.sipData={};
+        if(!gr.sipphoneData)
+            return;
+        if(!gr.sipphoneData.rxed_f)
+            return;
+        var sipData=st.sipData=gr.sipphoneData;
+        /*
+                kj.jStart();
+                kj.jadd("realSipphoneIp", GB.realIpAddress);
+                kj.jadd("realSipphoneMac", GB.macStr);
+                kj.jadd("sipName", sipData.sipName);
+                kj.jadd("sipNo", sipData.sipNo);
+                kj.jadd("phoneSta", sipData.phoneSta);
+                //================
+                int ibuf=0;
+                ibuf+=sipData.reDirection_f<<0;
+                kj.jadd("phoneFlag", ibuf);
+                //=================
+                kj.jadd("nowLine", sipData.nowLine);
+                kj.jadd("status", sipData.status);
+                kj.jadd("action", sipData.action);
+                ibuf=sipData.lineFlagA[1]*16+sipData.lineFlagA[0];
+                kj.jadd("lineFlag", ibuf);
+                ibuf=sipData.lineStaA[1]*16+sipData.lineStaA[0];
+                kj.jadd("lineSta", ibuf);
+                ibuf=sipData.handStaA[1]*16+sipData.handStaA[0];
+                kj.jadd("handSta", ibuf);
+       */ 
+        
 
-        var sipData = {};
-        sipData.sipName = "";
-        sipData.sipNo = "";
-        sipData.reDirection_f = 0;
-        sipData.nowLine = 0;
-        sipData.phoneSta = 0;  //0 no raspberryPi,1:raspberry pi ready,2:linphonec load,3:pbx registed
-        sipData.lineFlag = 255;   //0:mute, 1:syssec, 2:nowLine, 3:dtmf, 4:hold, 7:reDirection
-        sipData.lineSta = 2;     //0:ready, 1: ring out, 2:ring in, 3:connect, 4:hold  4bit:4bit
-        sipData.handSta = 1;     //0:ready, 1: earphone, 2:epeaker  4bit:4bit
-        sipData.lineNoA = ["", ""];
-        sipData.lineNameA = ["", ""];
-        sipData.lineMessageA = ["", ""];
-        sipData.lineConnectTimeA = ["", ""];
-        sipData.status = "status";
-        sipData.action = "action";
-        st.sipData=sipData;
-        if(st.sipData.nowLine===0){
+        if(sipData.nowLine===0){
             st.line1Color="#00f";
             st.line2Color="#000";
         }
@@ -842,27 +855,26 @@ class PhoneBox {
             st.line1Color="#000";
             st.line2Color="#00f";
         }
-        if(st.sipData.lineFlag&0x01)
-            st.muteColor="#f00";
-        else
-            st.muteColor="#000";
-        if(st.sipData.lineFlag&0x10)
+        var nowLine=sipData.nowLine;
+        if(sipData.lineFlagA[nowLine]&0x01)
             st.holdColor="#f00";
         else
             st.holdColor="#000";
-        if(st.sipData.lineFlag&0x80)
+        
+        if(sipData.lineFlagA[nowLine]&0x02)
+            st.muteColor="#f00";
+        else
+            st.muteColor="#000";
+        if(st.sipData.phoneFlag&0x01)
             st.reDirectColor="#f00";
         else
             st.reDirectColor="#000";
         
         
-        var nowLine=(st.lineFlag>>2)&1;
-        var handSta=st.sipData.handSta&3;
-        if(nowLine)
-            handSta=(st.sipData.handSta>>4)&3;
+        var handSta=sipData.handStaA[nowLine]&3;
         if(handSta===0){
             st.earPhoneColor="#ccf";
-            var setPhoneColor="#ccf";
+            st.setPhoneColor="#ccf";
         }    
         if(handSta===1){
             st.earPhoneColor="#ffc";
@@ -872,12 +884,9 @@ class PhoneBox {
             st.earPhoneColor="#ccf";
             st.setPhoneColor="#ff0";
         }    
-        var lineSta=st.sipData.lineSta&7;
-        if(nowLine)
-            lineSta=(st.sipData.lineSta>>4)&7;
+        var lineSta=sipData.lineStaA[nowLine]&7;
         if(++self.flashTime>60)
             self.flashTime=0;
-            
         if(lineSta !== 2)
             st.ringLedCnt=0;
         else{
@@ -894,19 +903,16 @@ class PhoneBox {
     }
 
     keyClick(iobj) {
+        console.log(iobj);
         var md = iobj.kvObj.fatherMd;
         if (md.opts.actionFunc) {
             var obj = {};
             obj.act = "phoneKeyClick";
-            obj.key = iobj.kvObj.opts.itemId;
+            obj.key = iobj.kvObj.opts.buttonId;
             md.opts.actionFunc(obj);
         }
     }
 
-    keyClick(iobj) {
-        console.log(iobj);
-
-    }
 
     build(md) {
         var self = this;
@@ -1046,6 +1052,7 @@ class PhoneBox {
         opts.textAlign = "left";
         opts.lpd = op.lcdLpd;
         opts.fontSize = op.lcdFontSize;
+        opts.fontFamily = "monospace";
         var watchReg = "self.fatherMd.stas.sipData.status";
         md.setInputWatch(opts, "directReg", watchReg, "innerText", 1);
 
@@ -1056,6 +1063,7 @@ class PhoneBox {
         opts.textAlign = "left";
         opts.lpd = op.lcdLpd;
         opts.fontSize = op.lcdFontSize;
+        opts.fontFamily = "monospace";
         var watchReg = "self.fatherMd.stas.sipData.action";
         md.setInputWatch(opts, "directReg", watchReg, "innerText", 1);
         blocks[cname] = {name: "lcdLine2", type: "Component~Cp_base~plate.none", opts: opts};
@@ -1123,8 +1131,7 @@ class PhoneBox {
             opts.innerText = texts[i];
             opts.fontSize = "0.8rh";
             opts.actionFunc = self.keyClick;
-            opts.buttonId = texts[i];
-            ;
+            opts.buttonId = "hotline "+(i+1);
             blocks[cname] = {name: "hotLineButton#" + i, type: "Component~Cp_base~button.sys0", opts: opts};
         }
 
