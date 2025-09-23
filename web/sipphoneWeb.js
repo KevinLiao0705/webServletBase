@@ -346,27 +346,25 @@ class SipphoneWeb {
 
 class SipphoneUiWeb {
     constructor() {
-        gr.hideWavePageElem = null;
-        gr.socketRetPrgTbl["tick"] = function (radarData) {
-            var keys = Object.keys(radarData);
+        gr.sipphoneUiData = {};
+        
+        
+        gr.socketRetPrgTbl["tick"] = function (sipphoneUiData) {
+            var keys = Object.keys(sipphoneUiData);
             for (var i = 0; i < keys.length; i++) {
                 var strA = keys[i].split("#");
                 if (strA.length === 1) {
-                    gr.radarData[keys[i]] = radarData[keys[i]];
+                    gr.sipphoneUiData[keys[i]] = sipphoneUiData[keys[i]];
                     continue;
                 }
                 if (strA.length === 2) {
                     var inx0 = KvLib.toInt(strA[1], 0);
-                    gr.radarData[strA[0]][inx0] = radarData[keys[i]];
+                    gr.sipphoneUiData[strA[0]][inx0] = sipphoneUiData[keys[i]];
                     continue;
                 }
             }
-            if (gr.viewDatas_f) {
-                for (var i = 0; i < 8; i++) {
-                    gr.viewDatas[i] = KvLib.trsIntToHexStr(gr.radarData.viewDatas[i]);
-                }
-            }
-            console.log("radarData");
+            gr.sipphoneUiData.rxed_f = 1;
+            console.log("sipphoneUiData");
         };
 
 
@@ -388,6 +386,27 @@ class SipphoneUiWeb {
         if (gr.paraSet.emulate !== 1)
             ws.tick();
 
+        st.watchDataA = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""];
+        if (gr.sipphoneUiData) {
+            st.watchDataA[0] = gr.sipphoneUiData.realMac;
+            if(gr.sipphoneUiData.ipMode){
+                st.watchDataA[1] = gr.sipphoneUiData.carTypeName;
+                st.watchDataA[2] = gr.sipphoneUiData.carTypeNo;
+            }
+            else{
+                st.watchDataA[1]="---";
+                st.watchDataA[2]="---";
+                
+            }
+            st.watchDataA[3] = gr.sipphoneUiData.sipName;
+            st.watchDataA[4] = gr.sipphoneUiData.sipNo;
+            st.watchDataA[5] = gr.sipphoneUiData.realIp;
+            st.watchDataA[6] =gr.sipphoneUiData.sipPhoneIp;
+            st.watchDataA[7] =gr.sipphoneUiData.sipServerIp;
+            st.watchDataA[8] =gr.sipphoneUiData.switchIp;
+            st.watchDataA[9] =gr.sipphoneUiData.ntpIp;
+            
+        }
 
 
 
@@ -485,7 +504,7 @@ class SipphoneUiWeb {
                         console.log(iobj);
                         if (iobj.act === "actButtonClick") {
                             var carNo = iobj.kvObj.opts.setOpts.value;
-                            self.setPrg("車號內容設定", "content#"+carTypeName + "#" + carNo);
+                            self.setPrg("車號內容設定", "content#" + carTypeName + "#" + carNo);
                             return;
                         }
                         if (iobj.act === "save") {
@@ -522,49 +541,117 @@ class SipphoneUiWeb {
         if (id === "系統設定") {
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "adminName"}));
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "adminPassword"}));
-            setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemIpAddress"}));
-            setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipphoneIpAddress"}));
-            setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipServerAddress"}));
-            setOptsA.push(sopt.getParaSetOpts({paraSetName: "switchIpAddress"}));
+            
+            
+            
+            
+            var setOpts = sopt.getParaSetOpts({paraSetName: "ipMode"});
+            var ipMode=setOpts.value;
+            setOptsA.push(setOpts);
+            if(ipMode===0){
+                var buttons=[];
+                var readOnly_f=0;
+                
+            }    
+            else{    
+                var buttons=["pull"];
+                var readOnly_f=1;
+            }    
+            var setOpts = sopt.getParaSetOpts({paraSetName: "nowCarTypeName"});
+            setOpts.enum = gr.paraSet["carTypeNames"];
+            setOpts.actButtons=buttons;
+            setOptsA.push(setOpts);
+
+            var paraKey = "carTypeNos#" + gr.paraSet["nowCarTypeName"];
+            var setOpts = sopt.getParaSetOpts({paraSetName: "nowCarTypeNo"});
+            if (gr.paraSet[paraKey])
+                setOpts.enum = gr.paraSet[paraKey];
+            else
+                setOpts.enum = [];
+            setOpts.actButtons=buttons;
+            setOptsA.push(setOpts);
+
+            var setOpts=sopt.getParaSetOpts({paraSetName: "sipName"});
+            setOpts.readOnly_f=readOnly_f;
+            setOptsA.push(setOpts);
+            
+            var setOpts=sopt.getParaSetOpts({paraSetName: "sipNumber"});
+            setOpts.readOnly_f=readOnly_f;
+            setOptsA.push(setOpts);
+            
+            var setOpts=sopt.getParaSetOpts({paraSetName: "systemIpAddress"});
+            setOpts.readOnly_f=readOnly_f;
+            setOptsA.push(setOpts);
+            
+            var setOpts=sopt.getParaSetOpts({paraSetName: "sipphoneIpAddress"});
+            setOpts.readOnly_f=readOnly_f;
+            setOptsA.push(setOpts);
+            
+            var setOpts=sopt.getParaSetOpts({paraSetName: "sipServerAddress"});
+            setOpts.readOnly_f=readOnly_f;
+            setOptsA.push(setOpts);
+            
+            var setOpts=sopt.getParaSetOpts({paraSetName: "switchIpAddress"});
+            setOpts.readOnly_f=readOnly_f;
+            setOptsA.push(setOpts);
+            
+            var setOpts=sopt.getParaSetOpts({paraSetName: "ntpServerAddress"});
+            setOpts.readOnly_f=readOnly_f;
+            setOptsA.push(setOpts);
+            
 
 
-            setOptsA.push(sopt.getParaSetOpts({paraSetName: "ntpServerAddress"}));
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "ntpAdjTime"}));
+            
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemNetMask"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemGateWay"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipPhoneNetMask"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipPhoneGateWay"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "switchNetMask"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "switchGateWay"}));
+            
+            
         }
 
         if (id === "車號內容設定") {
             var values = gr.paraSet[setId];
             if (!values)
-                values = ["100", "192.168.0.0", "192.168.0.0", "192.168.0.0", "192.168.0.0", "192.168.0.0"];
+                values = ["kevin","100", "192.168.0.0", "192.168.0.0", "192.168.0.0", "192.168.0.0", "192.168.0.0"];
 
-            var setOpts = sopt.getOptsPara("natureStr");
-            setOpts.title = ["電話號碼"];
+            var setOpts = sopt.getOptsPara("str");
+            setOpts.title = "電話名稱";
             setOpts.value = values[0];
             setOptsA.push(setOpts);
 
-            var setOpts = sopt.getOptsPara("ipStr");
-            setOpts.title = ["本機 IP"];
+
+            var setOpts = sopt.getOptsPara("natureStr");
+            setOpts.title = "電話號碼";
             setOpts.value = values[1];
             setOptsA.push(setOpts);
 
             var setOpts = sopt.getOptsPara("ipStr");
-            setOpts.title = ["SIP電話 IP"];
+            setOpts.title = "本機 IP";
             setOpts.value = values[2];
             setOptsA.push(setOpts);
 
             var setOpts = sopt.getOptsPara("ipStr");
-            setOpts.title = ["閘道器 IP"];
+            setOpts.title = "SIP電話 IP";
             setOpts.value = values[3];
             setOptsA.push(setOpts);
 
             var setOpts = sopt.getOptsPara("ipStr");
-            setOpts.title = ["SIP Server IP"];
+            setOpts.title = "閘道器 IP";
             setOpts.value = values[4];
             setOptsA.push(setOpts);
 
             var setOpts = sopt.getOptsPara("ipStr");
-            setOpts.title = ["NTP Server IP"];
+            setOpts.title = "SIP Server IP";
             setOpts.value = values[5];
+            setOptsA.push(setOpts);
+
+            var setOpts = sopt.getOptsPara("ipStr");
+            setOpts.title = "NTP Server IP";
+            setOpts.value = values[6];
             setOptsA.push(setOpts);
 
 
@@ -634,6 +721,53 @@ class SipphoneUiWeb {
         opts.w = "0.9rw";
         opts.h = "0.9rh";
         opts.actionFunc = function (iobj) {
+            console.log(iobj);
+            if (iobj.act === "checkChanged") {
+                if (iobj.setOptsObj.opts.setOpts.paraSetName === "ipMode") {
+                    var readOnly_f=1;
+                    if(iobj.setOptsObj.opts.setOpts.value===1)
+                        readOnly_f=0;
+                    if(readOnly_f)
+                        var buttons=[];
+                    else
+                        var buttons=["pull"];
+                    mac.setLineContainerSet(iobj.setOptsObj.fatherMd,"nowCarTypeName",{actButtons:buttons});
+                    mac.setLineContainerSet(iobj.setOptsObj.fatherMd,"nowCarTypeNo",{actButtons:buttons});
+                    readOnly_f^=1;
+                    mac.setLineContainerSet(iobj.setOptsObj.fatherMd,"sipName",{readOnly_f:readOnly_f});
+                    mac.setLineContainerSet(iobj.setOptsObj.fatherMd,"sipNumber",{readOnly_f:readOnly_f});
+                    mac.setLineContainerSet(iobj.setOptsObj.fatherMd,"systemIpAddress",{readOnly_f:readOnly_f});
+                    mac.setLineContainerSet(iobj.setOptsObj.fatherMd,"sipphoneIpAddress",{readOnly_f:readOnly_f});
+                    mac.setLineContainerSet(iobj.setOptsObj.fatherMd,"sipServerAddress",{readOnly_f:readOnly_f});
+                    mac.setLineContainerSet(iobj.setOptsObj.fatherMd,"switchIpAddress",{readOnly_f:readOnly_f});
+                    mac.setLineContainerSet(iobj.setOptsObj.fatherMd,"ntpServerAddress",{readOnly_f:readOnly_f});
+                }
+                
+                if (iobj.setOptsObj.opts.setOpts.paraSetName === "nowCarTypeName") {
+                    var setLineContainer = iobj.setOptsObj.fatherMd;
+                    //=================================================
+                    var ksObjss = setLineContainer.opts.ksObjss;
+                    var keys = Object.keys(setLineContainer.blockRefs);
+                    for (var i = 0; i < keys.length; i++) {
+                        var strA = keys[i].split("#");
+                        if (strA[0] !== "setLine")
+                            continue;
+                        var setObj = setLineContainer.blockRefs[keys[i]];
+                        if (setObj.opts.setOpts.paraSetName !== "nowCarTypeNo")
+                            continue;
+                        setObj.opts.setOpts.value = "";
+                        var paraKey = "carTypeNos#" + iobj.value;
+                        if (gr.paraSet[paraKey])
+                            setObj.opts.setOpts.enum = gr.paraSet[paraKey];
+                        else
+                            setObj.opts.setOpts.enum = [];
+                        setObj.reCreate();
+                        return;
+                    }
+                    return;
+                }
+                return;
+            }
             if (iobj.act !== "mouseClick")
                 return;
             if (iobj.buttonId !== "ok")
@@ -648,7 +782,7 @@ class SipphoneUiWeb {
                         values.push(setOpts.value);
                     }
                 }
-                gr.paraSet[setId]=values;
+                gr.paraSet[setId] = values;
             } else
                 mac.saveSetOpts(iobj.ksObjss, gr.paraSet);
 
@@ -691,39 +825,40 @@ class SipphoneUiWeb {
         var actionPrg = function (iobj) {
             console.log(iobj);
             if (iobj.kvObj.opts.itemId === "save")
-                var keys=Object.keys(gr.paraSet);
-                for(var i=0;i<keys.length;i++){
-                    var strA=keys[i].split("#");
-                    if(strA[0]!=="content")
-                        continue;
-                    var names=gr.paraSet["carTypeNames"];
-                    var yes_f=0;
-                    for(var j=0;j<names.length;j++){
-                        if(names[j]===strA[1]){
-                            yes_f=1;
-                            break;
-                        }
+                var keys = Object.keys(gr.paraSet);
+            for (var i = 0; i < keys.length; i++) {
+                var strA = keys[i].split("#");
+                if (strA[0] !== "content")
+                    continue;
+                var names = gr.paraSet["carTypeNames"];
+                var yes_f = 0;
+                for (var j = 0; j < names.length; j++) {
+                    if (names[j] === strA[1]) {
+                        yes_f = 1;
+                        break;
                     }
-                    if(!yes_f){
-                        delete gr.paraSet[keys[i]];
-                        continue;
-                    }    
-                    
-                    var names=gr.paraSet["carTypeNos#"+strA[1]];
-                    var yes_f=0;
-                    for(var j=0;j<names.length;j++){
-                        if(names[j]===strA[2]){
-                            yes_f=1;
-                            break;
-                        }
-                    }
-                    if(!yes_f){
-                        delete gr.paraSet[keys[i]];
-                        continue;
-                    }    
                 }
-                
-                mac.saveParaSetAll("responseDialogOk");
+                if (!yes_f) {
+                    delete gr.paraSet[keys[i]];
+                    continue;
+                }
+
+                var names = gr.paraSet["carTypeNos#" + strA[1]];
+                var yes_f = 0;
+                for (var j = 0; j < names.length; j++) {
+                    if (names[j] === strA[2]) {
+                        yes_f = 1;
+                        break;
+                    }
+                }
+                if (!yes_f) {
+                    delete gr.paraSet[keys[i]];
+                    continue;
+                }
+            }
+            delete gr.paraSet["dec~end"];
+            gr.paraSet["dec~end"] = 0;
+            mac.saveParaSetAll("responseDialogOk");
             if (iobj.kvObj.opts.itemId === "esc")
                 window.close();
         };
@@ -759,32 +894,58 @@ class SipphoneUiWeb {
         var regName = "self.fatherMd.fatherMd.fatherMd.fatherMd.stas.watchDataA";
         var setOpts = sopt.getParaSetOpts({paraSetName: "systemMacAddress"});
         var watchDatas = setOpts.watchDatas = [];
+        watchDatas.push(["directReg", regName + "#0", "editValue", 1]);
+        setOptsA.push(setOpts);
+
+        setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemId"}));
+        
+        
+        var setOpts = sopt.getParaSetOpts({paraSetName: "nowCarTypeName"});
+        var watchDatas = setOpts.watchDatas = [];
         watchDatas.push(["directReg", regName + "#1", "editValue", 1]);
         setOptsA.push(setOpts);
 
-
-
-
-        setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemId"}));
-        setOptsA.push(sopt.getParaSetOpts({paraSetName: "nowCarTypeName"}));
-        setOptsA.push(sopt.getParaSetOpts({paraSetName: "nowCarTypeNo"}));
-        setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemIpAddress"}));
-        setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipphoneIpAddress"}));
-        var setOpts = sopt.getParaSetOpts({paraSetName: "sipName"});
+        var setOpts = sopt.getParaSetOpts({paraSetName: "nowCarTypeNo"});
         var watchDatas = setOpts.watchDatas = [];
         watchDatas.push(["directReg", regName + "#2", "editValue", 1]);
         setOptsA.push(setOpts);
-
-        var setOpts = sopt.getParaSetOpts({paraSetName: "sipNumber"});
+        
+        
+        var setOpts = sopt.getParaSetOpts({paraSetName: "sipName"});
         var watchDatas = setOpts.watchDatas = [];
         watchDatas.push(["directReg", regName + "#3", "editValue", 1]);
         setOptsA.push(setOpts);
 
-
-
-        setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipServerAddress"}));
-        setOptsA.push(sopt.getParaSetOpts({paraSetName: "switchIpAddress"}));
-        setOptsA.push(sopt.getParaSetOpts({paraSetName: "ntpServerAddress"}));
+        var setOpts = sopt.getParaSetOpts({paraSetName: "sipNumber"});
+        var watchDatas = setOpts.watchDatas = [];
+        watchDatas.push(["directReg", regName + "#4", "editValue", 1]);
+        setOptsA.push(setOpts);
+        //========================
+        var setOpts = sopt.getParaSetOpts({paraSetName: "systemIpAddress"});
+        var watchDatas = setOpts.watchDatas = [];
+        watchDatas.push(["directReg", regName + "#5", "editValue", 1]);
+        setOptsA.push(setOpts);
+        //===============================
+        var setOpts = sopt.getParaSetOpts({paraSetName: "sipphoneIpAddress"});
+        var watchDatas = setOpts.watchDatas = [];
+        watchDatas.push(["directReg", regName + "#6", "editValue", 1]);
+        setOptsA.push(setOpts);
+        //===============================
+        var setOpts = sopt.getParaSetOpts({paraSetName: "sipServerAddress"});
+        var watchDatas = setOpts.watchDatas = [];
+        watchDatas.push(["directReg", regName + "#7", "editValue", 1]);
+        setOptsA.push(setOpts);
+        //===============================
+        var setOpts = sopt.getParaSetOpts({paraSetName: "switchIpAddress"});
+        var watchDatas = setOpts.watchDatas = [];
+        watchDatas.push(["directReg", regName + "#8", "editValue", 1]);
+        setOptsA.push(setOpts);
+        //===============================
+        var setOpts = sopt.getParaSetOpts({paraSetName: "ntpServerAddress"});
+        var watchDatas = setOpts.watchDatas = [];
+        watchDatas.push(["directReg", regName + "#9", "editValue", 1]);
+        setOptsA.push(setOpts);
+        //===============================
         var setObjs = [];
         var inx = 0;
         for (var ii = 0; ii < setOptsA.length; ii++) {

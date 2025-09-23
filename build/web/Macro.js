@@ -418,6 +418,21 @@ class Macro {
         return loginPage;
     }
 
+    setLineContainerSet(setLineContainer, paraSetName, setOpts) {
+        var ksObjss = setLineContainer.opts.ksObjss;
+        var keys = Object.keys(setLineContainer.blockRefs);
+        for (var i = 0; i < keys.length; i++) {
+            var strA = keys[i].split("#");
+            if (strA[0] !== "setLine")
+                continue;
+            var setObj = setLineContainer.blockRefs[keys[i]];
+            if (setObj.opts.setOpts.paraSetName !== paraSetName)
+                continue;
+            KvLib.deepCoverObject(setObj.opts.setOpts, setOpts);
+            setObj.reCreate();
+            return;
+        }
+    }
     setLineBoxOpts(_op)
     {
         var op = {};
@@ -532,6 +547,15 @@ class Macro {
             if (iobj.act === "checkPreChange") {
                 return preChangeFunc(iobj);
             }
+
+            if (iobj.act === "setLineSave") {
+                KvLib.exe(_op.actionFunc, iobj);
+            }
+            if (iobj.act === "checkChanged") {
+                KvLib.exe(_op.actionFunc, iobj);
+            }
+
+
             if (iobj.act === "mouseClick") {
                 if (iobj.kvObj.opts.id === "ok") {
                     var errStr = preChangeFunc(iobj);

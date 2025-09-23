@@ -2997,16 +2997,38 @@ class MdaSetLine {
                 }
             }
             if (save_f) {
+                var chg = 0;
+                var newValue = inValue;
                 if (setOpts.array) {
-                    if (setOpts.dataType === "str") {
-                        setOpts.value = inValue;
-                    } else
-                        setOpts.value = ivA;
+                    if (setOpts.dataType !== "str") {
+                        newValue = ivA;
+                    } else {
+                        if (setOpts.dataType !== "str")
+                            newValue = ivA[0];
+                    }
+                }
+                var chg_f = 0;
+                if (setOpts.array) {
+                    for (var i = 0; i < newValue.length; i++) {
+                        if (newValue[1] !== setOpts.value) {
+                            chg_f = 1;
+                            break;
+                        }
+                    }
                 } else {
-                    if (setOpts.dataType === "str")
-                        setOpts.value = inValue;
-                    else
-                        setOpts.value = ivA[0];
+                    if (newValue !== setOpts.value)
+                        chg_f = 1;
+                }
+
+
+                setOpts.value = newValue;
+                if (chg_f) {
+                    var obj = {};
+                    obj.kvObj = md;
+                    obj.setOptsObj=md;
+                    obj.act = "checkChanged";
+                    obj.value = setOpts.value;
+                    KvLib.exe(op.actionFunc, obj);
                 }
             }
             return;
@@ -3014,7 +3036,8 @@ class MdaSetLine {
 
         }
     }
-    chkWatch() {
+    chkWatch()
+    {
 
     }
 
@@ -3240,12 +3263,12 @@ class MdaSetLine {
                 box.pickColorBox(opts);
                 return;
             }
-            iobj.sender=md;
-            iobj.kvObj=md;
-            iobj.act="actButtonClick";
-            KvLib.exe(md.opts.actionFunc,iobj);
+            iobj.sender = md;
+            iobj.kvObj = md;
+            iobj.act = "actButtonClick";
+            KvLib.exe(md.opts.actionFunc, iobj);
         }
-        
+
         if (iobj.buttonId === "pad" || iobj.buttonId === "edit") {
             var sop = md.opts.setOpts;
             var kobj = md.blockRefs["inputText"];
@@ -4351,10 +4374,12 @@ class MdaSetLine {
                 console.log(iobj);
                 var strA = iobj.kvObj.name.split("#");
                 var inx = KvLib.toInt(strA[1], -1);
-                op.setOpts.value = inx;
-                iobj.sender = md;
-                iobj.setOptsObj = md;
-                KvLib.exe(op.actionFunc, iobj);
+                if (op.setOpts.value !== inx) {
+                    op.setOpts.value = inx;
+                    iobj.sender = md;
+                    iobj.setOptsObj = md;
+                    KvLib.exe(op.actionFunc, iobj);
+                }
             };
             for (var i = 0; i < setOpts.enum.length; i++) {
                 var cname = md.lyMaps["mainBody"] + "~" + i;

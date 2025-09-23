@@ -62,6 +62,11 @@ class MyWebSocket {
                     gr.socketRetPrgTbl["tick"](recObj.sipphoneData);
                 }
             }
+            if (recObj.sipphoneUiData) {
+                if (gr.socketRetPrgTbl["tick"]) {
+                    gr.socketRetPrgTbl["tick"](recObj.sipphoneUiData);
+                }
+            }
             
             
             
