@@ -165,7 +165,7 @@ class Macro {
         var layouts = md.opts.layouts;
         //======================
         var opts = {};
-        opts.xArr = [9999, 100, 100, 100];
+        opts.xArr = [9999, 100, 120, 120];
         layouts[cname] = {name: cname, type: "Layout~Ly_base~xyArray.sys0", opts: opts};
         lyMaps["footBar"] = cname;
         //============

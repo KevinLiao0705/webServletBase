@@ -72,7 +72,6 @@ class DummyTargetMaster {
                 opts.kvTexts.push("系統重啟");
                 opts.kvTexts.push("即時資料");
                 opts.kvTexts.push("數位波形群組");
-                opts.kvTexts.push("關閉UI介面");
                 opts.kvTexts.push("邏輯分析儀");
             }
             opts.actionFunc = function (iobj) {
@@ -82,13 +81,6 @@ class DummyTargetMaster {
                 opts.title = iobj.selectText;
                 opts.setNames = [];
 
-                if (iobj.selectText === "關閉UI介面") {
-                    MdaPopWin.popOff(2);
-                    gr.gbcs.command({'act': "closeUi"});
-                    return;
-
-
-                }
 
                 if (iobj.selectText === "邏輯分析儀") {
                     MdaPopWin.popOff(2);
@@ -691,6 +683,7 @@ class DummyTargetMaster {
                 if (iobj.selectText === "上傳設定檔") {
                     var actionFunc = function (content) {
                         gr.paraSet = JSON.parse(content);
+                        mac.saveParaSet();
                     };
                     mac.readLocalTextFile(actionFunc, ".json");
                     return;
@@ -1943,6 +1936,28 @@ class DummyTargetSub {
         var st = md.stas;
         if (gr.paraSet.emulate !== 1)
             ws.tick();
+        if (gr.radarData.conRxA) {
+            var str = "SRX:";
+            str += " " + gr.radarData.conRxA[0] % 10;
+            str += " " + gr.radarData.conRxA[1] % 10;
+            gr.footBarStatus1 = str;
+
+
+            var str = "FRX: ";
+            str += gr.radarData.conRxA[8] % 10;
+            str += gr.radarData.conRxA[9] % 10;
+            str += gr.radarData.conRxA[10] % 10;
+            str += gr.radarData.conRxA[11] % 10;
+
+            str += " " + gr.radarData.conRxA[12] % 10;
+            str += gr.radarData.conRxA[13] % 10;
+            str += gr.radarData.conRxA[14] % 10;
+            str += gr.radarData.conRxA[15] % 10;
+
+            gr.footBarStatus2 = str;
+        }
+        
+        
         return;
 
 
@@ -2666,75 +2681,17 @@ class SubRadarPane1 {
         if (this.md.subType === "base.sys0") {
         }
     }
-    static getMeterStatus(wa, wac) {
-        var daInx = 0;
-        var preText = "ctr1";
-        var da = gr.radarData.meterStatusAA;
-        //======================================
-        var prg = function (data, name, fixed) {
-            var value = (data - gr.paraSet[preText + name + "Offs"]) * gr.paraSet[preText + name + "Gain"];
-            if (value < gr.paraSet[preText + name + "Zero"])
-                value = 0;
-            var valueStr = "" + value.toFixed(fixed);
-            var valueColor = "#ddd";
-            if (value < gr.paraSet[preText + name + "LimD"] && value !== 0)
-                valueColor = "#fcf";
-            if (value >= gr.paraSet[preText + name + "LimD"])
-                valueColor = "#cfc";
-            if (value > gr.paraSet[preText + name + "LimU"])
-                valueColor = "#fcc";
-            return [valueStr, valueColor, value];
-        };
-        //======================================
-        var va = prg(da[0], "InRfpow", 1);
-        wa[0] = va[0];
-        wac[0] = va[1];
-        //======================================
-        //======================================
-        var va = prg(da[2], "PreAmpOutRfpow", 1);
-        wa[2] = va[0];
-        wac[2] = va[1];
-        //======================================
-        var va = prg(da[3], "DriverAmpOutRfpow", 1);
-        wa[3] = va[0];
-        wac[3] = va[1];
-        //======================================
-        var va = prg(da[4], "CwAmpOutRfpow", 1);
-        wa[4] = va[0];
-        wac[4] = va[1];
-        //======================================
-        var va = prg(da[5], "CcwAmpOutRfpow", 1);
-        wa[5] = va[0];
-        wac[5] = va[1];
-        //======================================
-        var cur = 0;
-        for (var i = 0; i < 36; i++) {
-            var value = gr.radarData["sspaPowerV32iAA"][i];
-            value -= gr.paraSet[preText + "SspaPowerV32iOffs"];
-            value *= gr.paraSet[preText + "SspaPowerV32iGain"];
-            cur += value;
-        }
-        wa[9] = "" + cur.toFixed(1);
-        if (cur > (gr.paraSet[preText + "SspaPowerV32iZero"] * 36))
-            wac[9] = "#cfc";
-        if (cur > gr.paraSet[preText + "SspaPowerAllV32iLimU"])
-            wac[9] = "#fcc";
-
-    }
     chkWatch() {
         var self = this;
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
-        var wa = md.stas.meterStatusA = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"];
-        var wac = md.stas.meterColorA = ["#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd"];
         var wb = md.stas.ledStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         var wc = md.stas.buttonColorA = ["#888", "#888", "#888", "#888"];
         if (gr.appId === 3)
             var preText = "ctr1";
         if (gr.appId === 4)
             var preText = "ctr2";
-        DummyTargetCtrPane.getMeterStatus(wa, wac);
 
         var sysStatus = gr.radarData.systemStatus0 & 3;
         wb[0] = 0;
@@ -3023,8 +2980,8 @@ class SubRadarPane1 {
             var opts = {};
             opts.setOptss = [];
             var inx = 0;
-            var regName = "self.fatherMd.fatherMd.fatherMd.stas.meterStatusA";
-            var regName1 = "self.fatherMd.fatherMd.fatherMd.stas.meterColorA";
+            var regName = "gr.radarData.meterValueTextA";
+            var regName1 = "gr.radarData.meterValueColorA";
             if (i === inx++) {
                 opts.title = "輸入功率";
                 var setOpts = opts.setOpts = sopt.getOptsPara("lcdView");
@@ -5190,38 +5147,55 @@ class DummyTargetCtr {
             }
             var rd = gr.radarData;
             //rd.pulseFormAddBufA0=[90*1000*2+0,10*1000*2+1];
+
+            if (gr.appId === 3 || gr.appId === 4) {
+                var wa = gr.radarData.meterValueTextA = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"];
+                var wac = gr.radarData.meterValueColorA = ["#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd"];
+                DummyTargetCtrPane.getMeterStatus(wa, wac);
+            }
+
+
             if (rd.pulseFormAddBufA0) {
                 if (gr.scope) {
                     if (gr.scope.opts.signalMode === 2 && gr.scope.opts.signalModeInx === 0) {
-                        var len=rd.pulseFormAddBufA0.length;
+                        var len = rd.pulseFormAddBufA0.length;
                         if (rd.pulseFormAddBufA0.length) {
-                            var values=[]; 
-                            for(var i=0;i<len;i++){
-                                var vv=rd.pulseFormAddBufA0[i];
-                                var hf=vv&1;
-                                var tt=((vv>>1)*6.25)|0;
-                                values.push(tt*2+hf);
-                            }    
+                            var values = [];
+                            for (var i = 0; i < len; i++) {
+                                var vv = rd.pulseFormAddBufA0[i];
+                                var hf = vv & 1;
+                                var tt = ((vv >> 1) * 6.25) | 0;
+                                values.push(tt * 2 + hf);
+                            }
                             gr.scope.mdClass.addBuf(0, values);
                         }
                     }
                 }
-                /*
-                 for (var i = 0; i < rd.pulseFormAddBufA0.length; i++) {
-                 gr.pulseFormInxA[0]++;
-                 if (gr.pulseFormInxA[0] > gr.pulseFormLenA[0])
-                 gr.pulseFormLenA[0] = gr.pulseFormInxA[0];
-                 if (gr.pulseFormInxA[0] >= gr.pulseFormAA[0].length)
-                 gr.pulseFormInxA[0] = 0;
-                 gr.pulseFormAA[0][gr.pulseFormInxA[0]] = (rd.pulseFormAddBufA0[i] >> 1) * 1000 / 160;
-                 gr.pulseLevelAA[0][gr.pulseFormInxA[0]] = (rd.pulseFormAddBufA0[i] & 1) * 3300;
-                 }
-                 */
+            }
+            rd.pulseFormAddBufA0 = null;
+
+
+            if (gr.scope) {
+                if (gr.scope.opts.signalMode === 3 && gr.scope.opts.signalModeInx === 0) {
+                    for (var i = 0; i < 4; i++) {
+                        var values = [];
+                        if (i === 0)
+                            var vv = gr.radarData.meterValueA[2];
+                        if (i === 1)
+                            var vv = gr.radarData.meterValueA[3];
+                        if (i === 2)
+                            var vv = gr.radarData.meterValueA[4];
+                        if (i === 3)
+                            var vv = gr.radarData.meterValueA[5];
+                        if (!vv)
+                            vv = 0;
+                        values.push(vv);
+                        gr.scope.mdClass.addBuf(i, values);
+                    }
+                }
             }
 
 
-
-            rd.pulseFormAddBufA0 = null;
             if (rd.pulseFormInf) {
                 var plow = rd.pulseFormInf[0];
                 var phigh = rd.pulseFormInf[1];
@@ -5237,28 +5211,6 @@ class DummyTargetCtr {
                 }
             }
 
-            if (gr.signalMode === 3) {
-                //<<debug
-                /*
-                 var rand = Math.round(20 * Math.random() - 10);
-                 rd.meterStatusAA[0] = 855 + rand;
-                 var rand = Math.round(10 * Math.random() - 10);
-                 rd.meterStatusAA[3] = 755 + rand;
-                 var rand = Math.round(10 * Math.random() - 10);
-                 rd.meterStatusAA[4] = 555 + rand;
-                 var rand = Math.round(10 * Math.random() - 10);
-                 rd.meterStatusAA[5] = 655 + rand;
-                 */
-
-
-                var wa = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"];
-                var wac = ["#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd"];
-                DummyTargetCtrPane.getMeterStatus(wa, wac);
-                gr.plotValue[0] = wa[0];
-                gr.plotValue[1] = wa[3];
-                gr.plotValue[2] = wa[4];
-                gr.plotValue[3] = wa[5];
-            }
             if (gr.degug_f)
                 console.log("radarData");
 
@@ -5277,6 +5229,26 @@ class DummyTargetCtr {
         var st = md.stas;
         if (gr.paraSet.emulate !== 1)
             ws.tick();
+        if (gr.radarData.conRxA) {
+            var str = "SRX:";
+            str += " " + gr.radarData.conRxA[0] % 10;
+            str += " " + gr.radarData.conRxA[1] % 10;
+            gr.footBarStatus1 = str;
+
+
+            var str = "FRX: ";
+            str += gr.radarData.conRxA[8] % 10;
+            str += gr.radarData.conRxA[9] % 10;
+            str += gr.radarData.conRxA[10] % 10;
+            str += gr.radarData.conRxA[11] % 10;
+
+            str += " " + gr.radarData.conRxA[12] % 10;
+            str += gr.radarData.conRxA[13] % 10;
+            str += gr.radarData.conRxA[14] % 10;
+            str += gr.radarData.conRxA[15] % 10;
+
+            gr.footBarStatus2 = str;
+        }
         return;
 
 
@@ -5399,7 +5371,7 @@ class DummyTargetCtr {
                 //var mesObj = mda.popObj(0, 0, kvObj);
                 opts.kvObj = kvObj;
                 gr.scope = kvObj;
-                
+
                 kvObj.opts.popStackCnt = gr.mdSystem.mdClass.stackCnt;
                 MdaPopWin.popObj(opts);
                 return;
@@ -5500,15 +5472,15 @@ class DummyTargetCtrPane {
         if (this.md.subType === "base.sys0") {
         }
     }
-    static getMeterStatus(wa, wac) {
+    static getMeterStatus() {
         var daInx = 0;
         var preText = "ctr1";
         var rd = gr.radarData;
         var da = gr.radarData.meterStatusAA;
-        var daa = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-
+        var wa = gr.radarData.meterValueTextA = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"];
+        var wac = gr.radarData.meterValueColorA = ["#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd"];
+        var wv = gr.radarData.meterValueA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         //======================================
-
         var prg = function (data, name, fixed, dinx) {
             if (data <= 0)
                 return["", "#ddd", 0];
@@ -5552,12 +5524,6 @@ class DummyTargetCtrPane {
 
 
             }
-
-
-
-
-
-
             //========================================
             var valueStr = "" + value.toFixed(fixed);
             var valueColor = "#ddd";
@@ -5573,23 +5539,28 @@ class DummyTargetCtrPane {
         var va = prg(da[0], "InRfpow", 1, 0);
         wa[0] = va[0];
         wac[0] = va[1];
+        wv[0] = va[2];
         //======================================
         //======================================
         var va = prg(da[2], "PreAmpOutRfpow", 1, 2);
         wa[2] = va[0];
         wac[2] = va[1];
+        wv[2] = va[2];
         //======================================
         var va = prg(da[3], "DriverAmpOutRfpow", 1, 3);
         wa[3] = va[0];
         wac[3] = va[1];
+        wv[3] = va[2];
         //======================================
         var va = prg(da[4], "CwAmpOutRfpow", 1, 4);
         wa[4] = va[0];
         wac[4] = va[1];
+        wv[4] = va[2];
         //======================================
         var va = prg(da[5], "CcwAmpOutRfpow", 1, 5);
         wa[5] = va[0];
         wac[5] = va[1];
+        wv[5] = va[2];
         //======================================
         var cur = 0;
         for (var i = 0; i < 36; i++) {
@@ -5605,6 +5576,7 @@ class DummyTargetCtrPane {
             wac[9] = "#cfc";
         if (cur > gr.paraSet[preText + "SspaPowerAllV32iLimU"])
             wac[9] = "#fcc";
+        wv[9] = cur;
 
     }
     chkWatch() {
@@ -5614,6 +5586,8 @@ class DummyTargetCtrPane {
         var st = md.stas;
         var wa = md.stas.meterStatusA = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"];
         var wac = md.stas.meterColorA = ["#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd"];
+
+
         var wb = md.stas.ledStatusA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         var wc = md.stas.buttonColorA = ["#888", "#888", "#888", "#888"];
         var wd = md.stas.selectValueA = [0, 0, 0, 0];
@@ -5621,7 +5595,6 @@ class DummyTargetCtrPane {
             var preText = "ctr1";
         if (gr.appId === 4)
             var preText = "ctr2";
-        DummyTargetCtrPane.getMeterStatus(wa, wac);
 
         var sysStatus = gr.radarData.systemStatus0 & 3;
         wb[0] = 0;
@@ -5930,8 +5903,10 @@ class DummyTargetCtrPane {
             var opts = {};
             opts.setOptss = [];
             var inx = 0;
-            var regName = "self.fatherMd.fatherMd.fatherMd.stas.meterStatusA";
-            var regName1 = "self.fatherMd.fatherMd.fatherMd.stas.meterColorA";
+            var regName = "gr.radarData.meterValueTextA";
+            var regName1 = "gr.radarData.meterValueColorA";
+
+
             if (i === inx++) {
                 opts.title = "輸入功率";
                 var setOpts = opts.setOpts = sopt.getOptsPara("lcdView");
@@ -6363,8 +6338,9 @@ class CtrRadarStatus {
             var opts = {};
             opts.setOptss = [];
             var inx = 0;
-            var regName = "self.fatherMd.fatherMd.fatherMd.stas.meterStatusA";
-            var regName1 = "self.fatherMd.fatherMd.fatherMd.stas.meterColorA";
+            var regName = "gr.radarData.meterValueTextA";
+            var regName1 = "gr.radarData.meterValueColorA";
+
             if (i === inx++) {
                 opts.title = "順向輸出功率";
                 var setOpts = opts.setOpts = sopt.getOptsPara("lcdView");
