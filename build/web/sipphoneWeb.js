@@ -238,7 +238,7 @@ class SipphoneWeb {
             if (iobj.kvObj.opts.itemId === "esc")
                 window.close();
         };
-        mac.setHeadTitleBar(md, cname, "JOSN SIP 電話系統", actionPrg, ["save"]);
+        mac.setHeadTitleBar(md, cname, "JOSN SIP 電話系統", actionPrg, ["save","esc"]);
         //==============================
         var cname = lyMaps["mainBody"] + "~" + 3;
         mac.setFootBar(md, cname);
@@ -347,8 +347,6 @@ class SipphoneWeb {
 class SipphoneUiWeb {
     constructor() {
         gr.sipphoneUiData = {};
-        
-        
         gr.socketRetPrgTbl["tick"] = function (sipphoneUiData) {
             var keys = Object.keys(sipphoneUiData);
             for (var i = 0; i < keys.length; i++) {
@@ -419,7 +417,17 @@ class SipphoneUiWeb {
         var opts = {};
         var setOptsA = [];
         opts.ksObjWs = [9999];
-        if (id === "電話使用介面") {
+        if (id === "SIP電話設定") {
+            screen.availWidth;
+            screen.availHeight;
+            var features="width="+screen.availWidth;
+            features+=",height="+screen.availHeight;
+            features+=",resizable=yes";
+            features+=",scrollbars=yes";
+             window.open("http://192.168.111.222", "myNewWindow", features);
+             //window.open("http://192.168.111.222", "_blank");
+            //window.open("http://192.168.111.222/", "_self");
+            return;
             var opts = {};
             opts.actionFunc = function (iobj) {
                 console.log(iobj);
@@ -458,7 +466,9 @@ class SipphoneUiWeb {
             };
             var kvObj = new Block("phoneBox", "Model~MdbPhoneBox~base.sys0", opts);
             mda.popObj(800, 9999, kvObj);
+            
             return;
+            
         }
 
 
@@ -605,8 +615,8 @@ class SipphoneUiWeb {
             
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemNetMask"}));
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemGateWay"}));
-            setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipPhoneNetMask"}));
-            setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipPhoneGateWay"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipphoneNetMask"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipphoneGateWay"}));
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "switchNetMask"}));
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "switchGateWay"}));
             
@@ -824,8 +834,14 @@ class SipphoneUiWeb {
         };
         var actionPrg = function (iobj) {
             console.log(iobj);
-            if (iobj.kvObj.opts.itemId === "save")
-                var keys = Object.keys(gr.paraSet);
+            if (iobj.kvObj.opts.itemId === "esc"){
+                window.close();
+                return;
+            }
+            if (iobj.kvObj.opts.itemId !== "save")
+                return;
+                
+            var keys = Object.keys(gr.paraSet);
             for (var i = 0; i < keys.length; i++) {
                 var strA = keys[i].split("#");
                 if (strA[0] !== "content")
@@ -862,7 +878,7 @@ class SipphoneUiWeb {
             if (iobj.kvObj.opts.itemId === "esc")
                 window.close();
         };
-        mac.setHeadTitleBar(md, cname, "車載二合一 電話系統", actionPrg, ["save"]);
+        mac.setHeadTitleBar(md, cname, "車載二合一 電話系統", actionPrg, ["save","esc"]);
 
         //==============================
         var cname = lyMaps["mainBody"] + "~" + 3;
@@ -870,7 +886,8 @@ class SipphoneUiWeb {
 
         var cname = lyMaps["mainBody"] + "~" + 1;
         var opts = {};
-        opts.buttons = ["系統設定", "車型設定", "車號設定", "快撥鍵設定", "電話使用介面"];
+        opts.buttons = ["系統設定", "車型設定", "車號設定", "快撥鍵設定", "SIP電話設定"];
+        //opts.buttons = ["系統設定", "車型設定", "車號設定", "快撥鍵設定"];
         opts.buttonIds = ["sipphoneSet", "sysSet", "hotlineSet", "phoneUi"];
         opts.actionFunc = function (iobj) {
             if (iobj.act !== "mouseClick")

@@ -16,12 +16,12 @@ import java.util.Map;
 public class GB {
     public static int osInx = 0;//0 for window 1:for linux
     //==============================================
-    public static String winParaSetFullName="e:/kevin/myCode/syncSet/paraSet.json";
-    public static String linuxParaSetFullName="/home/admintx/syncSetExe/paraSet.json";
+    //public static String winParaSetFullName="e:/kevin/myCode/syncSet/paraSet.json";
+    //public static String linuxParaSetFullName="/home/admintx/syncSetExe/paraSet.json";
     //public static String winParaSetFullName="e:/kevin/myCode/josnSipSet/paraSetSip.json";
     //public static String linuxParaSetFullName="/home/pi/kevin/sipphone/paraSetSip.json";
-    //public static String winParaSetFullName="e:/kevin/myCode/josnSipSet/paraSetUi.json";
-    //public static String linuxParaSetFullName="/home/pi/kevin/sipphone/paraSetUi.json";
+    public static String winParaSetFullName="e:/kevin/myCode/josnSipSet/paraSetUi.json";
+    public static String linuxParaSetFullName="/home/pi/kevin/sipui2in1/paraSetUi.json";
     //=====================================
     public static int min_js_f = 0;
     static public String appName = "webServeletBase";

@@ -15,9 +15,10 @@ class MyWebSocket {
         if (self.wsok)
             return;
         try {
-            //gr.ws = new WebSocket('ws://' + "127.0.0.1" + ':' + gr.webSocketPort + '/websocket');
-            //gr.paraSet.webSocketAddr
-            self.socket = new WebSocket('ws://' + gr.paraSet.webSocketAddr + ':' + gr.webSocketPort + '/websocket');
+            var sockIp=gr.paraSet.webSocketAddr;
+            if(gr.paraSet.systemIpAddress)
+                sockIp=gr.paraSet.systemIpAddress;
+            self.socket = new WebSocket('ws://' + sockIp + ':' + gr.webSocketPort + '/websocket');
         } catch (ex) {
             console.log(ex);
         }
@@ -67,13 +68,13 @@ class MyWebSocket {
                     gr.socketRetPrgTbl["tick"](recObj.sipphoneUiData);
                 }
             }
-            
-            
-            
-            
         };
         return;
     }
+    
+    
+    
+    
     closeSocket() {
         if (this.wsok) {
             this.wsok.close();

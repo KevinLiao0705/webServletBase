@@ -36,9 +36,9 @@ class GlobalRes {
         this.version = "1.0";
         
         //this.appName = "webBuilder";
-        this.appName = "sync";
+        //this.appName = "sync";
         //this.appName = "sipphoneWeb";
-        //this.appName = "sipphoneUiWeb";
+        this.appName = "sipphoneUiWeb";
         this.appId = 3;
         //=================================
         this.webSocketEnable_f=1;
@@ -53,8 +53,8 @@ class GlobalRes {
         this.enabelLogin_f = 1;
         this.defaultUserName = "";
         this.defaultUserPassword = "";
-        this.defaultUserName = "kevinAdmin";
-        this.defaultUserPassword = "16020039";
+        //this.defaultUserName = "kevinAdmin";
+        //this.defaultUserPassword = "16020039";
         this.clearCookie_f = 0;
         //=================================
         this.globleTime = "DummyTargetMaster.globleTime()";
