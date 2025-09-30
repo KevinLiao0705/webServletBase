@@ -41,6 +41,7 @@ public final class MainServlet extends HttpServlet {
     KvJson kj = new KvJson();
 
     public MainServlet() {
+
     }
 
     /**
@@ -96,7 +97,7 @@ public final class MainServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String filePath;
         //boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-        boolean isMultipart =false;
+        boolean isMultipart = false;
         JSONObject webInJo = new JSONObject();
         JSONObject webOutJo = new JSONObject();
         if (isMultipart) {
@@ -236,10 +237,10 @@ public final class MainServlet extends HttpServlet {
 
     }
 
-    public HashMap<String, Object> getParas() {
+    public HashMap<String, Object> getParas(String systemName) {
         HashMap<String, Object> paraMap = new HashMap();
         //String fileName = GB.webRootPath + "user-" + "webIcs" + "/paraSet.json";
-        String fileName = GB.paraSetFullName;
+        String fileName = GB.getParaSetPath(systemName);
         File file = new File(fileName);
         if (file.exists() && !file.isDirectory()) {
             String jsonStr = Lib.readStringFile(fileName);
@@ -428,7 +429,8 @@ public final class MainServlet extends HttpServlet {
         String outStr;
         String filePath;
         String fileName;
-        String appName;
+        String systemName;
+        int appId = 0;
         String userName;
         String password;
         String content;
@@ -450,10 +452,12 @@ public final class MainServlet extends HttpServlet {
                 case "login":
                     kj.wStr(outJo, "message", "login Error !!!");
                     kj.jobj = inOptsJo;
-                    if (kj.rStr("appName")) {
+
+                    if (kj.rStr("systemName")) {
                         return;
                     }
-                    appName = kj.valueStr;
+                    systemName = kj.valueStr;
+
                     if (kj.rStr("userName")) {
                         return;
                     }
@@ -463,7 +467,7 @@ public final class MainServlet extends HttpServlet {
                     }
                     password = kj.valueStr;
                     //=======================================================
-                    fileName = GB.webRootPath + "user-" + appName + "/systemSet.json";
+                    fileName = GB.webRootPath + "user-" + systemName + "/systemSet.json";
                     retc = Lib.readFileToString(fileName);
                     if (retc.errorF) {
                         kj.wStr(outJo, "message", "Read 'systemSet.json' error !!!");
@@ -471,33 +475,33 @@ public final class MainServlet extends HttpServlet {
                     }
                     String systemSetContent = retc.valueStr;
                     //=======================================================                    
-                    fileName = GB.webRootPath + "user-" + appName + "/userSet.json";
+                    fileName = GB.webRootPath + "user-" + systemName + "/userSet.json";
                     retc = Lib.readFileToString(fileName);
                     if (retc.errorF) {
                         kj.wStr(outJo, "message", "Read 'userSet.json' error !!!");
                         return;
                     }
                     String userSetContent = retc.valueStr;
-                    //=======================================================                    
-                    fileName = GB.paraSetFullName;
+                    //=======================================================  
+                    GB.systemName=systemName;
+                    fileName = GB.getParaSetPath(systemName);
                     retc = Lib.readFileToString(fileName);
                     if (retc.errorF) {
                         kj.wStr(outJo, "message", "Read 'paraSet' error !!!");
                         return;
                     }
                     String paraSetContent = retc.valueStr;
-                    GB.paraSetMap = this.getParas();
-                    
-                    
+                    GB.paraSetMap = this.getParas(systemName);
+
                     //=======================================================                    
                     JSONObject systemSetJo = new JSONObject(systemSetContent);
                     JSONObject paraSetJo = new JSONObject(paraSetContent);
                     JSONObject userSetJo = new JSONObject(userSetContent);
                     ArrayList<String> acounts = new ArrayList<String>();
-                    Object nameObj=GB.paraSetMap.get("adminName");
-                    Object passwordObj=GB.paraSetMap.get("adminPassword");
-                    if(nameObj!=null && passwordObj !=null){
-                        str=nameObj.toString()+"~0~"+passwordObj.toString();
+                    Object nameObj = GB.paraSetMap.get("adminName");
+                    Object passwordObj = GB.paraSetMap.get("adminPassword");
+                    if (nameObj != null && passwordObj != null) {
+                        str = nameObj.toString() + "~0~" + passwordObj.toString();
                         acounts.add(str);
                     }
                     kj.jobj = systemSetJo;
@@ -514,9 +518,9 @@ public final class MainServlet extends HttpServlet {
                     }
 
                     int pass = 0;
-                    int user=0;
+                    int user = 0;
                     for (int i = 0; i < acounts.size(); i++) {
-                        user=0;
+                        user = 0;
                         strA = acounts.get(i).split("~");
                         if (strA.length != 3) {
                             continue;
@@ -524,18 +528,18 @@ public final class MainServlet extends HttpServlet {
                         if (!strA[0].equals(userName)) {
                             continue;
                         }
-                        user=1;
+                        user = 1;
                         if (!strA[2].equals(password)) {
                             break;
                         }
                         pass = 1;
                         break;
                     }
-                    if(user==0 && pass==0){
+                    if (user == 0 && pass == 0) {
                         kj.wStr(outJo, "message", "Login Error !!!");
                         return;
                     }
-                    if(user==1 && pass==0){
+                    if (user == 1 && pass == 0) {
                         kj.wStr(outJo, "message", "Password Error !!!");
                         return;
                     }
@@ -546,7 +550,7 @@ public final class MainServlet extends HttpServlet {
                     kj.wStr(outJo, "status", "ok");
                     kj.wStr(outJo, "message", "Login OK.");
                     break;
-                    
+
                 case "readFile":
                     kj.wStr(outJo, "message", "login Error !!!");
                     kj.jobj = inOptsJo;
@@ -557,7 +561,7 @@ public final class MainServlet extends HttpServlet {
                     //=======================================================
                     retc = Lib.readFileToString(fileName);
                     if (retc.errorF) {
-                        kj.wStr(outJo, "message", "Read '"+fileName+"' error !!!");
+                        kj.wStr(outJo, "message", "Read '" + fileName + "' error !!!");
                         return;
                     }
                     String fileContent = retc.valueStr;
@@ -567,28 +571,27 @@ public final class MainServlet extends HttpServlet {
                     kj.wStr(outJo, "status", "ok");
                     kj.wStr(outJo, "message", "Read File OK.");
                     break;
-                    
-                    
+
 //=============================================================================================================================                    
                 case "saveStringToFile":
                     kj.wStr(outJo, "message", "Command Format Error !!!");
                     kj.jobj = inOptsJo;
-                    if (kj.rStr("appName")) {
+                    if (kj.rStr("systemName")) {
                         return;
                     }
-                    appName = kj.valueStr;
+                    systemName = kj.valueStr;
                     if (kj.rStr("fileName")) {
                         return;
                     }
                     fileName = kj.valueStr;
-                    if("paraSet".equals(fileName))
-                        fileName=GB.paraSetFullName;
+                    if ("paraSet".equals(fileName)) {
+                        fileName = GB.getParaSetPath(systemName);
+                    }
                     if (kj.rStr("content")) {
                         return;
                     }
                     content = kj.valueStr;
-                    
-                    
+
                     System.out.println("Write String To File: " + fileName);
 
                     BufferedWriter outf = new BufferedWriter(new OutputStreamWriter(
@@ -605,13 +608,10 @@ public final class MainServlet extends HttpServlet {
                     kj.wStr(outJo, "message", "Write File OK.");
                     strA = fileName.split("/");
                     if (strA[strA.length - 1].equals("paraSet.json")) {
-                        GB.paraSetMap = this.getParas();
+                        GB.paraSetMap = this.getParas(systemName);
                     }
                     break;
-                    
-                    
-                    
-                
+
                 //****************************************************************************************************
                 case "writeImageFile":
                     loadOutJoResponseError(inOptsJo, outJo, "writeImageFile Error !!!");
@@ -699,7 +699,6 @@ public final class MainServlet extends HttpServlet {
                     putJoJo(outJo, "opts", outOptsJo);
                     break;
 
-
 //=============================================================================================================================                    
                 case "copyFile":
                     putJoO(outJo, "responseMessage", "Copy File Error!");
@@ -763,36 +762,6 @@ public final class MainServlet extends HttpServlet {
                     putJoJo(outJo, "opts", outOptsJo);
                     break;
 
-                case "saveStringToFilexxx":
-                    putJoO(outJo, "responseMessage", "Save To File Error!");
-                    if (!geJoToRetStr(inOptsJo, "fileName")) {
-                        break;
-                    }
-                    fileName = GB.webRootPath + this.retData.retStr;
-                    if (!geJoToRetStr(inOptsJo, "value")) {
-                        break;
-                    }
-                    System.out.println("fileName= " + fileName);
-
-                    outf = new BufferedWriter(new OutputStreamWriter(
-                            new FileOutputStream(fileName), "UTF-8"));
-                    try {
-                        outf.write(this.retData.retStr);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    } finally {
-                        outf.close();
-                    }
-                    putJoO(outOptsJo, "status", "OK");
-                    putJoO(outJo, "responseMessage", "Save To File OK");
-                    putJoJo(outJo, "opts", outOptsJo);
-                    strA = fileName.split("/");
-                    if (strA[strA.length - 1].equals("paraSet.json")) {
-                        GB.paraSetMap = this.getParas();
-
-                    }
-
-                    break;
                 case "readFilexxx":
                     putJoO(outJo, "responseMessage", "Read File Error!");
                     if (!geJoToRetStr(inOptsJo, "fileName")) {

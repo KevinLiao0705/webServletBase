@@ -58,7 +58,7 @@ public final class Root {
         wstr += "\nlog4j.appender.consoleout.layout=org.apache.log4j.PatternLayout";
         wstr += "\nlog4j.appender.consoleout.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %p %c:%L - %m%n";
         wstr += "\nlog4j.appender.fileout=org.apache.log4j.RollingFileAppender";
-        wstr += "\nlog4j.appender.fileout.File=" + GB.rootPath + "log/" + GB.appName + ".log";
+        wstr += "\nlog4j.appender.fileout.File=" + GB.webRootPath + "log/" + GB.appName + ".log";
         wstr += "\nlog4j.appender.fileout.MaxFileSize=5MB";
         wstr += "\nlog4j.appender.fileout.MaxBackupIndex=10";
         wstr += "\nlog4j.appender.fileout.layout=org.apache.log4j.PatternLayout";

@@ -340,10 +340,8 @@ class Macro {
                     document.cookie = 'password=' + password + "; max-age=3600";
                     gr.userName = userName;
                     gr.password = password;
+                    gr.systemName=gr.paraSet.systemName;
                     gr.appPageCnt = 2;
-                    if (gr.paraSet.appName !== undefined) {
-                        gr.appName = gr.paraSet.appName;
-                    }
                     if (gr.paraSet.appId !== undefined) {
                         gr.appId = gr.paraSet.appId;
                     }

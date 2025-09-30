@@ -1,7 +1,7 @@
 class GlobalRes {
 
     static initApp(self) {
-        if (self.appName === "sync") {
+        if (self.systemName === "dummyTarget") {
             self.deviceId="syncSet";
             if (self.appId === 0)
                 self.appType = "Model~DummyTargetMaster~base.sys0";
@@ -16,29 +16,28 @@ class GlobalRes {
             if (self.appId === 99)
                 self.appType = "Model~MdTest~base.sys0";
         }
-        if (self.appName === "webBuilder") {
+        if (self.systemName === "webBuilder") {
             self.appType = "Model~MdaMdTest~base.sys0";
         }
-
-        if (self.appName === "sipphoneWeb") {
+        if (self.systemName === "josnSipPhone") {
             self.deviceId="sipphoneSet";
             self.appType = "Model~SipphoneWeb~base.sys0";
         }
-        if (self.appName === "sipphoneUiWeb") {
+        if (self.systemName === "josnSipUi") {
             self.deviceId="sipphoneUiSet";
             self.appType = "Model~SipphoneUiWeb~base.sys0";
         }
-
-
     }
     constructor() {
-        this.debug_f = 1;
-        this.version = "1.0";
+        this.systemName="dummyTarget";
+        //this.systemName="josnSipPhone";
+        //this.systemName="josnSipUi";
+        //this.systemName="webBuilder";
+        this.appId=0;
+        this.debug_f = 0;
         
-        //this.appName = "webBuilder";
-        //this.appName = "sync";
-        //this.appName = "sipphoneWeb";
-        this.appName = "sipphoneUiWeb";
+        
+        this.version = "1.0";
         this.appId = 3;
         //=================================
         this.webSocketEnable_f=1;
@@ -53,8 +52,8 @@ class GlobalRes {
         this.enabelLogin_f = 1;
         this.defaultUserName = "";
         this.defaultUserPassword = "";
-        //this.defaultUserName = "kevinAdmin";
-        //this.defaultUserPassword = "16020039";
+        this.defaultUserName = "kevinAdmin";
+        this.defaultUserPassword = "16020039";
         this.clearCookie_f = 0;
         //=================================
         this.globleTime = "DummyTargetMaster.globleTime()";

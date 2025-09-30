@@ -30,23 +30,6 @@ class Server {
     }
 
 //================================================
-    serverLogin(responseType, responseAction, userName, password) {
-        var opts;
-        var obj = {};
-        obj["act"] = "login";
-        obj["type"] = "command";
-        //=============================
-        var retOpts = obj["retOpts"] = {};
-        retOpts["cmdInx"] = sv.cmdInx;
-        retOpts["responseType"] = responseType;
-        retOpts["responseAction"] = responseAction;
-        //=============================
-        var opts = obj["opts"] = {};
-        opts["appName"] = gr.appName;
-        opts["userName"] = userName;
-        opts["password"] = password;
-        this.callServer(JSON.stringify(obj));
-    }
 
     serverLogin(responseType, responseAction, userName, password) {
         var opts;
@@ -60,7 +43,8 @@ class Server {
         retOpts["responseAction"] = responseAction;
         //=============================
         var opts = obj["opts"] = {};
-        opts["appName"] = gr.appName;
+        opts["osName"] = gr.osName;
+        opts["systemName"] = gr.systemName;
         opts["userName"] = userName;
         opts["password"] = password;
         this.callServer(JSON.stringify(obj));
@@ -78,7 +62,7 @@ class Server {
         retOpts["responseAction"] = responseAction;
         //=============================
         var opts = obj["opts"] = {};
-        opts["appName"] = gr.appName;
+        opts["systemName"] = gr.systemName;
         opts["fileName"] = fileName;
         opts["content"] = content;
         this.callServer(JSON.stringify(obj));

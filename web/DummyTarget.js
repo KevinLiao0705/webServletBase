@@ -46,7 +46,12 @@ class DummyTargetMaster {
                 opts.kvTexts.push("測試脈波設定");
                 opts.kvTexts.push("進階設定");
                 opts.kvTexts.push("下載記錄檔");
+                opts.kvTexts.push("下載設定檔");
+                opts.kvTexts.push("上傳設定檔");
                 opts.kvTexts.push("系統重啟");
+                opts.kvTexts.push("即時資料");
+                opts.kvTexts.push("數位波形群組");
+                opts.kvTexts.push("邏輯分析儀");
             }
             if (gr.appId === 1 || gr.appId === 2) {
                 opts.kvTexts.push("雷達信號參數設定");
@@ -55,7 +60,12 @@ class DummyTargetMaster {
                 opts.kvTexts.push("測試脈波設定");
                 opts.kvTexts.push("進階設定");
                 opts.kvTexts.push("下載記錄檔");
+                opts.kvTexts.push("下載設定檔");
+                opts.kvTexts.push("上傳設定檔");
                 opts.kvTexts.push("系統重啟");
+                opts.kvTexts.push("即時資料");
+                opts.kvTexts.push("數位波形群組");
+                opts.kvTexts.push("邏輯分析儀");
             }
             if (gr.appId === 3 || gr.appId === 4) {
                 opts.kvTexts.push("雷達參數設定");
@@ -1937,23 +1947,20 @@ class DummyTargetSub {
         if (gr.paraSet.emulate !== 1)
             ws.tick();
         if (gr.radarData.conRxA) {
-            var str = "SRX:";
-            str += " " + gr.radarData.conRxA[0] % 10;
-            str += " " + gr.radarData.conRxA[1] % 10;
+            var str = "U:";
+            str += gr.radarData.conRxA[24] &7;
+            str += gr.radarData.conRxA[25] &7;
             gr.footBarStatus1 = str;
 
+            var str = "CTR:";
+            str += gr.radarData.conRxA[0] &7;
+            str += gr.radarData.conRxA[1] &7;
+            str += gr.radarData.conRxA[3] &7;
 
-            var str = "FRX: ";
-            str += gr.radarData.conRxA[8] % 10;
-            str += gr.radarData.conRxA[9] % 10;
-            str += gr.radarData.conRxA[10] % 10;
-            str += gr.radarData.conRxA[11] % 10;
-
-            str += " " + gr.radarData.conRxA[12] % 10;
-            str += gr.radarData.conRxA[13] % 10;
-            str += gr.radarData.conRxA[14] % 10;
-            str += gr.radarData.conRxA[15] % 10;
-
+            str += " SYN:";
+            str += gr.radarData.conRxA[16] &7;
+            str += gr.radarData.conRxA[17] &7;
+            str += gr.radarData.conRxA[18] &7;
             gr.footBarStatus2 = str;
         }
         
@@ -5229,24 +5236,23 @@ class DummyTargetCtr {
         var st = md.stas;
         if (gr.paraSet.emulate !== 1)
             ws.tick();
+        
+         
         if (gr.radarData.conRxA) {
-            var str = "SRX:";
-            str += " " + gr.radarData.conRxA[0] % 10;
-            str += " " + gr.radarData.conRxA[1] % 10;
+            var str = "U:";
+            str +=gr.radarData.conRxA[22]&7;
+            str +=gr.radarData.conRxA[23]&7;
+            str += " M:" +gr.radarData.conRxA[12]&7;
+            str += gr.radarData.conRxA[13]&7;
+            str += gr.radarData.conRxA[15]&7;
             gr.footBarStatus1 = str;
-
-
-            var str = "FRX: ";
-            str += gr.radarData.conRxA[8] % 10;
-            str += gr.radarData.conRxA[9] % 10;
-            str += gr.radarData.conRxA[10] % 10;
-            str += gr.radarData.conRxA[11] % 10;
-
-            str += " " + gr.radarData.conRxA[12] % 10;
-            str += gr.radarData.conRxA[13] % 10;
-            str += gr.radarData.conRxA[14] % 10;
-            str += gr.radarData.conRxA[15] % 10;
-
+            
+            str = "A:" + gr.radarData.conRxA[4]&7;
+            str += gr.radarData.conRxA[5]&7;
+            str += gr.radarData.conRxA[7]&7;
+            str += " B:" + gr.radarData.conRxA[8]&7;
+            str += gr.radarData.conRxA[9]&7;
+            str += gr.radarData.conRxA[11]&7;
             gr.footBarStatus2 = str;
         }
         return;
