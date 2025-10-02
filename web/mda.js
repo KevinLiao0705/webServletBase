@@ -3007,6 +3007,11 @@ class MdaSetLine {
                             newValue = ivA[0];
                     }
                 }
+                else{
+                    if (setOpts.dataType !== "str")
+                        newValue = ivA[0];
+                    
+                }
                 var chg_f = 0;
                 if (setOpts.array) {
                     for (var i = 0; i < newValue.length; i++) {

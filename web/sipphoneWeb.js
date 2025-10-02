@@ -424,9 +424,7 @@ class SipphoneUiWeb {
             features+=",height="+screen.availHeight;
             features+=",resizable=yes";
             features+=",scrollbars=yes";
-             window.open("http://192.168.111.222", "myNewWindow", features);
-             //window.open("http://192.168.111.222", "_blank");
-            //window.open("http://192.168.111.222/", "_self");
+             window.open("http://"+gr.sipphoneUiData.sipPhoneIp, "myNewWindow", features);
             return;
             var opts = {};
             opts.actionFunc = function (iobj) {

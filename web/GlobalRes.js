@@ -29,9 +29,9 @@ class GlobalRes {
         }
     }
     constructor() {
-        this.systemName="dummyTarget";
+        //this.systemName="dummyTarget";
         //this.systemName="josnSipPhone";
-        //this.systemName="josnSipUi";
+        this.systemName="josnSipUi";
         //this.systemName="webBuilder";
         this.appId=0;
         this.debug_f = 0;
