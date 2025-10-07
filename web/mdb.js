@@ -1077,7 +1077,7 @@ class MdbPhoneBox {
         ];
         var ids = [
             "cancle", "up", "ok", "+", "-", "set"
-                    , "left", "down", "right", "meet", "transfer", "meetInf"
+                    , "left", "down", "right", "ptt", "transfer", "meetInf"
                     , "line1", "line2", "hold", "mute", "reDirect", "broadInf"
         ];
 

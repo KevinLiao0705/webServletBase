@@ -12,20 +12,19 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/kevin/myCode/webServletBase/web/SubOpts.js</file>
             <file>file:/E:/kevin/myCode/webServletBase/web/Dbg.js</file>
+            <file>file:/E:/kevin/myCode/webServletBase/web/SubOpts.js</file>
+            <file>file:/E:/kevin/myCode/webServletBase/src/java/org/kevin/KvJson.java</file>
             <file>file:/E:/kevin/myCode/webServletBase/web/KvLib.js</file>
             <file>file:/E:/kevin/myCode/webServletBase/web/GlobalRes.js</file>
             <file>file:/E:/kevin/myCode/webServletBase/web/webSocket.js</file>
+            <file>file:/E:/kevin/myCode/webServletBase/src/java/MainServlet.java</file>
             <file>file:/E:/kevin/myCode/webServletBase/web/sipphoneWeb.js</file>
-            <file>file:/E:/kevin/myCode/webServletBase/web/MySystem.js</file>
             <file>file:/E:/kevin/myCode/webServletBase/web/mda.js</file>
-            <file>file:/E:/kevin/myCode/webServletBase/web/Block.js</file>
-            <file>file:/E:/kevin/myCode/webServletBase/src/java/org/kevin/Lib.java</file>
-            <file>file:/E:/kevin/myCode/webServletBase/web/MyPlot.js</file>
-            <file>file:/E:/kevin/myCode/webServletBase/web/DummyTarget.js</file>
-            <file>file:/E:/kevin/myCode/webServletBase/src/java/org/kevin/GB.java</file>
+            <file>file:/E:/kevin/myCode/webServletBase/web/Server.js</file>
+            <file>file:/E:/kevin/myCode/webServletBase/web/mdb.js</file>
             <file>file:/E:/kevin/myCode/webServletBase/web/Macro.js</file>
+            <file>file:/E:/kevin/myCode/webServletBase/src/java/org/kevin/GB.java</file>
         </group>
     </open-files>
 </project-private>
