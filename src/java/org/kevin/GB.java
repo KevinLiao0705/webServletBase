@@ -28,7 +28,7 @@ public class GB {
     public static int min_js_f = 0;
     public static String systemName = "";
     public static String osName = "win";
-
+    public static String interfaces_path = "";
     static public String appName = "webServeletBase";
     public static Map<String, Object> paraSetMap = new HashMap();
     public static String sourceDir = "web/";          //for debug use
@@ -112,5 +112,9 @@ public class GB {
         return paraSetFullName;
 
     }
+    
+    
+    
+    
 
 }

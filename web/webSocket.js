@@ -15,9 +15,12 @@ class MyWebSocket {
         if (self.wsok)
             return;
         try {
-            var sockIp=gr.paraSet.webSocketAddr;
+            var sockIp=gr.webIp;
             if(gr.paraSet.systemIpAddress)
                 sockIp=gr.paraSet.systemIpAddress;
+            if(gr.paraSet.webSocketAddr)
+                sockIp=gr.paraSet.webSocketAddr;
+            
             self.socket = new WebSocket('ws://' + sockIp + ':' + gr.webSocketPort + '/websocket');
         } catch (ex) {
             console.log(ex);
@@ -42,7 +45,8 @@ class MyWebSocket {
             var received_msg = evt.data;
             var recObj = JSON.parse(received_msg);
             var wsSysObj = JSON.parse(recObj.wsSysJson);
-            gr.footBarStatus0 = "Connected " + (wsSysObj.serialTime % 10);
+            gr.webSocketConnectCnt=wsSysObj.serialTime;
+            //gr.footBarStatus0 = "Connected " + (wsSysObj.serialTime % 10);
             if (gr.socketRetPrgTbl[recObj.act])
                 gr.socketRetPrgTbl[recObj.act](recObj);
             if (recObj.tickBackValue) {

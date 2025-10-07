@@ -8,10 +8,6 @@ class GlobalRes {
             if (self.appId === 1)
                 self.appType = "Model~DummyTargetSub~base.sys0";
             if (self.appId === 2)
-                self.appType = "Model~DummyTargetSub~base.sys0";
-            if (self.appId === 3)
-                self.appType = "Model~DummyTargetCtr~base.sys0";
-            if (self.appId === 4)
                 self.appType = "Model~DummyTargetCtr~base.sys0";
             if (self.appId === 99)
                 self.appType = "Model~MdTest~base.sys0";
@@ -29,9 +25,9 @@ class GlobalRes {
         }
     }
     constructor() {
-        //this.systemName="dummyTarget";
+        this.systemName="dummyTarget";
         //this.systemName="josnSipPhone";
-        this.systemName="josnSipUi";
+        //this.systemName="josnSipUi";
         //this.systemName="webBuilder";
         this.appId=0;
         this.debug_f = 0;

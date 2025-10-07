@@ -948,7 +948,7 @@ class Block {
                 continue;
             ipObj.cnt = 0;
             var value;
-            if (ipObj.inputName === "self.fatherMd.fatherMd.fatherMd.stas.watchDataA#0") {
+            if (ipObj.inputName === "setOpts.value") {
                 var uu = 0;
             }
             if (ipObj.type === "directReg") {

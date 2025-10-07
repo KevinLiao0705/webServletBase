@@ -341,6 +341,7 @@ class Macro {
                     gr.userName = userName;
                     gr.password = password;
                     //gr.systemName=gr.paraSet.systemName;
+                    gr.webIp=mes.opts.webIp;
                     gr.appPageCnt = 2;
                     if (gr.paraSet.appId !== undefined) {
                         gr.appId = gr.paraSet.appId;
