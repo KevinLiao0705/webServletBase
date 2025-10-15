@@ -45,6 +45,7 @@ class SipphoneWeb {
             st.watchDataA[3] = gr.sipphoneData.sipNo;
             st.watchDataA[4] = gr.sipphoneData.sipServerIp;
         }
+        gr.footBarStatus2 = "Connected " + (gr.webSocketConnectCnt % 10);
 
 
 
@@ -405,6 +406,7 @@ class SipphoneUiWeb {
             st.watchDataA[9] =gr.sipphoneUiData.ntpIp;
             
         }
+        gr.footBarStatus2 = "Connected " + (gr.webSocketConnectCnt % 10);
 
 
 
@@ -549,6 +551,7 @@ class SipphoneUiWeb {
         if (id === "系統設定") {
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "adminName"}));
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "adminPassword"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "settingPassword"}));
             
             
             

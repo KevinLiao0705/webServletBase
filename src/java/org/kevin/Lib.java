@@ -111,15 +111,14 @@ public class Lib {
     //else return 1;
     public static final int ping(String hostname) {
         try {
-            if (GB.osInx == 0) //n=tx count w=wait time
+            if (GB.osName.equals("win")) //n=tx count w=wait time
             {
                 //return Runtime.getRuntime().exec("ping -n 1 -w 1000 " + hostname).waitFor();  //windows
                 return ping(hostname, 1000);
             }
-            if (GB.osInx == 1) {
+            else {
                 return Runtime.getRuntime().exec("ping -c 1 " + hostname).waitFor();  //linux
             }
-            return 1;
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
             return -1;

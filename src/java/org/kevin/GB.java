@@ -14,13 +14,12 @@ import java.util.Map;
  */
 public class GB {
 
-    public static int osInx = 0;//0 for window 1:for linux
     //==============================================
     public static String dummyTargetWinParaSet = "e:/kevin/myCode/syncSet/paraSet.json";
     public static String dummyTargetLinuxParaSet = "/home/admintx/syncSetExe/paraSet.json";
-    public static String josnSipPhoneWinParaSet = "e:/kevin/myCode/josnSipSet/paraSetSip.json";
+    public static String josnSipPhoneWinParaSet = "e:/kevin/myCode/webSet/josnSipSet/paraSetSip.json";
     public static String josnSipPhoneLinuxParaSet = "/home/pi/kevin/sipphone/paraSetSip.json";
-    public static String josnSipUiWinParaSet = "e:/kevin/myCode/josnSipSet/paraSetUi.json";
+    public static String josnSipUiWinParaSet = "e:/kevin/myCode/webSet/josnSipSet/paraSetUi.json";
     public static String josnSipUiLinuxParaSet = "/home/pi/kevin/sipui2in1/paraSetUi.json";
     public static String webBuilderWinParaSet = "e:/kevin/myCode/webBuilderSet/paraSet.json";
     public static String webBuilderLinuxParaSet = "/home/pi/kevin/webBuilderSet/paraSet.json";

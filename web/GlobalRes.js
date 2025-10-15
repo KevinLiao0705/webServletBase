@@ -36,6 +36,7 @@ class GlobalRes {
         this.version = "1.0";
         this.appId = 3;
         //=================================
+        
         this.webSocketEnable_f=1;
         this.showLogo_f = 1;
         this.showLogoTime = 1000;//ms
@@ -62,7 +63,7 @@ class GlobalRes {
         this.selfTestStartAll_f = 0;
         this.selfTestTime = 0;
         this.selfTestInx = 0;
-
+        this.webSocketConnectCnt=0;
         //==============================
         this.kid = 0;
         this.ser = 0;
