@@ -16,8 +16,8 @@ class MyWebSocket {
             return;
         try {
             var sockIp=gr.webIp;
-            if(gr.paraSet.systemIpAddress)
-                sockIp=gr.paraSet.systemIpAddress;
+            //if(gr.paraSet.systemIpAddress)
+            //    sockIp=gr.paraSet.systemIpAddress;
             if(gr.paraSet.webSocketAddr)
                 sockIp=gr.paraSet.webSocketAddr;
             
