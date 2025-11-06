@@ -68,7 +68,8 @@ class SipphoneWeb {
                 if (strA[0] === "reDirect") {
                     if (gr.sipphoneData.phoneFlag & 1) {
                         var sipCmd = "Redirect -a off\n";
-                        ws.cmd("sipCommandDirect", [sipCmd]);
+                        //ws.cmd("sipCommandDirect", [sipCmd]);
+                        ws.cmd("phoneCommand", ["transfer "+iobj.inputText]);
                         return;
                     }
 
@@ -80,7 +81,8 @@ class SipphoneWeb {
                         if (iobj.act === "padEnter") {
                             if (iobj.inputText.length !== 0) {
                                 var sipCmd = "Redirect -t always " + iobj.inputText + "\n";
-                                ws.cmd("sipCommandDirect", [sipCmd]);
+                                //ws.cmd("sipCommandDirect", [sipCmd]);
+                                ws.cmd("phoneCommand", ["transfer "+iobj.inputText]);
                                 return;
                             }
                         }
@@ -455,7 +457,8 @@ class SipphoneUiWeb {
                         if (iobj.act === "padEnter") {
                             if (iobj.inputText.length !== 0) {
                                 var sipCmd = "Redirect -t always " + iobj.inputText + "\n";
-                                ws.cmd("sipCommandDirect", [sipCmd]);
+                                ws.cmd("phoneCommand", [iobj.key+" "+iobj.inputText]);
+                                //ws.cmd("sipCommandDirect", [sipCmd]);
                                 return;
                             }
                         }

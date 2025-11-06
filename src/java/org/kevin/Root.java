@@ -109,6 +109,7 @@ public final class Root {
         String localIp = null;
         try {
             Enumeration e = NetworkInterface.getNetworkInterfaces();
+            int yes_f=0;
             while (e.hasMoreElements()) {
                 NetworkInterface n = (NetworkInterface) e.nextElement();
                 Enumeration ee = n.getInetAddresses();
@@ -118,8 +119,12 @@ public final class Root {
                     sti = str.indexOf("192.168.");
                     if (sti >= 0) {
                         localIp = str;
+                        yes_f=1;
+                        break;
                     }
                 }
+                if(yes_f==1)
+                    break;
             }
             if (localIp == null) {
                 return str;
