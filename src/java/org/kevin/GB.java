@@ -15,7 +15,7 @@ import java.util.Map;
 public class GB {
 
     //==============================================
-    public static String dummyTargetWinParaSet = "e:/kevin/myCode/syncSet/paraSet.json";
+    public static String dummyTargetWinParaSet = "e:/kevin/myCode/webSet/syncSet/paraSet.json";
     public static String dummyTargetLinuxParaSet = "/home/admintx/syncSetExe/paraSet.json";
     public static String josnSipPhoneWinParaSet = "e:/kevin/myCode/webSet/josnSipSet/paraSetSip.json";
     public static String josnSipPhoneLinuxParaSet = "/home/pi/kevin/sipphone/paraSetSip.json";
