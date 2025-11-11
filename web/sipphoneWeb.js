@@ -17,6 +17,7 @@ class SipphoneWeb {
                 }
             }
             gr.sipphoneData.rxed_f = 1;
+            gr.webSocketConnectTime=0;
             console.log("sipphoneData");
         };
 
@@ -37,7 +38,7 @@ class SipphoneWeb {
         var op = md.opts;
         var st = md.stas;
         ws.tick();
-        st.watchDataA = ["", "", "", "", "",""];
+        st.watchDataA = ["", "", "", "", "","",""];
         if (gr.sipphoneData) {
             st.watchDataA[0] = gr.sipphoneData.realSipphoneIp;
             st.watchDataA[1] = gr.sipphoneData.realSipphoneMac;
@@ -45,9 +46,18 @@ class SipphoneWeb {
             st.watchDataA[3] = gr.sipphoneData.sipNo;
             st.watchDataA[4] = gr.sipphoneData.sipServerIp;
             st.watchDataA[5] = gr.sipphoneData.ntppServerIp;
+            st.watchDataA[6] = gr.sipphoneData.version+"-"+gr.version;
         }
         gr.footBarStatus2 = "Connected " + (gr.webSocketConnectCnt % 10);
-
+        gr.webSocketConnectTime++;
+        if(gr.webSocketConnectTime>=60){
+            if(gr.sipphoneData){
+                gr.sipphoneData.status="";
+                gr.sipphoneData.action="";
+                
+            }
+            
+        }
 
 
     }
@@ -69,11 +79,9 @@ class SipphoneWeb {
                     if (gr.sipphoneData.phoneFlag & 1) {
                         var sipCmd = "Redirect -a off\n";
                         //ws.cmd("sipCommandDirect", [sipCmd]);
-                        ws.cmd("phoneCommand", ["transfer "+iobj.inputText]);
+                        ws.cmd("phoneCommand", ["reDirect "+"reset"]);
                         return;
                     }
-
-
                     var opts = {};
                     opts.title = "無條件轉接號碼";
                     opts.actionFunc = function (iobj) {
@@ -82,17 +90,23 @@ class SipphoneWeb {
                             if (iobj.inputText.length !== 0) {
                                 var sipCmd = "Redirect -t always " + iobj.inputText + "\n";
                                 //ws.cmd("sipCommandDirect", [sipCmd]);
-                                ws.cmd("phoneCommand", ["transfer "+iobj.inputText]);
+                                ws.cmd("phoneCommand", ["reDirect "+iobj.inputText]);
                                 return;
                             }
                         }
-                        /*
-                         sipCommand = "Redirect -t always " + Input.ret_str + "\n";
-                         } else {
-                         sipCommand = "Redirect -a off\n";
-                         */
-
-
+                    };
+                    box.intPadBox(opts);
+                    return;
+                }
+                if (strA[0] === "transfer") {
+                    var opts = {};
+                    opts.title = "轉接號碼";
+                    opts.actionFunc = function (iobj) {
+                        console.log(iobj);
+                        if (iobj.act === "padEnter") {
+                                ws.cmd("phoneCommand", ["transferNumber "+iobj.inputText]);
+                                return;
+                        }
                     };
                     box.intPadBox(opts);
                     return;
@@ -131,6 +145,7 @@ class SipphoneWeb {
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "adminPassword"}));
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "ntpServerAddress"}));
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "ntpAdjTime"}));
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "setAllCnt"}));
 
         }
 
@@ -274,7 +289,12 @@ class SipphoneWeb {
         var regName = "self.fatherMd.fatherMd.fatherMd.fatherMd.stas.watchDataA";
         var setOptsA = [];
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemName"}));
-        setOptsA.push(sopt.getParaSetOpts({paraSetName: "version"}));
+        
+        
+        var setOpts = sopt.getParaSetOpts({paraSetName: "version"});
+        var watchDatas = setOpts.watchDatas = [];
+        watchDatas.push(["directReg", regName + "#6", "editValue", 1]);
+        setOptsA.push(setOpts);
         //
 
         var setOpts = sopt.getParaSetOpts({paraSetName: "systemMacAddress"});
@@ -414,6 +434,7 @@ class SipphoneUiWeb {
             st.watchDataA[7] = gr.sipphoneUiData.sipServerIp;
             st.watchDataA[8] = gr.sipphoneUiData.switchIp;
             st.watchDataA[9] = gr.sipphoneUiData.ntpIp;
+            st.watchDataA[10] =gr.sipphoneUiData.version+"-"+gr.version;
 
         }
         gr.footBarStatus2 = "Connected " + (gr.webSocketConnectCnt % 10);
@@ -632,6 +653,8 @@ class SipphoneUiWeb {
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "sipphoneGateWay"}));
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "switchNetMask"}));
             setOptsA.push(sopt.getParaSetOpts({paraSetName: "switchGateWay"}));
+
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "setAllCnt"}));
 
 
         }
@@ -924,9 +947,17 @@ class SipphoneUiWeb {
         //==============================
         var setOptsA = [];
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemName"}));
-        setOptsA.push(sopt.getParaSetOpts({paraSetName: "version"}));
-        //===============
+        
+        
+        
         var regName = "self.fatherMd.fatherMd.fatherMd.fatherMd.stas.watchDataA";
+        var setOpts = sopt.getParaSetOpts({paraSetName: "version"});
+        var watchDatas = setOpts.watchDatas = [];
+        watchDatas.push(["directReg", regName + "#10", "editValue", 1]);
+        setOptsA.push(setOpts);
+        
+        
+        //===============
         var setOpts = sopt.getParaSetOpts({paraSetName: "systemMacAddress"});
         var watchDatas = setOpts.watchDatas = [];
         watchDatas.push(["directReg", regName + "#0", "editValue", 1]);

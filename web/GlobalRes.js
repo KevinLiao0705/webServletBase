@@ -25,16 +25,15 @@ class GlobalRes {
         }
     }
     constructor() {
-        this.systemName="dummyTarget";
+        this.version = "w3.0";
+        //this.systemName="dummyTarget";
         //this.systemName="josnSipPhone";
-        //this.systemName="josnSipUi";
+        this.systemName="josnSipUi";
         //this.systemName="webBuilder";
         this.appId=0;
         this.debug_f = 0;
         
         
-        this.version = "1.0";
-        this.appId = 2;
         //=================================
         
         this.webSocketEnable_f=1;
@@ -64,13 +63,13 @@ class GlobalRes {
         this.selfTestTime = 0;
         this.selfTestInx = 0;
         this.webSocketConnectCnt=0;
+        this.webSocketConnectTime=0;
         //==============================
         this.kid = 0;
         this.ser = 0;
         //this.webSocketAddress = "192.168.0.28";
         this.webSocketAddress = "127.0.0.1";
         this.webSocketPort = "8899";
-        this.webSocketConnTime = 0;
         this.webSocketConnect_f = 0;
         //
         this.mouseAct = {};
