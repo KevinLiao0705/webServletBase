@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.animation.KeyValue;
+//import javafx.animation.KeyValue;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -834,5 +834,5 @@ class RetData {
     int reti = 0;
     float retf = 0;
     Object retObj;
-    List<KeyValue> lsKeyValue = new ArrayList<>();
+    //List<KeyValue> lsKeyValue = new ArrayList<>();
 }
