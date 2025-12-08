@@ -248,13 +248,22 @@ class KvLib {
     static setEditorMaker(editor, color) {
         var row = editor.session.getLength() - 1;
         var Range = ace.require('ace/range').Range;
-        if (color === "red")
+        if (color === "red"){
             editor.session.addMarker(new Range(row, 0, row, 1), "myRedMarker", "fullLine");
-        if (color === "green")
+            return;
+        }    
+        if (color === "green"){
             editor.session.addMarker(new Range(row, 0, row, 1), "myGreenMarker", "fullLine");
-        if (color === "yellow")
+            return;
+        }    
+        if (color === "yellow"){
             editor.session.addMarker(new Range(row, 0, row, 1), "myYellowMarker", "fullLine");
+            return;
+        }    
+        editor.session.addMarker(new Range(row, 0, row, 1), color, "fullLine");
     }
+
+
 
     static clearEditorMaker(editor) {
         const prevMarkers = editor.session.getMarkers();

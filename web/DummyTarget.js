@@ -83,6 +83,7 @@ class DummyTargetMaster {
                 opts.kvTexts.push("即時資料");
                 opts.kvTexts.push("數位波形群組");
                 opts.kvTexts.push("邏輯分析儀");
+                opts.kvTexts.push("幫助");
             }
             opts.actionFunc = function (iobj) {
                 console.log(iobj);
@@ -94,6 +95,10 @@ class DummyTargetMaster {
 
                 if (iobj.selectText === "邏輯分析儀") {
                     MdaPopWin.popOff(2);
+                    gr.gbcs.command({'act': "exeLogic"});
+                    return;
+                }
+                if (iobj.selectText === "幫助") {
                     gr.gbcs.command({'act': "exeLogic"});
                     return;
                 }

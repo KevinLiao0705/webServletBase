@@ -341,7 +341,7 @@ class Macro {
                     gr.userName = userName;
                     gr.password = password;
                     //gr.systemName=gr.paraSet.systemName;
-                    gr.webIp=mes.opts.webIp;
+                    gr.webIp = mes.opts.webIp;
                     gr.appPageCnt = 2;
                     if (gr.paraSet.appId !== undefined) {
                         gr.appId = gr.paraSet.appId;
@@ -1827,6 +1827,80 @@ class KvBox {
         };
         var kvObj = new Block("mdaBox", "Model~MdaBox~base.sys0", opts);
         mda.popObj(op.w, op.h, kvObj);
+    }
+
+    editorBox(_op) {
+        var op = {};
+        op.w = 9999;
+        op.h = 9999;
+        op.margin = 10;
+        op.ym = 10;
+        op.baseColor = "#222";
+        op.buttonXm = 20;
+        op.title = "Editor";
+        op.titleBaseColor = "#004";
+        op.lpd = 0;
+        op.buttonOn_f = 1;
+        op.headButtons = ["ESC"];
+        op.headButtonIds = ["esc"];
+        op.exName = "txt";//js|css|html|txt|xml|json
+        op.readOnly_f = 0;
+        op.hideNo_f = 1;
+        op.wrapSize = 80;
+        op.nextRow=20;
+
+
+        KvLib.deepCoverObject(op, _op);
+        //=====================================
+        var opts = {};
+        opts.title = op.title;
+        opts.titleBaseColor = op.titleBaseColor;
+        opts.headButtons = op.headButtons;
+        opts.headButtonIds = op.headButtonIds;
+        opts.buttons = op.buttons;
+        opts.buttonIds = op.buttonIds;
+        opts.buttonXm = op.buttonXm;
+        opts.baseColor = op.baseColor;
+        opts.ym = op.ym;
+        opts.buttonsOn_f = op.buttonOn_f;
+        mda.setMargin(opts, op);
+        //=================
+        var ksObj = opts.ksObj = {};
+        var kopts = ksObj.opts = {};
+        ksObj.name = "editor";
+        ksObj.type = "Component~Cp_base~editor.sys0";
+        kopts.readOnly_f = op.readOnly_f;
+        kopts.hideNo_f = op.hideNo_f;
+        kopts.exName = op.exName;
+        kopts.wrapSize = op.wrapSize;
+        kopts.nextRow = op.nextRow;
+
+        //=================
+        opts.actionFunc = function (iobj) {
+            console.log(iobj);
+            if (iobj.act === "mousePush") {
+                if (iobj.kvObj.opts.id === "nextButton") {
+                    var kvObj = iobj.sender.blockRefs["mainMd"];
+                    KvLib.lineMoveEditor(kvObj, kvObj.opts.nextRow);
+                    
+                    return;
+                }
+                if (iobj.kvObj.opts.id === "prevButton") {
+                    var kvObj = iobj.sender.blockRefs["mainMd"];
+                    KvLib.lineMoveEditor(kvObj, 0-kvObj.opts.nextRow);
+                    return;
+                }
+            }
+            if (iobj.act === "mouseClick") {
+                if (iobj.kvObj.opts.id === "ok") {
+                }
+                MdaPopWin.popOffTo(iobj.sender.opts.popStackCnt);
+                return;
+            }
+        };
+        var kvObj = new Block("mdaBox", "Model~MdaBox~base.sys0", opts);
+        mda.popObj(op.w, op.h, kvObj);
+        return kvObj;
     }
 
     intPadBox(_op) {

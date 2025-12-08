@@ -1745,6 +1745,8 @@ class Cp_base {
                 var mode = "ace/mode/xml";
             if (op.exName === "json")
                 var mode = "ace/mode/json";
+            if(!op.wrapSize)
+                op.wrapSize=80;
 
             var hideNo = true;
             if (op.hideNo_f)
@@ -1760,7 +1762,7 @@ class Cp_base {
                 theme: "ace/theme/monokai", // 默认设置的主题
                 mode: mode, // 默认设置的语言模式
                 //value: data.toString(),
-                wrap: 90, //op.wrapLine,
+                wrap: op.wrapSize, //op.wrapLine,
                 //useWrapMode: true,   // wrap text to view
                 indentedSoftWrap: true,
                 behavioursEnabled: false, // disable autopairing of brackets and tags

@@ -351,8 +351,12 @@ class MdaMdTest {
                 mda.setLineStrInputText({});
                 return;
             }
-            if (iobj.keyId === "testSetLineInputText~intPassword") {
-                mda.setLineIntPassword({});
+            if (iobj.keyId === "testViewBox~editorBox") {
+                var editorBox=box.editorBox({});
+                var kvObj = editorBox.blockRefs["mainMd"];
+                KvLib.endInputEditor(kvObj,"ewaweqweqw","green");
+                KvLib.endInputEditor(kvObj,"ewaweqweqw","yellow");
+                KvLib.endInputEditor(kvObj,"ewaweqweqw","red");
                 return;
             }
             if (iobj.keyId === "componentTest~showButtons") {

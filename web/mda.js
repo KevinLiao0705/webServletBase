@@ -2470,15 +2470,17 @@ class MdaBox {
 
                     if (iobj.kvObj.opts.id === "nextButton") {
                         var kvObj = md.blockRefs["mainMd"];
-                        if (kvObj.mdClass.nextPage)
+                        if (kvObj.mdClass.nextPage){
                             kvObj.mdClass.nextPage();
-                        return;
+                            return;
+                        }
                     }
                     if (iobj.kvObj.opts.id === "prevButton") {
                         var kvObj = md.blockRefs["mainMd"];
-                        if (kvObj.mdClass.prevPage)
+                        if (kvObj.mdClass.prevPage){
                             kvObj.mdClass.prevPage();
-                        return;
+                            return;
+                        }
                     }
                 }
                 iobj.sender = md;

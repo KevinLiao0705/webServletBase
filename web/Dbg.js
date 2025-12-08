@@ -20,7 +20,7 @@ class Dbg {
         //
         kvs0[7].eng = "DialogTest";
         kvs0[7].id = "dialogTest";
-        kvs0[7].menus=this.getMenus(kvs0[0].id, 8);
+        kvs0[7].menus=this.getMenus(kvs0[0].id, 9);
         var kvs07=kvs0[7].menus.kvTexts;
         //===================================================================
         kvs07[0].id="testMesssageBox";
@@ -187,6 +187,7 @@ class Dbg {
         kvs076[7].eng="Show pickColorBox";
         kvs076[7].image = "systemResource/icons8-list-100.png";
         
+        //================================
         kvs07[7].id="testSetLineInputText";
         kvs07[7].eng="Test SetLine InputText Int";
         kvs07[7].image = "systemResource/icons8-container-64.png";
@@ -201,6 +202,19 @@ class Dbg {
         kvs077[2].id="intPassword";
         kvs077[2].eng="Show intPassword";
         kvs077[2].image = "systemResource/icons8-list-100.png";
+        
+        //================================
+        kvs07[8].id="testViewBox";
+        kvs07[8].eng="Test View Box";
+        kvs07[8].image = "systemResource/icons8-container-64.png";
+        kvs07[8].menus=this.getMenus(kvs07[8].id, 8);
+        var kvs078=kvs07[8].menus.kvTexts;
+        kvs078[0].id="editorBox";
+        kvs078[0].eng="Editor Box";
+        kvs078[0].image = "systemResource/icons8-listPage-64.png";
+        
+        
+        
         //==========================================================
         kvs06[0].id="showButtons";
         kvs06[0].eng="Show Buttons";
