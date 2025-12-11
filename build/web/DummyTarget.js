@@ -99,8 +99,17 @@ class DummyTargetMaster {
                     return;
                 }
                 if (iobj.selectText === "幫助") {
-                    gr.gbcs.command({'act': "exeLogic"});
+                    var opts={};
+                    opts.title="HELP";
+                    opts.readOnly_f = 1;
+                    opts.hideNo_f = 0;
+                    opts.nextRow=20;
+                    var editorBox=box.editorBox(opts);
+                    var kvObj = editorBox.blockRefs["mainMd"];
+                    KvLib.endInputEditor(kvObj,"IPC Connect Flag: W:webSocket, U1:UATr from FPGA to IPC, U2:control panel to IPC","");
+                    KvLib.endInputEditor(kvObj,"Fiber Connect Flag: CTR:1:, U1:UATr from FPGA to IPC, U2:control panel to IPC","");
                     return;
+                    
                 }
                 if (iobj.selectText === "數位波形群組") {
                     var opts = {};
@@ -1833,18 +1842,18 @@ class DummyTargetSub {
             var str = "U:";
             str += gr.radarData.conRxA[24] & 7;
             str += gr.radarData.conRxA[25] & 7;
-            gr.footBarStatus1 = str;
+            gr.footBarStatus0 = str;
 
-            var str = "CTR:";
-            str += gr.radarData.conRxA[0] & 7;
-            str += gr.radarData.conRxA[1] & 7;
-            str += gr.radarData.conRxA[3] & 7;
-
+            
+            var str = "SUB:";
+            str += gr.radarData.conRxA[0] & 7;//sub fiberA to ctr ok
+            str += gr.radarData.conRxA[1] & 7;//sub fiberB to ctr ok
+            str += gr.radarData.conRxA[3] & 7;//ctr fiberB to sub ok
             str += " SYN:";
-            str += gr.radarData.conRxA[16] & 7;
-            str += gr.radarData.conRxA[17] & 7;
-            str += gr.radarData.conRxA[18] & 7;
-            gr.footBarStatus2 = str;
+            str += gr.radarData.conRxA[16] & 7;//sync s1FiberRx
+            str += gr.radarData.conRxA[17] & 7;//sync s1RfRx
+            str += gr.radarData.conRxA[18] & 7;//sync packRx
+            gr.footBarStatus1 = str;
         }
 
 
@@ -5056,18 +5065,35 @@ class DummyTargetCtr {
             str += "U";
             str += gr.radarData.conRxA[24] & 7;
             str += gr.radarData.conRxA[25] & 7;
-            gr.footBarStatus0 = str;
-
-            var str = "CTR:";
-            str += gr.radarData.conRxA[0] & 7;
-            str += gr.radarData.conRxA[1] & 7;
-            str += gr.radarData.conRxA[3] & 7;
-
-            str += " SYN:";
+            str += "P";
             str += gr.radarData.conRxA[16] & 7;
             str += gr.radarData.conRxA[17] & 7;
             str += gr.radarData.conRxA[18] & 7;
+            
+            
+            gr.footBarStatus0 = str;
+
+            var str = "SUB:";
+            str += gr.radarData.conRxA[0] & 7;
+            str += gr.radarData.conRxA[1] & 7;
+            str += gr.radarData.conRxA[3] & 7;
+            str += " MTR:";
+            str += gr.radarData.conRxA[12] & 7;
+            str += gr.radarData.conRxA[13] & 7;
+            str += gr.radarData.conRxA[15] & 7;
+            gr.footBarStatus1 = str;
+            
+            var str = "DRA:";
+            str += gr.radarData.conRxA[4] & 7;
+            str += gr.radarData.conRxA[5] & 7;
+            str += gr.radarData.conRxA[7] & 7;
+            str += " DRB:";
+            str += gr.radarData.conRxA[8] & 7;
+            str += gr.radarData.conRxA[9] & 7;
+            str += gr.radarData.conRxA[11] & 7;
             gr.footBarStatus2 = str;
+            
+            
         }
         return;
 

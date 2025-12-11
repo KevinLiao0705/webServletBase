@@ -21,7 +21,7 @@ public class GB {
     public static String josnSipPhoneLinuxParaSet = "/home/pi/kevin/sipphone/paraSetSip.json";
     public static String josnSipUiWinParaSet = "e:/kevin/myCode/webSet/josnSipSet/paraSetUi.json";
     public static String josnSipUiLinuxParaSet = "/home/pi/kevin/sipui2in1/paraSetUi.json";
-    public static String webBuilderWinParaSet = "e:/kevin/myCode/webBuilderSet/paraSet.json";
+    public static String webBuilderWinParaSet = "e:/kevin/myCode/webSet/webBuilderSet/paraSet.json";
     public static String webBuilderLinuxParaSet = "/home/pi/kevin/webBuilderSet/paraSet.json";
     //=====================================
     public static int min_js_f = 0;
