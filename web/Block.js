@@ -919,7 +919,7 @@ class Block {
             opts.inputRegs = [];
         opts.inputRegs.push(ipObj);
     }
-    static setInputWatch(opts, type, regName, optName, redraw_f){
+    static setInputWatch(opts, type, regName, optName, redraw_f) {
         var ipObj = {};
         ipObj.cnt = 0;
         ipObj.period = 1;
@@ -930,7 +930,7 @@ class Block {
         if (!opts.inputRegs)
             opts.inputRegs = [];
         opts.inputRegs.push(ipObj);
-        
+
     }
     setInputWatch(opts, type, regName, optName, redraw_f) {
         Block.setInputWatch(opts, type, regName, optName, redraw_f);
@@ -1002,14 +1002,14 @@ class Block {
                     }
                 }
             } else {
-                var strA=ipObj.optName.split(".");
-                var reg=self.opts;
-                var optsName=strA[strA.length-1];
-                for(var j=0;j<strA.length-1;j++){
-                    var reg=reg[strA[j]];
+                var strA = ipObj.optName.split(".");
+                var reg = self.opts;
+                var optsName = strA[strA.length - 1];
+                for (var j = 0; j < strA.length - 1; j++) {
+                    var reg = reg[strA[j]];
                 }
                 if (reg[optsName] !== value) {
-                    reg[optsName]=value;
+                    reg[optsName] = value;
                     self.setWatch(self, ipObj.optName, value, ipObj.redraw_f);
                 }
             }
@@ -1090,16 +1090,15 @@ class Block {
             var rect = fatherLay.stas.rects[fatherLayCnt];
             if (!rect)
                 var i = 0;
-            if (rect.elemId){
+            if (rect.elemId) {
                 lr.fhid = rect.elemId;
                 lr.x = 0;
                 lr.y = 0;
-            }    
-            else{
+            } else {
                 lr.fhid = fatherLay.elemId;
                 lr.x = rect.x;
                 lr.y = rect.y;
-            }    
+            }
             lr.w = rect.w;
             lr.h = rect.h;
             lr.z = rect.z;
@@ -1745,8 +1744,8 @@ class Cp_base {
                 var mode = "ace/mode/xml";
             if (op.exName === "json")
                 var mode = "ace/mode/json";
-            if(!op.wrapSize)
-                op.wrapSize=80;
+            if (!op.wrapSize)
+                op.wrapSize = 80;
 
             var hideNo = true;
             if (op.hideNo_f)
@@ -1813,7 +1812,7 @@ class Cp_base {
         st.containerHeight = st.ch;
         st.containerBaseId = this.kid;
         return;
-    }    
+    }
     setCanvas(elem) {
         if (this.md.subType0 !== "canvas")
             return;
@@ -1834,6 +1833,46 @@ class Cp_base {
         md.elems["canvas"] = selem;
         md.opts.canvasId = selem.id;
     }
+
+    setYoutube(elem) {
+        if (this.md.subType0 !== "youtube")
+            return;
+        var md = this.md;
+        var op = md.opts;
+        var st = md.stas;
+        if (op.wwwUrls[op.urlsInx]) {
+            var url = op.wwwUrls[op.urlsInx];
+            if (op.autoPlay_f)
+                url += "?autoplay=1";
+            if (!op.controls_f)
+                url += "&controls=0";
+            if (op.loop_f)
+                url += "&loop=1";
+
+            this.setIframe(elem,url);
+        }
+    }
+    setIframe(elem,url) {
+        var md = this.md;
+        var op = md.opts;
+        var selem = document.createElement("iframe");
+        selem.id = this.kid + "_iframe";
+        selem.style.position = "absolute";
+        selem.style.left = 0 + "px";
+        selem.style.top = 0 + "px";
+        selem.style.width = "100%";
+        selem.style.height = "100%";
+        selem.style.backgroundColor = op.baseColor;
+        selem.src = url;
+        selem.allow = "autoplay";
+        elem.appendChild(selem);
+        md.elems["canvas"] = selem;
+        md.opts.canvasId = selem.id;
+    }
+    
+    
+    
+    
 
     /*
      setScope(elem) {
@@ -1907,7 +1946,7 @@ class Cp_base {
         }
         //=====================================
         if ("setBaseElem") {
-            if (md.subType0 === "none") 
+            if (md.subType0 === "none")
                 return;
             var elem = document.createElement("div");
             elem.id = md.kid;
@@ -1976,6 +2015,7 @@ class Cp_base {
             self.setEditor(elem);
             self.setContainer(elem);
             self.setCanvas(elem);
+            self.setYoutube(elem);
 
         }
 

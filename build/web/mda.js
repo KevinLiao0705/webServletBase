@@ -221,7 +221,7 @@ class MdaMenu {
         opts.menus = dbg.getTestMenus();
         opts.menuHeight = 24;
         opts.menuMaxWidth = 100;
-        opts.headIconWidth = 30;
+        opts.headIconWidth = 50;
         opts.fontSize = "0.6rh";
         opts.fontWeight = "bold";
         opts.fontFamily = "Arial";
@@ -913,7 +913,6 @@ class MdaListItem {
 class MdaContainer {
     constructor() {
     }
-
     initOpts(md) {
         var self = this;
         var opts = {};
@@ -1653,24 +1652,30 @@ class MdaScroll {
         var self = this;
         var opts = {};
         Block.setBaseOpts(opts);
-        this.subTypeOpts(opts);
         opts.vhScroll_f = 1;
         opts.minCursorH = 30;
         opts.posRate = 0.0;
         opts.winRate = 0.1;
         opts.lineRate = 0.1;
-
-
-
-
+        this.subTypeOpts(opts);
         return opts;
     }
 
     subTypeOpts(opts) {
         if (this.md.subType === "base.sys0") {
+            opts.vhScroll_f = 1;
             opts.baseColor = "#bbb";
         }
         if (this.md.subType === "base.sys1") {
+            opts.vhScroll_f = 1;
+            opts.baseColor = "#888";
+        }
+        if (this.md.subType === "base.sys2") {
+            opts.vhScroll_f = 0;
+            opts.baseColor = "#bbb";
+        }
+        if (this.md.subType === "base.sys3") {
+            opts.vhScroll_f = 0;
             opts.baseColor = "#888";
         }
     }
@@ -1960,7 +1965,6 @@ class MdaScroll {
 
     }
 }
-
 
 class MdaPopWin {
     constructor() {
@@ -2273,12 +2277,6 @@ class MdaBase {
             return 1;
         };
         blocks[cname] = {name: "basePanel", type: "Component~Cp_base~plate.sys0", opts: opts};
-        //======================================    
-        //var cname = lyMaps["body"] + "~" + 0;
-        //var opts = {};
-        //opts.iw=300;
-        //opts.ih=100;
-        //blocks[cname] = {name: "basePanel", type: "Component~Cp_base~button.sys0", opts: opts};
     }
 }
 
@@ -2305,13 +2303,12 @@ class MdaBox {
         opts.headButtonWidthes = [100, 100, 100, 100, 100, 100, 100, 100];
         opts.baseColor = "#ccc";
         var ksObj = opts.ksObj = {};
-        ksObj.name = "testButton";
-        ksObj.type = "Component~Cp_base~button.sys0";
+        ksObj.name = "testPlate";
+        ksObj.type = "Component~Cp_base~plate.sys0";
         ksObj.opts = {};
         opts.eh = 9999;
         opts.ym = 0;
         opts.viewPage_f = 1;
-
         this.subTypeOpts(opts);
         return opts;
     }
@@ -2331,21 +2328,6 @@ class MdaBox {
                 }
             }
         }
-
-        /*
-         if (!op.buttonsOn_f) {
-         if (iobj.totalRow > iobj.pageRowAmt) {
-         if (op.autoPage_f) {
-         op.buttonsOn_f=1;
-         md.clear();
-         md.reCreate();
-         return;
-         }
-         }
-         }
-         
-         */
-
         var obj = {};
         obj.act = "afterCreate";
         obj.sender = this.md;
@@ -2423,9 +2405,6 @@ class MdaBox {
             opts.maxFontSize = 30;
             blocks[cname] = {name: "headButton#" + i, type: "Component~Cp_base~button.sys0", opts: opts};
         }
-
-
-
         //=======================================    
         var cname = lyMaps["main"] + "~" + 2;
         var opts = {};
@@ -2435,7 +2414,6 @@ class MdaBox {
         opts.wAlign = "center";
         layouts[cname] = {name: cname, type: "Layout~Ly_base~array.sys0", opts: opts};
         lyMaps["footBody"] = cname;
-
         if (op.viewPage_f) {
             var opts = {};
             opts.iw = 200;
@@ -2488,8 +2466,6 @@ class MdaBox {
             };
             blocks[cname] = {name: op.buttonIds[i], type: "Component~Cp_base~button.sys0", opts: opts};
         }
-
-
         //=======================================    
         var cname = lyMaps["main"] + "~" + 1;
         var opts = {};
@@ -2577,7 +2553,6 @@ class MdaSelector {
         if (this.md.subType === "base.sys0") {
         }
     }
-
     newPage() {
         var md = this.md;
         var op = md.opts;
@@ -2587,7 +2562,6 @@ class MdaSelector {
         md.clearOpts(cname);
         md.reCreate();
     }
-
     nextPage() {
         var md = this.md;
         var op = md.opts;
@@ -2606,7 +2580,6 @@ class MdaSelector {
         op.startInx -= st.totalAmt;
         this.newPage();
     }
-
     afterCreate() {
         var md = this.md;
         var op = md.opts;
@@ -2712,6 +2685,7 @@ class MdaSelector {
 class MdaArray {
     constructor() {
     }
+    
     initOpts(md) {
         var self = this;
         var opts = {};
@@ -2733,16 +2707,18 @@ class MdaArray {
         this.subTypeOpts(opts);
         return opts;
     }
+    
     subTypeOpts(opts) {
         if (this.md.subType === "base.sys0") {
         }
     }
-
+    
     afterCreate() {
         var md = this.md;
         var op = md.opts;
         var st = md.stas;
     }
+    
     build() {
         var self = this;
         var md = self.md;
@@ -2791,6 +2767,7 @@ class MdaArray {
 class MdaBlockSelect {
     constructor() {
     }
+    
     initOpts(md) {
         var self = this;
         var opts = {};
@@ -2802,6 +2779,7 @@ class MdaBlockSelect {
         this.subTypeOpts(opts);
         return opts;
     }
+    
     subTypeOpts(opts) {
         if (this.md.subType === "base.sys0") {
         }
@@ -2809,6 +2787,7 @@ class MdaBlockSelect {
 
     afterCreate() {
     }
+    
     build() {
         var self = this;
         var md = self.md;
@@ -2850,14 +2829,6 @@ class MdaBlockSelect {
 
     }
 }
-
-
-
-
-
-
-
-
 
 class MdaSetLine {
     constructor() {
@@ -4583,8 +4554,6 @@ class MdaSetLine {
     }
 }
 
-
-
 //setType.dataType
 //setType.checkType
 class MdaPad {
@@ -5228,10 +5197,6 @@ class MdaPad {
 
     }
 }
-
-
-
-
 //===========================================
 class MdaColorPicker {
     constructor() {
@@ -5569,8 +5534,6 @@ class MdaColorPicker {
     }
 }
 
-
-
 class MdaBlockView {
     constructor() {
     }
@@ -5636,8 +5599,6 @@ class MdaBlockView {
         //======================================    
     }
 }
-
-
 
 class MdaBlocksSelect {
     constructor() {
@@ -5732,7 +5693,6 @@ class MdaBlocksSelect {
         //======================================    
     }
 }
-
 
 class MdaSetGroup {
     constructor() {
@@ -5920,7 +5880,6 @@ class MdaSetGroup {
     }
 }
 
-
 class MdaButtons {
     constructor() {
     }
@@ -6020,7 +5979,6 @@ class MdaButtons {
     }
 }
 
-
 class MdaHeadTitle {
     constructor() {
     }
@@ -6079,8 +6037,6 @@ class MdaHeadTitle {
         }
     }
 }
-
-
 
 class Md_setNames {
     constructor()

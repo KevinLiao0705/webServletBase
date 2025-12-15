@@ -155,6 +155,7 @@ class MdaMdTest {
                 box.checkBox({});
                 return;
             }
+            //========================
             if (iobj.keyId === "testSelectBox~selectBox") {
                 box.selectBox({});
                 return;
@@ -171,6 +172,7 @@ class MdaMdTest {
                 box.selectPageOkBox({});
                 return;
             }
+            //========================
             if (iobj.keyId === "testMdaList~base.sys0") {
                 var opts = {};
                 var kvObj = new Block("testList", "Model~MdaList~base.sys0", opts);
@@ -183,6 +185,7 @@ class MdaMdTest {
                 mda.popObj(300, 400, kvObj, 1);
                 return;
             }
+            //========================
             if (iobj.keyId === "testMdaContainer~base.page") {
                 var opts = {};
                 var kvObj = new Block("testList", "Model~MdaContainer~base.page", opts);
@@ -219,6 +222,7 @@ class MdaMdTest {
                 mda.popObj(800, 600, kvObj, 1);
                 return;
             }
+            //========================
             if (iobj.keyId === "testContainerBox~base.page") {
                 box.containerPageBox({},{});
                 return;
@@ -231,6 +235,7 @@ class MdaMdTest {
                 box.containerFreeBox({},{});
                 return;
             }
+            //========================
             if (iobj.keyId === "testSetLine~buttonActs") {
                 mda.setLineButtonActs({});
                 return;
@@ -259,9 +264,7 @@ class MdaMdTest {
                 mda.setLineTextArea({});
                 return;
             }
-
-
-
+            //========================
             if (iobj.keyId === "testSetLine~labelViews") {
                 mda.setLineLabelViews({});
                 return;
@@ -274,7 +277,6 @@ class MdaMdTest {
                 mda.setLineInputSelect({});
                 return;
             }
-
             if (iobj.keyId === "testSetLine~setLineBox") {
                 box.setLineBox({});
                 return;
@@ -283,8 +285,7 @@ class MdaMdTest {
                 box.setOptsBox({});
                 return;
             }
-
-
+            //========================
             if (iobj.keyId === "testInputPad~intPad") {
                 var obj = {};
                 obj.name = "testClass";
@@ -331,7 +332,6 @@ class MdaMdTest {
                 box.floatPadBox({});
                 return;
             }
-
             if (iobj.keyId === "testInputPad~keyboardBox") {
                 var opts = {};
                 opts.setOpts = dsc.optsCopy.str;
@@ -342,7 +342,7 @@ class MdaMdTest {
                 box.pickColorBox({});
                 return;
             }
-
+            //========================
             if (iobj.keyId === "testSetLineInputText~inputTextInt") {
                 mda.setLineIntInputText({});
                 return;
@@ -351,6 +351,7 @@ class MdaMdTest {
                 mda.setLineStrInputText({});
                 return;
             }
+            //========================
             if (iobj.keyId === "testViewBox~editorBox") {
                 var editorBox=box.editorBox({});
                 var kvObj = editorBox.blockRefs["mainMd"];
@@ -359,6 +360,7 @@ class MdaMdTest {
                 KvLib.endInputEditor(kvObj,"ewaweqweqw","red");
                 return;
             }
+            //menu6=================================================================
             if (iobj.keyId === "componentTest~showButtons") {
                 var op1 = {};
                 var op2 = {};
@@ -468,7 +470,6 @@ class MdaMdTest {
                 box.containerPageBox(op1, op2);
                 return;
             }
-
             if (iobj.keyId === "componentTest~showLabels") {
                 var op1 = {};
                 var op2 = {};
@@ -557,7 +558,6 @@ class MdaMdTest {
                 box.containerPageBox(op1, op2);
                 return;
             }
-
             if (iobj.keyId === "componentTest~showInputs") {
                 var op1 = {};
                 var op2 = {};
@@ -606,7 +606,6 @@ class MdaMdTest {
                 box.containerPageBox(op1, op2);
                 return;
             }
-
             if (iobj.keyId === "componentTest~showSetLines") {
                 var op1 = {};
                 var op2 = {};
@@ -682,7 +681,6 @@ class MdaMdTest {
                 box.containerPageBox(op1, op2);
                 return;
             }
-
             if (iobj.keyId === "componentTest~showGauges") {
                 var op1 = {};
                 var op2 = {};
@@ -731,7 +729,6 @@ class MdaMdTest {
                 box.containerPageBox(op1, op2);
                 return;
             }
-
             if (iobj.keyId === "componentTest~showCharts") {
                 var op1 = {};
                 var op2 = {};
@@ -800,6 +797,85 @@ class MdaMdTest {
                         op2.ksObjss.push(ksObjs);
                 }
                 box.containerPageBox(op1, op2);
+                return;
+            }
+            
+            if (iobj.keyId === "showOthers~showYoutube") {
+                var opts = {};
+                var kvObj = new Block("testBase", "Model~MdaBase~base.sys0", opts);
+                mda.popObj(1200, 800, kvObj, 1);
+                return;
+            }
+            
+            
+            //=================================================================
+            if (iobj.keyId === "showMdaMenu~base.sys0") {
+                var opts = {};
+                var kvObj = new Block("testMenu", "Model~MdaMenu~base.sys0", opts);
+                mda.popObj(1200, 40, kvObj, 1);
+                return;
+            }
+            if (iobj.keyId === "showMdaMenu~base.sys1") {
+                var opts = {};
+                var kvObj = new Block("testMenu", "Model~MdaMenu~base.sys1", opts);
+                mda.popObj(1200, 40, kvObj, 1);
+                return;
+            }
+            //===============
+            if (iobj.keyId === "showMdaScroll~base.sys0") {
+                var opts = {};
+                var kvObj = new Block("testScroll", "Model~MdaScroll~base.sys0", opts);
+                mda.popObj(20, 800, kvObj, 1);
+                return;
+            }
+            if (iobj.keyId === "showMdaScroll~base.sys1") {
+                var opts = {};
+                var kvObj = new Block("testScroll", "Model~MdaScroll~base.sys1", opts);
+                mda.popObj(20, 800, kvObj, 1);
+                return;
+            }
+            if (iobj.keyId === "showMdaScroll~base.sys2") {
+                var opts = {};
+                var kvObj = new Block("testScroll", "Model~MdaScroll~base.sys2", opts);
+                mda.popObj(800,20, kvObj, 1);
+                return;
+            }
+            if (iobj.keyId === "showMdaScroll~base.sys3") {
+                var opts = {};
+                var kvObj = new Block("testScroll", "Model~MdaScroll~base.sys3", opts);
+                mda.popObj(800,20, kvObj, 1);
+                return;
+            }
+            //===============
+            if (iobj.keyId === "showMdaOthers~mdaBase") {
+                var opts = {};
+                var kvObj = new Block("testBase", "Model~MdaBase~base.sys0", opts);
+                mda.popObj(1200, 800, kvObj, 1);
+                return;
+            }
+            //===============
+            if (iobj.keyId === "showMdaOthers~mdaBox") {
+                var opts = {};
+                opts.title="1222";
+                opts.buttonsOn_f=1;
+                opts.headButtons = ["ESC"];
+                opts.headButtonIds = ["esc"];
+                var kvObj = new Block("testBox", "Model~MdaBox~base.sys0", opts);
+                mda.popObj(1200, 800, kvObj, 1);
+                return;
+            }
+            //===============
+            if (iobj.keyId === "showMdaOthers~mdaSelector") {
+                var opts = {};
+                var kvObj = new Block("testBox", "Model~MdaSelector~base.sys0", opts);
+                mda.popObj(1200, 800, kvObj, 1);
+                return;
+            }
+            //===============
+            if (iobj.keyId === "showMdaOthers~mdaArray") {
+                var opts = {};
+                var kvObj = new Block("testBox", "Model~MdaArray~base.sys0", opts);
+                mda.popObj(1200, 800, kvObj, 1);
                 return;
             }
 

@@ -13,6 +13,11 @@ class Dbg {
         kvs0[0].chnT = "";
         kvs0[0].image = "systemResource/color.png";
         
+        kvs0[5].eng = "MdaTest";
+        kvs0[5].id = "mdaTest";
+        kvs0[5].menus=this.getMenus(kvs0[5].id, 8);
+        var kvs05=kvs0[5].menus.kvTexts;
+        //
         kvs0[6].eng = "ComponentTest";
         kvs0[6].id = "componentTest";
         kvs0[6].menus=this.getMenus(kvs0[6].id, 8);
@@ -213,6 +218,59 @@ class Dbg {
         kvs078[0].eng="Editor Box";
         kvs078[0].image = "systemResource/icons8-listPage-64.png";
         
+
+        
+        //==========================================================
+        kvs05[0].id="showMdaMenu";
+        kvs05[0].eng="Show MdaMenu";
+        kvs05[0].image = "systemResource/icons8-info-64.png";
+        kvs05[0].menus=this.getMenus(kvs05[0].id, 3);
+        var kvs050=kvs05[0].menus.kvTexts;
+        kvs050[0].id="base.sys0";
+        kvs050[0].eng="Base.sys0";
+        kvs050[0].image = "systemResource/icons8-listPage-64.png";
+        kvs050[1].id="base.sys1";
+        kvs050[1].eng="Base.sys1";
+        kvs050[1].image = "systemResource/icons8-listPage-64.png";
+        //==============================
+        kvs05[1].id="showMdaScroll";
+        kvs05[1].eng="Show MdaScroll";
+        kvs05[1].image = "systemResource/icons8-info-64.png";
+        kvs05[1].menus=this.getMenus(kvs05[1].id, 4);
+        var kvs051=kvs05[1].menus.kvTexts;
+        kvs051[0].id="base.sys0";
+        kvs051[0].eng="Base.sys0";
+        kvs051[0].image = "systemResource/icons8-listPage-64.png";
+        kvs051[1].id="base.sys1";
+        kvs051[1].eng="Base.sys1";
+        kvs051[1].image = "systemResource/icons8-listPage-64.png";
+        kvs051[2].id="base.sys2";
+        kvs051[2].eng="Base.sys2";
+        kvs051[2].image = "systemResource/icons8-listPage-64.png";
+        kvs051[3].id="base.sys3";
+        kvs051[3].eng="Base.sys3";
+        kvs051[3].image = "systemResource/icons8-listPage-64.png";
+        //==============================
+        kvs05[2].id="showMdaOthers";
+        kvs05[2].eng="Show MdaOthers";
+        kvs05[2].image = "systemResource/icons8-info-64.png";
+        kvs05[2].menus=this.getMenus(kvs05[2].id, 4);
+        var kvs052=kvs05[2].menus.kvTexts;
+        kvs052[0].id="mdaBase";
+        kvs052[0].eng="MdaBase";
+        kvs052[0].image = "systemResource/icons8-listPage-64.png";
+        kvs052[1].id="mdaBox";
+        kvs052[1].eng="MdaBox";
+        kvs052[1].image = "systemResource/icons8-listPage-64.png";
+        kvs052[2].id="mdaSelector";
+        kvs052[2].eng="MdaSelector";
+        kvs052[2].image = "systemResource/icons8-listPage-64.png";
+        kvs052[3].id="mdaArray";
+        kvs052[3].eng="MdaArray";
+        kvs052[3].image = "systemResource/icons8-listPage-64.png";
+        
+        
+        
         
         
         //==========================================================
@@ -234,6 +292,14 @@ class Dbg {
         kvs06[5].id="showCharts";
         kvs06[5].eng="Show Charts";
         kvs06[5].image = "systemResource/icons8-info-64.png";
+        kvs06[6].id="showOthers";
+        kvs06[6].eng="Show Others";
+        kvs06[6].image = "systemResource/icons8-info-64.png";
+        kvs06[6].menus=this.getMenus(kvs06[6].id, 4);
+        var kvs066=kvs06[6].menus.kvTexts;
+        kvs066[0].id="showYoutube";
+        kvs066[0].eng="Show Youtube";
+        kvs066[0].image = "systemResource/icons8-listPage-64.png";
         
         
         
@@ -259,11 +325,11 @@ class Dbg {
     }
 
     getTestMenus() {
-        var menus = this.getMenus("menu0", 14);
+        var menus = this.getMenus("menu0", 8);
         var kvs = menus.kvTexts;
         kvs[0].chnT = "";
         kvs[0].image = "systemResource/color.png";
-        for (var i = 0; i < 14; i++) {
+        for (var i = 0; i < 8; i++) {
             var count = 8;
             if (i === 2)
                 count = 2;
