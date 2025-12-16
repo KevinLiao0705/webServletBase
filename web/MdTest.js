@@ -224,15 +224,15 @@ class MdaMdTest {
             }
             //========================
             if (iobj.keyId === "testContainerBox~base.page") {
-                box.containerPageBox({},{});
+                box.containerPageBox({}, {});
                 return;
             }
             if (iobj.keyId === "testContainerBox~base.table") {
-                box.containerTableBox({},{});
+                box.containerTableBox({}, {});
                 return;
             }
             if (iobj.keyId === "testContainerBox~base.free") {
-                box.containerFreeBox({},{});
+                box.containerFreeBox({}, {});
                 return;
             }
             //========================
@@ -353,11 +353,11 @@ class MdaMdTest {
             }
             //========================
             if (iobj.keyId === "testViewBox~editorBox") {
-                var editorBox=box.editorBox({});
+                var editorBox = box.editorBox({});
                 var kvObj = editorBox.blockRefs["mainMd"];
-                KvLib.endInputEditor(kvObj,"ewaweqweqw","green");
-                KvLib.endInputEditor(kvObj,"ewaweqweqw","yellow");
-                KvLib.endInputEditor(kvObj,"ewaweqweqw","red");
+                KvLib.endInputEditor(kvObj, "ewaweqweqw", "green");
+                KvLib.endInputEditor(kvObj, "ewaweqweqw", "yellow");
+                KvLib.endInputEditor(kvObj, "ewaweqweqw", "red");
                 return;
             }
             //menu6=================================================================
@@ -617,7 +617,7 @@ class MdaMdTest {
                 op2.ksObjss = [];
                 op2.ym = 10;
                 op2.xm = 10;
-                op2.background="linear-gradient(to top, #110044, #332266)";
+                op2.background = "linear-gradient(to top, #110044, #332266)";
                 var inx = 0;
                 var ser = 0;
                 var lim = 19;
@@ -768,8 +768,8 @@ class MdaMdTest {
                             var csObj = cs.get("chart.moutain");
                         if (inx === 7)
                             var csObj = cs.get("chart.moutainDark");
-                        
-                        
+
+
                         if (inx === 8)
                             var csObj = cs.get("chart.doughnut");
                         if (inx === 9)
@@ -799,15 +799,29 @@ class MdaMdTest {
                 box.containerPageBox(op1, op2);
                 return;
             }
-            
-            if (iobj.keyId === "showOthers~showYoutube") {
-                var opts = {};
-                var kvObj = new Block("testBase", "Model~MdaBase~base.sys0", opts);
+
+            if (iobj.keyId === "showOthers~showYouTube") {
+                var csObj = cs.get("youTube.darji");
+                var opts={};
+                opts.type = csObj.type;
+                opts.opts = csObj.opts;
+                opts.csName = csObj.csName;
+                var kvObj = new Block(csObj.csName, csObj.type, csObj.opts);
                 mda.popObj(1200, 800, kvObj, 1);
                 return;
             }
-            
-            
+            if (iobj.keyId === "showOthers~showUrlReader") {
+                var csObj = cs.get("urlReader.png");
+                var opts={};
+                opts.type = csObj.type;
+                opts.opts = csObj.opts;
+                opts.csName = csObj.csName;
+                var kvObj = new Block(csObj.csName, csObj.type, csObj.opts);
+                mda.popObj(1200, 800, kvObj, 1);
+                return;
+            }
+
+
             //=================================================================
             if (iobj.keyId === "showMdaMenu~base.sys0") {
                 var opts = {};
@@ -837,13 +851,13 @@ class MdaMdTest {
             if (iobj.keyId === "showMdaScroll~base.sys2") {
                 var opts = {};
                 var kvObj = new Block("testScroll", "Model~MdaScroll~base.sys2", opts);
-                mda.popObj(800,20, kvObj, 1);
+                mda.popObj(800, 20, kvObj, 1);
                 return;
             }
             if (iobj.keyId === "showMdaScroll~base.sys3") {
                 var opts = {};
                 var kvObj = new Block("testScroll", "Model~MdaScroll~base.sys3", opts);
-                mda.popObj(800,20, kvObj, 1);
+                mda.popObj(800, 20, kvObj, 1);
                 return;
             }
             //===============
@@ -856,8 +870,8 @@ class MdaMdTest {
             //===============
             if (iobj.keyId === "showMdaOthers~mdaBox") {
                 var opts = {};
-                opts.title="1222";
-                opts.buttonsOn_f=1;
+                opts.title = "1222";
+                opts.buttonsOn_f = 1;
                 opts.headButtons = ["ESC"];
                 opts.headButtonIds = ["esc"];
                 var kvObj = new Block("testBox", "Model~MdaBox~base.sys0", opts);

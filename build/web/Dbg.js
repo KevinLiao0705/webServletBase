@@ -297,9 +297,12 @@ class Dbg {
         kvs06[6].image = "systemResource/icons8-info-64.png";
         kvs06[6].menus=this.getMenus(kvs06[6].id, 4);
         var kvs066=kvs06[6].menus.kvTexts;
-        kvs066[0].id="showYoutube";
-        kvs066[0].eng="Show Youtube";
+        kvs066[0].id="showYouTube";
+        kvs066[0].eng="Show YouTube";
         kvs066[0].image = "systemResource/icons8-listPage-64.png";
+        kvs066[1].id="showUrlReader";
+        kvs066[1].eng="Show Url Reader";
+        kvs066[1].image = "systemResource/icons8-listPage-64.png";
         
         
         

@@ -578,6 +578,7 @@ class DummyTargetMaster {
                     opts.setNames.push(preText + "DriverAmpOutRfpowZero");
                     opts.setNames.push(preText + "DriverAmpOutRfpowLimD");
                     opts.setNames.push(preText + "DriverAmpOutRfpowLimU");
+                    opts.setNames.push(preText + "DriverAmpOutRfpowAtt");
                     //
                     opts.setNames.push(preText + "CwAmpOutRfpowFilter");
                     opts.setNames.push(preText + "CwAmpOutRfpowOffs");
@@ -585,6 +586,7 @@ class DummyTargetMaster {
                     opts.setNames.push(preText + "CwAmpOutRfpowZero");
                     opts.setNames.push(preText + "CwAmpOutRfpowLimD");
                     opts.setNames.push(preText + "CwAmpOutRfpowLimU");
+                    opts.setNames.push(preText + "CwAmpOutRfpowAtt");
                     //
                     opts.setNames.push(preText + "CcwAmpOutRfpowFilter");
                     opts.setNames.push(preText + "CcwAmpOutRfpowOffs");
@@ -592,6 +594,7 @@ class DummyTargetMaster {
                     opts.setNames.push(preText + "CcwAmpOutRfpowZero");
                     opts.setNames.push(preText + "CcwAmpOutRfpowLimD");
                     opts.setNames.push(preText + "CcwAmpOutRfpowLimU");
+                    opts.setNames.push(preText + "CcwAmpOutRfpowAtt");
                     //
                     opts.setNames.push(preText + "Attenuator");
                     opts.setNames.push("sp4tCnt");
@@ -5328,12 +5331,18 @@ class DummyTargetCtrPane {
         var wv = gr.radarData.meterValueA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         //======================================
         var prg = function (data, name, fixed, dinx) {
-            if (data <= 0)
+            if (data <= 0 || data > 1000)
                 return["", "#ddd", 0];
-            data = 1000 - data;
+            data=1000-data;
             var value = (data - gr.paraSet[preText + name + "Offs"]) * gr.paraSet[preText + name + "Gain"];
             if (value < gr.paraSet[preText + name + "Zero"])
                 value = 0;
+            else{
+                var att=0;
+                if(gr.paraSet[preText + name + "Att"])
+                    att=gr.paraSet[preText + name + "Att"];
+                value+=att;
+            }
             //========================================
             if (dinx !== undefined) {
                 var rd = gr.radarData;
@@ -5388,22 +5397,22 @@ class DummyTargetCtrPane {
         wv[0] = va[2];
         //======================================
         //======================================
-        var va = prg(da[2], "PreAmpOutRfpow", 1, 2);
+        var va = prg(da[1], "PreAmpOutRfpow", 1, 2);
         wa[2] = va[0];
         wac[2] = va[1];
         wv[2] = va[2];
         //======================================
-        var va = prg(da[3], "DriverAmpOutRfpow", 1, 3);
+        var va = prg(da[2], "DriverAmpOutRfpow", 1, 3);
         wa[3] = va[0];
         wac[3] = va[1];
         wv[3] = va[2];
         //======================================
-        var va = prg(da[4], "CwAmpOutRfpow", 1, 4);
+        var va = prg(da[3], "CwAmpOutRfpow", 1, 4);
         wa[4] = va[0];
         wac[4] = va[1];
         wv[4] = va[2];
         //======================================
-        var va = prg(da[5], "CcwAmpOutRfpow", 1, 5);
+        var va = prg(da[4], "CcwAmpOutRfpow", 1, 5);
         wa[5] = va[0];
         wac[5] = va[1];
         wv[5] = va[2];

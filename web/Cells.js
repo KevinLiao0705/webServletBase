@@ -674,12 +674,12 @@ class Cells {
                 case "bar":
                     return {type: "Model~MdbChart~bar", opts: opts, csName: csName};
                 case "hbar":
-                    opts.indexAxis='y';
+                    opts.indexAxis = 'y';
                     return {type: "Model~MdbChart~bar", opts: opts, csName: csName};
                 case "barDark":
                     return {type: "Model~MdbChart~bar.dark", opts: opts, csName: csName};
                 case "hbarDark":
-                    opts.indexAxis='y';
+                    opts.indexAxis = 'y';
                     return {type: "Model~MdbChart~bar.dark", opts: opts, csName: csName};
                 case "line":
                     return {type: "Model~MdbChart~line", opts: opts, csName: csName};
@@ -689,8 +689,8 @@ class Cells {
                     return {type: "Model~MdbChart~moutain", opts: opts, csName: csName};
                 case "moutainDark":
                     return {type: "Model~MdbChart~moutain.dark", opts: opts, csName: csName};
-                    
-                    
+
+
                 case "doughnut":
                     return {type: "Model~MdbChart~doughnut", opts: opts, csName: csName};
                 case "doughnutDark":
@@ -707,6 +707,46 @@ class Cells {
                     return {type: "Model~MdbChart~radar", opts: opts, csName: csName};
                 case "radarDark":
                     return {type: "Model~MdbChart~radar.dark", opts: opts, csName: csName};
+
+            }
+        }
+        if (strA[0] === "youTube") {
+            switch (strA[1]) {
+                case "darji":
+                    opts.baseColor = "rgba(0,0,0,0)";
+                    opts.urlsInx = 0;
+                    opts.autoPlay_f=1;
+                    opts.controls_f=1;
+                    opts.loop_f=1;
+                    opts.startTime=5;
+                    opts.endTime=20;
+                    opts.wwwUrls = ["https://www.youtube.com/embed/5afSSqSdHnU"];
+                    return {type: "Component~Cp_base~youTube.sys0", opts: opts, csName: csName};
+
+            }
+        }
+        if (strA[0] === "urlReader") {
+            switch (strA[1]) {
+                case "pdf":
+                    opts.baseColor = "rgba(0,0,0,0)";
+                    opts.urlsInx = 0;
+                    opts.urls = ["./systemResource/JS-AIoT_DM_hardware.pdf"];
+                    return {type: "Component~Cp_base~urlReader.sys0", opts: opts, csName: csName};
+                case "txt":
+                    opts.baseColor = "rgba(0,0,0,0)";
+                    opts.urlsInx = 0;
+                    opts.urls = ["./systemResource/helpTmp.txt"];
+                    return {type: "Component~Cp_base~urlReader.sys0", opts: opts, csName: csName};
+                case "xml":
+                    opts.baseColor = "rgba(0,0,0,0)";
+                    opts.urlsInx = 0;
+                    opts.urls = ["./systemResource/build.xml"];
+                    return {type: "Component~Cp_base~urlReader.sys0", opts: opts, csName: csName};
+                case "png":
+                    opts.baseColor = "rgba(0,0,0,0)";
+                    opts.urlsInx = 0;
+                    opts.urls = ["./systemResource/robot_aiot_1920x1080.png"];
+                    return {type: "Component~Cp_base~urlReader.sys0", opts: opts, csName: csName};
 
             }
         }

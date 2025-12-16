@@ -1834,24 +1834,43 @@ class Cp_base {
         md.opts.canvasId = selem.id;
     }
 
-    setYoutube(elem) {
-        if (this.md.subType0 !== "youtube")
+    setYouTube(elem) {
+        if (this.md.subType0 !== "youTube")
             return;
         var md = this.md;
         var op = md.opts;
-        var st = md.stas;
         if (op.wwwUrls[op.urlsInx]) {
             var url = op.wwwUrls[op.urlsInx];
+            var strA=url.split("/");
+            var id=strA[strA.length-1];
+            if(!op.startTime)
+                op.startTime=0;
+            url += "?start="+op.startTime;
+            if (op.endTime)
+                url += "&end="+op.endTime;
             if (op.autoPlay_f)
-                url += "?autoplay=1";
-            if (!op.controls_f)
-                url += "&controls=0";
+                url += "&autoplay=1";
+            if (op.controls_f)
+                url += "&controls=1";
             if (op.loop_f)
-                url += "&loop=1";
+                url += "&loop=1&playlist="+id;
 
             this.setIframe(elem,url);
         }
     }
+    
+    setUrlReader(elem) {
+        if (this.md.subType0 !== "urlReader")
+            return;
+        var md = this.md;
+        var op = md.opts;
+        if (op.urls[op.urlsInx]) {
+            var url = op.urls[op.urlsInx];
+            this.setIframe(elem,url);
+        }
+    }
+    
+    
     setIframe(elem,url) {
         var md = this.md;
         var op = md.opts;
@@ -1866,8 +1885,8 @@ class Cp_base {
         selem.src = url;
         selem.allow = "autoplay";
         elem.appendChild(selem);
-        md.elems["canvas"] = selem;
-        md.opts.canvasId = selem.id;
+        md.elems["iframe"] = selem;
+        md.opts.iframeId = selem.id;
     }
     
     
@@ -2015,7 +2034,8 @@ class Cp_base {
             self.setEditor(elem);
             self.setContainer(elem);
             self.setCanvas(elem);
-            self.setYoutube(elem);
+            self.setYouTube(elem);
+            self.setUrlReader(elem);
 
         }
 
