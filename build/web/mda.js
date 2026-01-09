@@ -4052,6 +4052,8 @@ class MdaSetLine {
                     md.setInputWatch(opts, items[0], items[1], items[2], items[3]);
                 }
             }
+            if(KvLib.getOs()==="Linux")
+                opts.bpd="0.2rh";
             md.newBlock(cname, opts, "Component~Cp_base~images.lcd", "labelMain#" + i);
             return;
         }

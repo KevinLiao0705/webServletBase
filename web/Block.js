@@ -948,8 +948,9 @@ class Block {
                 continue;
             ipObj.cnt = 0;
             var value;
-            if (ipObj.inputName === "setOpts.value") {
-                var uu = 0;
+            var debug_f = 0;
+            if (ipObj.inputName === "self.fatherMd.fatherMd.fatherMd.stas.selectValueA#2") {
+                debug_f = 1;
             }
             if (ipObj.type === "directReg") {
                 try {
@@ -995,6 +996,8 @@ class Block {
                 if (value.length === self.opts[ipObj.optName].length) {
                     for (var j = 0; j < value.length; j++) {
                         if (self.opts[ipObj.optName][j] !== value[j]) {
+                            if (debug_f === 1)
+                                var xxx = 1;
                             self.opts[ipObj.optName][j] = value;
                             self.setWatch(self, ipObj.optName, value, ipObj.redraw_f);
                             break;
@@ -1009,6 +1012,8 @@ class Block {
                     var reg = reg[strA[j]];
                 }
                 if (reg[optsName] !== value) {
+                    if (debug_f === 1)
+                        var xxx = 1;
                     reg[optsName] = value;
                     self.setWatch(self, ipObj.optName, value, ipObj.redraw_f);
                 }
@@ -1841,24 +1846,24 @@ class Cp_base {
         var op = md.opts;
         if (op.wwwUrls[op.urlsInx]) {
             var url = op.wwwUrls[op.urlsInx];
-            var strA=url.split("/");
-            var id=strA[strA.length-1];
-            if(!op.startTime)
-                op.startTime=0;
-            url += "?start="+op.startTime;
+            var strA = url.split("/");
+            var id = strA[strA.length - 1];
+            if (!op.startTime)
+                op.startTime = 0;
+            url += "?start=" + op.startTime;
             if (op.endTime)
-                url += "&end="+op.endTime;
+                url += "&end=" + op.endTime;
             if (op.autoPlay_f)
                 url += "&autoplay=1";
             if (op.controls_f)
                 url += "&controls=1";
             if (op.loop_f)
-                url += "&loop=1&playlist="+id;
+                url += "&loop=1&playlist=" + id;
 
-            this.setIframe(elem,url);
+            this.setIframe(elem, url);
         }
     }
-    
+
     setUrlReader(elem) {
         if (this.md.subType0 !== "urlReader")
             return;
@@ -1866,12 +1871,11 @@ class Cp_base {
         var op = md.opts;
         if (op.urls[op.urlsInx]) {
             var url = op.urls[op.urlsInx];
-            this.setIframe(elem,url);
+            this.setIframe(elem, url);
         }
     }
-    
-    
-    setIframe(elem,url) {
+
+    setIframe(elem, url) {
         var md = this.md;
         var op = md.opts;
         var selem = document.createElement("iframe");
@@ -1888,10 +1892,6 @@ class Cp_base {
         md.elems["iframe"] = selem;
         md.opts.iframeId = selem.id;
     }
-    
-    
-    
-    
 
     /*
      setScope(elem) {

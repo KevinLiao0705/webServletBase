@@ -1460,7 +1460,7 @@ class KvSetOpts {
         setOpts.dataType = "str";
         setOpts.checkType = "str";
         setOpts.value = "";
-        setOpts.titleFontSize = "0.5rh";
+        setOpts.fontSize = "1.0rh";
         setOpts.actButtons = [];
         setOpts.readOnly_f = 1;
         setOpts.editTextColor = "#ddd";

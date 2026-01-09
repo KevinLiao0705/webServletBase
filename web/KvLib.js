@@ -40,6 +40,25 @@ class KvLib {
         return dg;
     }
 
+    static getOs() {
+        const userAgent = navigator.userAgent;
+        let os = 'Unknown';
+
+        if (userAgent.includes('Win')) {
+            os = 'Windows';
+        } else if (userAgent.includes('Mac')) {
+            os = 'macOS';
+        } else if (userAgent.includes('Linux')) {
+            os = 'Linux';
+        } else if (userAgent.includes('Android')) {
+            os = 'Android';
+        } else if (userAgent.includes('iPhone') || userAgent.includes('iPad')) {
+            os = 'iOS';
+        }
+
+        return os;
+    }
+
     static anaString(istr, sep1, sep2) {
         var oobj = {};
         var strA = istr.split(sep1);
@@ -248,22 +267,20 @@ class KvLib {
     static setEditorMaker(editor, color) {
         var row = editor.session.getLength() - 1;
         var Range = ace.require('ace/range').Range;
-        if (color === "red"){
+        if (color === "red") {
             editor.session.addMarker(new Range(row, 0, row, 1), "myRedMarker", "fullLine");
             return;
-        }    
-        if (color === "green"){
+        }
+        if (color === "green") {
             editor.session.addMarker(new Range(row, 0, row, 1), "myGreenMarker", "fullLine");
             return;
-        }    
-        if (color === "yellow"){
+        }
+        if (color === "yellow") {
             editor.session.addMarker(new Range(row, 0, row, 1), "myYellowMarker", "fullLine");
             return;
-        }    
+        }
         editor.session.addMarker(new Range(row, 0, row, 1), color, "fullLine");
     }
-
-
 
     static clearEditorMaker(editor) {
         const prevMarkers = editor.session.getMarkers();
@@ -317,18 +334,16 @@ class KvLib {
     }
     static setColorRgba(colorStr, ca) {
         var errColor = {r: 0, g: 0, b: 0};
-        var cobj=KvLib.transColor(colorStr, errColor);
-        cobj.a=ca;
+        var cobj = KvLib.transColor(colorStr, errColor);
+        cobj.a = ca;
         var str = "rgba(";
-        str += cobj.r ;
-        str += "," + cobj.g ;
-        str += "," + cobj.b ;
-        str += "," + cobj.a ;
+        str += cobj.r;
+        str += "," + cobj.g;
+        str += "," + cobj.b;
+        str += "," + cobj.a;
         str += ")";
         return str;
     }
-
-
 
     static darkColor(cstr, darkRate) {
         var cobj = KvLib.transColor(cstr);
@@ -1032,11 +1047,11 @@ class KvLib {
     }
 
     static  bytes2String(bytes) {
-        var str="";
-        for(var i=0;i<bytes.length;i++){
-            if(bytes[i]===0)
+        var str = "";
+        for (var i = 0; i < bytes.length; i++) {
+            if (bytes[i] === 0)
                 break;
-            str+=String.fromCharCode(bytes[i]);
+            str += String.fromCharCode(bytes[i]);
         }
         return str;
     }
