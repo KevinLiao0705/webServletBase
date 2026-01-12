@@ -5803,11 +5803,11 @@ class DummyTargetCtrPane {
          var loadType = (gr.radarData.systemStatus1 >> 20) & 1;
          wd[1] = loadType;
          */
-        //wd[2] = gr.paraSet["ctr1TxLoad"];
-        //wd[3] = gr.paraSet["ctr1BatShort"];
+        wd[2] = gr.paraSet["ctr1TxLoad"];
+        wd[3] = gr.paraSet["ctr1BatShort"];
         
-        wd[2] = (gr.radarData.systemStatus1 >> 20) & 1;
-        wd[3] = (gr.radarData.systemStatus1 >> 22) & 1;
+        //wd[2] = (gr.radarData.systemStatus1 >> 20) & 1;
+        //wd[3] = (gr.radarData.systemStatus1 >> 22) & 1;
         
         mac.messageEditor(md);
     }
