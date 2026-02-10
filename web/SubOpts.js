@@ -262,7 +262,7 @@ class SubOpts {
             opts.borderColor = "#fff";
             //=================
             opts.insideShadowBlur = "0.2rh";
-            opts.fontFamily="digital_1";
+            opts.fontFamily="digital_2";
             opts.borderRadius = 0;
             opts.fontSize="1.0rh";
             opts.fontWeight="bold";
