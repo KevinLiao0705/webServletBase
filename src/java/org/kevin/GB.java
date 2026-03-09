@@ -23,6 +23,11 @@ public class GB {
     public static String josnSipUiLinuxParaSet = "/home/pi/kevin/sipui2in1/paraSetUi.json";
     public static String webBuilderWinParaSet = "e:/kevin/myCode/webSet/webBuilderSet/paraSet.json";
     public static String webBuilderLinuxParaSet = "/home/pi/kevin/webBuilderSet/paraSet.json";
+    public static String sip6In1UiWinParaSet = "e:/kevin/myCode/webSet/sip6In1UiSet/paraSetUi.json";
+    public static String sip6In1UiLinuxParaSet = "/home/pi/kevin/sip6In1Ui/paraSetUi.json";
+    
+    
+    
     //=====================================
     public static int min_js_f = 0;
     public static String systemName = "";
@@ -91,6 +96,11 @@ public class GB {
                 if (systemName.equals("webBuilder")) {
                     paraSetFullName = GB.webBuilderWinParaSet;
                 }
+                if (systemName.equals("sip6In1Ui")) {
+                    paraSetFullName = GB.sip6In1UiWinParaSet;
+                }
+                
+                
                 return paraSetFullName;
             }
         }
@@ -107,6 +117,9 @@ public class GB {
         }
         if (systemName.equals("webBuilder")) {
             paraSetFullName = GB.webBuilderLinuxParaSet;
+        }
+        if (systemName.equals("sip6In1Ui")) {
+            paraSetFullName = GB.sip6In1UiLinuxParaSet;
         }
         return paraSetFullName;
 

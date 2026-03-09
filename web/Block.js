@@ -1226,8 +1226,9 @@ class Block {
             var parent = document.getElementById(self.fhid);
             if (child && parent)
                 parent.removeChild(child);
-            if (!fatherMd)
+            if (!fatherMd){
                 return;
+            }    
             if (self.blockType === "Layout") {
                 delete fatherMd.layouts[self.cname];
                 delete fatherMd.opts.layouts[self.cname];
@@ -1413,6 +1414,7 @@ class Block {
             var name = md.name;
             var type = md.type;
             var nopts = {};
+            md.opts.blocks={};
             KvLib.deepCoverObject(nopts, md.opts);
             md.clear();
             var newMd = eval("new " + className + "(name,type,nopts);");

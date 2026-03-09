@@ -319,7 +319,7 @@ class SubOpts {
         
         if ("Component~Cp_base~label.sys1"){
             var opts = gr.blockSubOpts["Component~Cp_base~label.sys1"] = {};
-            KvLib.deepCoverObject(opts, gr.blockSubOpts["Component~Cp_base~label.sys0"]);
+            KvLib.deepCoverObject(opts, gr.blockSubOpts["Component~Cp_base~label.sys1"]);
             opts.baseColor = "#444";
             opts.innerTextColor="#ddd";
             opts.textShadow = "2px 2px 2px #000";

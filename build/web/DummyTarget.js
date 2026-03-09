@@ -15,14 +15,14 @@ class DummyTargetMaster {
                     continue;
                 }
             }
-            var rd=gr.radarData;
+            var rd = gr.radarData;
             if (gr.viewDatas_f) {
-                for (var i = 0; i < 8; i++) {
-                    gr.viewDatas[i] = KvLib.trsIntToHexStr(gr.radarData.viewDatas[i]);
+                for (var i = 0; i < 64; i++) {
+                    gr.viewDatas[i] = KvLib.trsIntToHexStrFix(gr.radarData.viewDatas[i]);
                 }
             }
-            
-            
+
+
             if (rd.pulseFormAddBufA0) {
                 if (gr.scope) {
                     if (gr.scope.opts.signalMode === 2 && gr.scope.opts.signalModeInx === 0) {
@@ -114,6 +114,7 @@ class DummyTargetMaster {
                 opts.kvTexts.push("即時資料");
                 opts.kvTexts.push("數位波形群組");
                 opts.kvTexts.push("邏輯分析儀");
+                opts.kvTexts.push("關機");
             }
             if (gr.appId === 1) {
                 opts.kvTexts.push("發射機信號參數設定");
@@ -128,6 +129,7 @@ class DummyTargetMaster {
                 opts.kvTexts.push("即時資料");
                 opts.kvTexts.push("數位波形群組");
                 opts.kvTexts.push("邏輯分析儀");
+                opts.kvTexts.push("關機");
             }
             if (gr.appId === 2) {
                 opts.kvTexts.push("發射機參數設定");
@@ -146,6 +148,10 @@ class DummyTargetMaster {
                 opts.kvTexts.push("數位波形群組");
                 opts.kvTexts.push("邏輯分析儀");
                 opts.kvTexts.push("幫助");
+                opts.kvTexts.push("關機");
+                opts.kvTexts.push("離開");
+                opts.kvTexts.push("fullscreen on");
+                opts.kvTexts.push("fullscreen off");
             }
             opts.actionFunc = function (iobj) {
                 console.log(iobj);
@@ -160,7 +166,90 @@ class DummyTargetMaster {
                     gr.gbcs.command({'act': "exeLogic"});
                     return;
                 }
+                if (iobj.selectText === "關機") {
+                    MdaPopWin.popOff(2);
+                    gr.gbcs.command({'act': "powerDown"});
+                    return;
+                }
+
+                if (iobj.selectText === "離開") {
+                    window.close();
+                    return;
+                }
+                if (iobj.selectText === "fullscreen on") {
+                    if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen();
+                    } else if (document.documentElement.msRequestFullscreen) {
+                        document.documentElement.msRequestFullscreen();
+                    } else if (document.documentElement.mozRequestFullScreen) {
+                        document.documentElement.mozRequestFullScreen();
+                    } else if (document.documentElement.webkitRequestFullscreen) {
+                        document.documentElement.webkitRequestFullscreen(
+                                Element.ALLOW_KEYBOARD_INPUT,
+                                );
+                    }
+                    return;
+                }
+                if (iobj.selectText === "fullscreen off") {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    }
+                    return;
+                }
+
                 if (iobj.selectText === "幫助") {
+
+                    if (
+                            !document.fullscreenElement && // alternative standard method
+                            !document.mozFullScreenElement &&
+                            !document.webkitFullscreenElement &&
+                            !document.msFullscreenElement
+                            ) {
+                        // current working methods
+                        if (document.documentElement.requestFullscreen) {
+                            document.documentElement.requestFullscreen();
+                        } else if (document.documentElement.msRequestFullscreen) {
+                            document.documentElement.msRequestFullscreen();
+                        } else if (document.documentElement.mozRequestFullScreen) {
+                            document.documentElement.mozRequestFullScreen();
+                        } else if (document.documentElement.webkitRequestFullscreen) {
+                            document.documentElement.webkitRequestFullscreen(
+                                    Element.ALLOW_KEYBOARD_INPUT,
+                                    );
+                        }
+                    } else {
+                        if (document.exitFullscreen) {
+                            document.exitFullscreen();
+                        } else if (document.msExitFullscreen) {
+                            document.msExitFullscreen();
+                        } else if (document.mozCancelFullScreen) {
+                            document.mozCancelFullScreen();
+                        } else if (document.webkitExitFullscreen) {
+                            document.webkitExitFullscreen();
+                        }
+                    }
+
+                    return;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     var opts = {};
                     opts.title = "HELP";
                     opts.readOnly_f = 1;
@@ -208,7 +297,7 @@ class DummyTargetMaster {
                 }
                 if (iobj.selectText === "即時資料") {
                     gr.viewDatas = [];
-                    for (var i = 0; i < 256; i++) {
+                    for (var i = 0; i < 64; i++) {
                         gr.viewDatas.push("");
                     }
                     var op1 = {};
@@ -225,7 +314,7 @@ class DummyTargetMaster {
                     }
                     op2.ksObjss = [];
                     var inx = 0;
-                    for (var i = 0; i < 32; i++) {
+                    for (var i = 0; i < 16; i++) {
                         var ksObjs = [];
                         for (var j = 0; j < 9; j++) {
                             var ksObj = {};
@@ -240,6 +329,9 @@ class DummyTargetMaster {
 
                             } else {
                                 kopts.baseColor = "#cff";
+                                kopts.textAlign = "right";
+                                kopts.rpd = 10;
+                                kopts.fontFamily = "monospace";
                                 var watchReg = "gr.viewDatas#" + inx;
                                 //var watchReg = "gr.radarData.viewDatas#" + inx;
                                 Block.setInputWatch(kopts, "directReg", watchReg, "innerText", 1);
@@ -702,11 +794,15 @@ class DummyTargetMaster {
                         var preText = "sub1";
                         opts.setNames.push("commTestPacks");
                         opts.setNames.push("vgTimeDelay");
+                        opts.setNames.push(preText + "ChFiberDelay");
+                        opts.setNames.push(preText + "ChRfDelay");
+                        opts.setNames.push("subChDelay");
+                        opts.setNames.push("ctrChDelay");
+                        opts.setNames.push("drvChDelay");
+                        opts.setNames.push("meterChDelay");
                         opts.setNames.push(preText + "ChTimeFineTune");
                         opts.setNames.push(preText + "ChSyncType");
                         opts.setNames.push(preText + "ChCommSet");
-                        opts.setNames.push(preText + "ChFiberDelay");
-                        opts.setNames.push(preText + "ChRfDelay");
                         opts.setNames.push(preText + "ChRfTxCh");
                         opts.setNames.push(preText + "ChRfRxCh");
                     }
@@ -823,33 +919,39 @@ class DummyTargetMaster {
             str += gr.radarData.conRxA[24] & 7;
             str += gr.radarData.conRxA[25] & 7;
             str += "P";
-            str += gr.radarData.conRxA[16] & 7;
-            str += gr.radarData.conRxA[17] & 7;
-            str += gr.radarData.conRxA[18] & 7;
-            gr.footBarStatus0 = str;
-            
-            
-            /*
-            var str = "MST:";
             str += gr.radarData.conRxA[0] & 7;
             str += gr.radarData.conRxA[2] & 7;
-            str += " CTR:";
-            str += gr.radarData.conRxA[4] & 7;
-            str += gr.radarData.conRxA[5] & 7;
-            str += gr.radarData.conRxA[7] & 7;
+            gr.footBarStatus0 = str;
+
+            var str = "S1:";
+            str += gr.radarData.conRxA[1] & 7;
+            str += " S2:";
+            str += gr.radarData.conRxA[3] & 7;
             gr.footBarStatus1 = str;
 
-            if (gr.radarData.conRxA[7] !== self.subRxFromCtrCnt) {
-                self.subRxFromCtrCnt = gr.radarData.conRxA[7];
-                self.subRxFromCtrTime = 0;
-                self.subRxFromCtr_f = 1;
-            }
-            self.subRxFromCtrTime++;
-            if (self.subRxFromCtrTime > 100)
-                self.subRxFromCtr_f = 0;
 
-            //gr.footBarStatus2 = str;
-            */
+
+            /*
+             var str = "MST:";
+             str += gr.radarData.conRxA[0] & 7;
+             str += gr.radarData.conRxA[2] & 7;
+             str += " CTR:";
+             str += gr.radarData.conRxA[4] & 7;
+             str += gr.radarData.conRxA[5] & 7;
+             str += gr.radarData.conRxA[7] & 7;
+             gr.footBarStatus1 = str;
+             
+             if (gr.radarData.conRxA[7] !== self.subRxFromCtrCnt) {
+             self.subRxFromCtrCnt = gr.radarData.conRxA[7];
+             self.subRxFromCtrTime = 0;
+             self.subRxFromCtr_f = 1;
+             }
+             self.subRxFromCtrTime++;
+             if (self.subRxFromCtrTime > 100)
+             self.subRxFromCtr_f = 0;
+             
+             //gr.footBarStatus2 = str;
+             */
 
         }
 
@@ -887,6 +989,7 @@ class DummyTargetMaster {
             }
 
             var setF = 0;
+            var preText="Sub";
             if (iobj.keyId === "targetPane1SetButton") {
                 setF = 1;
             }
@@ -896,39 +999,45 @@ class DummyTargetMaster {
             if (setF) {
                 var opts = {};
                 opts.w = 1000;
-                opts.h = 250;
+                opts.h = 300;
                 opts.headButtons = ["OK", "ESC"];
                 opts.headButtonIds = ["ok", "esc"];
-                var flag0 = gr.radarData.systemFlag0;
+                
+                
+                
+                var subStatus=0;
                 if (setF === 1) {
                     opts.title = "副控1發射機設定";
-                    var preText = "Ctr1";
-                    var batShort = (flag0 >> 9) & 1;
-                    var psSource = (flag0 >> 5) & 1;
-                    var outLoad = (flag0 >> 11) & 1;
+                    subStatus=gr.radarData.subStatusA[0];
                 }
                 if (setF === 2) {
                     opts.title = "副控2發射機設定";
-                    var preText = "Ctr2";
-                    var batShort = (flag0 >> 10) & 1;
-                    var psSource = (flag0 >> 6) & 1;
-                    var outLoad = (flag0 >> 12) & 1;
+                    subStatus=gr.radarData.subStatusA[1];
                 }
+                
                 opts.setOptsA = [];
                 var setOpts = sopt.getOptsPara("buttonSelect");
                 setOpts.title = "脈波來源";
-                setOpts.enum = ["SP同步脈波", "本機脈波"];
-                setOpts.value = psSource;
+                setOpts.enum = ["無線", "光纖"];
+                setOpts.value = (subStatus>>5)&1;
                 opts.setOptsA.push(setOpts);
+                
+                var setOpts = sopt.getOptsPara("buttonSelect");
+                setOpts.title = "脈波來源";
+                setOpts.enum = ["同步脈波", "本機脈波"];
+                setOpts.value = (subStatus>>6)&1;
+                opts.setOptsA.push(setOpts);
+                
                 var setOpts = sopt.getOptsPara("buttonSelect");
                 setOpts.title = "輸出裝置";
                 setOpts.enum = ["假負載", "天線"];
-                setOpts.value = outLoad;
+                setOpts.value = (subStatus>>7)&1;
                 opts.setOptsA.push(setOpts);
+                
                 var setOpts = sopt.getOptsPara("buttonSelect");
                 setOpts.title = "戰備短路";
                 setOpts.enum = ["關閉", "開啟"];
-                setOpts.value = batShort;
+                setOpts.value = (subStatus>>8)&1;
                 opts.setOptsA.push(setOpts);
                 opts.actionFunc = function (iobj) {
                     console.log(iobj);
@@ -938,7 +1047,7 @@ class DummyTargetMaster {
                         value += (kobj.opts.setOpts.value << i);
                     }
                     if (iobj.act === "mouseClick" && iobj.buttonId === "ok") {
-                        gr.gbcs.command({'act': "mast" + preText + "RadarSet", "value": value});
+                        gr.gbcs.command({'act': "mast" + preText + "RadarSet", "value": value,"idInx":(setF-1)});
                     }
                 };
                 box.testSetLineBox(opts);
@@ -947,13 +1056,12 @@ class DummyTargetMaster {
 
 
             var setF = 0;
+            var preText="Sub";
             if (iobj.keyId === "targetPane1CtrButton") {
                 setF = 1;
-                preText = "Ctr1";
             }
             if (iobj.keyId === "targetPane2CtrButton") {
                 setF = 2;
-                preText = "Ctr2";
             }
             if (setF) {
                 var opts = {};
@@ -962,30 +1070,23 @@ class DummyTargetMaster {
                 opts.xc = 2;
                 opts.yc = 10;
                 opts.eh = 60;
-                opts.eym = 20;
-                opts.h = 300;
+                opts.eym = 10;
+                opts.h = 400;
                 opts.kvTexts = [];
-                opts.kvTexts.push("放大器電源 開啟");
                 opts.kvTexts.push("放大器電源 關閉");
-                opts.kvTexts.push("脈波 開啟");
-                opts.kvTexts.push("脈波 關閉");
-                opts.kvTexts.push("系統 重置");
+                opts.kvTexts.push("放大器電源 開啟");
+                opts.kvTexts.push("放大器致能 關閉");
+                opts.kvTexts.push("放大器致能 開啟");
+                opts.kvTexts.push("脈波輸出 關閉");
+                opts.kvTexts.push("脈波輸出 開啟");
+                opts.kvTexts.push("緊急停止 關閉");
+                opts.kvTexts.push("緊急停止 開啟");
                 opts.actionFunc = function (iobj) {
                     console.log(iobj);
                     MdaPopWin.popOff(2);
                     if (iobj.act !== "selected")
                         return;
-                    var cmdTbl = [
-                        "mast" + preText + "SspaPowerOn",
-                        "mast" + preText + "SspaPowerOff",
-                        "mast" + preText + "RadiationOn",
-                        "mast" + preText + "RadiationOff",
-                        "mast" + preText + "SystemReset"
-                    ];
-                    gr.gbcs.command({'act': cmdTbl[iobj.selectInx]});
-
-
-
+                    gr.gbcs.command({'act': "mast" + preText + "RadarCtr", "value": iobj.selectInx,"idInx":(setF-1)});
                 };
                 box.selectBox(opts);
 
@@ -1175,11 +1276,13 @@ class DummyTargetMaster {
         var opts = {};
         opts.title = "副控發射機 1";
         opts.actionFunc = self.actionFunc;
+        opts.deviceInx=0;
         blocks[cname] = {name: "targetPane1", type: "Model~TargetPane~base.sys0", opts: opts};
         //==============================
         var cname = lyMaps["leftBody"] + "~" + 1;
         var opts = {};
         opts.title = "副控發射機 2";
+        opts.deviceInx=1;
         opts.actionFunc = self.actionFunc;
         blocks[cname] = {name: "targetPane2", type: "Model~TargetPane~base.sys0", opts: opts};
         //==============================
@@ -1236,180 +1339,102 @@ class TargetPane {
         var st = md.stas;
         st.radarStatusText = [];
         st.radarStatusColor = [];
-        st.radarStatusText.push("發射機狀態: 未連線");
-        st.radarStatusText.push("環控");
+        st.radarStatusText.push("連線");
+        st.radarStatusText.push("環控狀態");
+        st.radarStatusText.push("電源狀態");
+        st.radarStatusText.push("放大器狀態");
+        st.radarStatusText.push("脈波狀態");
+        st.radarStatusText.push("功率狀態");
+        //====================================
+        st.radarStatusText.push("連線方式:無線");
+        st.radarStatusText.push("脈波來源:同步");
+        st.radarStatusText.push("輸出裝置:假負載");
+        st.radarStatusText.push("戰備狀態:關閉");
+        //====================================
         st.radarStatusText.push("放大器電源");
         st.radarStatusText.push("固態放大器");
-        st.radarStatusText.push("輻射功率");
-        st.radarStatusText.push("戰備狀態");
-        st.radarStatusText.push("遠端遙控");
-        st.radarStatusText.push("脈波來源");
-        st.radarStatusText.push("輸出裝置");
-        st.radarStatusText.push("連線方式");
+        st.radarStatusText.push("脈波輸出");
+        st.radarStatusText.push("緊急停止");
+        //====================================
+        st.radarStatusText.push("遠端控制");
+        
+        
         st.radarStatusColor.push("#888");
         st.radarStatusColor.push("#888");
         st.radarStatusColor.push("#888");
         st.radarStatusColor.push("#888");
         st.radarStatusColor.push("#888");
+        st.radarStatusColor.push("#888");
+        st.radarStatusColor.push("#ddd");
+        st.radarStatusColor.push("#ddd");
+        st.radarStatusColor.push("#ddd");
+        st.radarStatusColor.push("#ddd");
         st.radarStatusColor.push("#888");
         st.radarStatusColor.push("#888");
         st.radarStatusColor.push("#888");
         st.radarStatusColor.push("#888");
         st.radarStatusColor.push("#888");
         st.remoteDisable_f = 1;
-        var status0 = gr.radarData.systemStatus0;
-        var status1 = gr.radarData.systemStatus1;
-        var flag0 = gr.radarData.systemFlag0;
-        var flag1 = gr.radarData.systemFlag1;
+        //gr.radarData.subStatusA=[0xffffffff,0x00000000];
+        var rd=gr.radarData;
+        if(!gr.radarData.subStatusA)
+            return;
+        
+        
 
-        var conSta = 0;
-        var radarSta = 0;
-        var radiation = 0;
-        var conSet = 0;
-        var env = 0;
-        var sspaPow = 0;
-        var sspaSta = 0;
-        var meterSta = 0;
-        var batShort = 0;
-        var remote = 0;
-        var psSource = 0;
-        var outLoad = 0;
+        var conOk = 0;
+        var statusFlag=0x00000000;
 
         if (op.deviceInx === 0) {
-            var conSet = (flag1 >> 19) & 3;
-            if (conSet === 0) {
-                if (status1 & 1)
-                    conSta = 1;
-            }
-            if (conSet === 1) {
-                if ((status1 >> 1) & 1)
-                    conSta = 1;
-            }
-            radarSta = (status0 >> 6) & 3;
-            radiation = (status0 >> 25) & 1;
-            env = (status1 >> 7) & 1;
-            sspaPow = (status0 >> 23) & 1;
-            if (sspaPow)
-                sspaPow += (status1 >> 7) & 1;
-
-            sspaSta = (status0 >> 24) & 1;
-            if (sspaSta)
-                sspaSta += (status1 >> 9) & 1;
-            if (radiation)
-                meterSta = 1 + ((status1 >> 17) & 1);
-            batShort = (flag0 >> 9) & 1;
-            remote = (flag0 >> 2) & 1;
-            psSource = (flag0 >> 5) & 1;
-            outLoad = (flag0 >> 11) & 1;
-
-
-
+            if(rd.commOkRateA[0]>500)
+                conOk=1;
+            statusFlag=rd.subStatusA[0];
         }
         if (op.deviceInx === 1) {
-            var conSet = (flag0 >> 21) & 3;
-            if (conSet === 0) {
-                if ((status1 >> 2) & 1)
-                    conSta = 1;
-            }
-            if (conSet === 1) {
-                if ((status1 >> 3) & 1)
-                    conSta = 1;
-            }
-            radarSta = (status0 >> 8) & 3;
-            radiation = (status0 >> 30) & 1;
-            env = (status1 >> 12) & 1;
-            sspaPow = (status0 >> 28) & 1;
-            if (sspaPow)
-                sspaPow += (status1 >> 12) & 1;
-            sspaSta = (status0 >> 29) & 1;
-            if (sspaSta)
-                sspaSta += (status1 >> 14) & 1;
-            if (radiation)
-                meterSta = 1 + ((status1 >> 18) & 1);
-            batShort = (flag0 >> 10) & 1;
-            remote = (flag0 >> 3) & 1;
-            psSource = (flag0 >> 6) & 1;
-            outLoad = (flag0 >> 12) & 1;
+            statusFlag=rd.subStatusA[1];
+        }
+
+        if (conOk === 1) {
+            st.radarStatusColor[0] = "#ccffcc";
+            if((statusFlag>>0)&1)
+                st.radarStatusColor[1] = "#ccffcc";
+            if((statusFlag>>1)&1)
+                st.radarStatusColor[2] = "#ccffcc";
+            if((statusFlag>>2)&1)
+                st.radarStatusColor[3] = "#ccffcc";
+            if((statusFlag>>3)&1)
+                st.radarStatusColor[4] = "#ccffcc";
+            if((statusFlag>>4)&1)
+                st.radarStatusColor[5] = "#ccffcc";
+            if((statusFlag>>5)&1)
+                st.radarStatusText[6] = "連線方式:光纖";
+            if((statusFlag>>6)&1)
+                st.radarStatusText[7] = "脈波來源:本機";
+            if((statusFlag>>7)&1)
+                st.radarStatusText[8] = "輸出裝置:天線";
+            if((statusFlag>>8)&1)
+                st.radarStatusText[9] = "戰備狀態:開啟";
+            if((statusFlag>>9)&1)
+                st.radarStatusColor[10] = "#ccffcc";
+            if((statusFlag>>10)&1)
+                st.radarStatusColor[11] = "#ccffcc";
+            if((statusFlag>>11)&1)
+                st.radarStatusColor[12] = "#ccffcc";
+            if((statusFlag>>12)&1)
+                st.radarStatusColor[13] = "#ffcccc";
+            if((statusFlag>>13)&1){
+                st.radarStatusColor[14] = "#ccffcc";
+                st.remoteDisable_f = 0;
+            }    
+
         }
 
         /*
-         conSta = 1; //<<debug
-         radarSta = 3;//<<debug
-         radiation = 1;
-         sspaPow = 1;
-         sspaSta = 1;
-         meterSta = 1;
-         batShort = 1;
-         remote = 1;
-         psSource = 0;
-         outLoad = 0;
-         */
-
-        if (conSta === 1) {
-            if (radarSta === 0) {
-                st.radarStatusText[0] = "發射機狀態: ---";
-            }
-            if (radarSta === 1) {
-                st.radarStatusText[0] = "發射機狀態: 準備中";
-                st.radarStatusColor[0] = "#eeeeee";
-            }
-            if (radarSta === 2) {
-                st.radarStatusText[0] = "發射機狀態: 備便";
-                st.radarStatusColor[0] = "#eeffee";
-            }
-            if (radarSta === 3) {
-                st.radarStatusText[0] = "發射機狀態: 異常";
-                st.radarStatusColor[0] = "#ffcccc";
-            }
-            if (radiation) {
-                st.radarStatusText[0] = "發射機狀態: 發射中";
-                st.radarStatusColor[0] = "#ffff00";
-            }
-            if (env === 0) {
-                st.radarStatusColor[1] = "#ccffcc";
-            }
-            if (env === 1) {
-                st.radarStatusColor[1] = "#eeeeee";
-            }
-            if (sspaPow === 1)
-                st.radarStatusColor[2] = "#ccffcc";
-            if (sspaPow === 2)
-                st.radarStatusColor[2] = "#ffcccc";
-            if (sspaSta === 1)
-                st.radarStatusColor[3] = "#ccffcc";
-            if (sspaSta === 2)
-                st.radarStatusColor[3] = "#ffcccc";
-            if (meterSta === 1)
-                st.radarStatusColor[4] = "#ccffcc";
-            if (meterSta === 2)
-                st.radarStatusColor[4] = "#ffcccc";
-
-            if (batShort)
-                st.radarStatusColor[5] = "#ffff00";
-            if (remote)
-                st.radarStatusColor[6] = "#ffff00";
-            st.radarStatusColor[7] = "#eeeeee";
-            st.radarStatusColor[8] = "#eeeeee";
-            st.radarStatusColor[9] = "#eeeeee";
-
-
-            if (!psSource)
-                st.radarStatusText[7] = "脈波來源: SP同步脈波";
-            else
-                st.radarStatusText[7] = "脈波來源: 本機脈波";
-            if (!outLoad)
-                st.radarStatusText[8] = "輸出裝置: 天線";
-            else
-                st.radarStatusText[8] = "輸出裝置: 假負載";
-            st.remoteDisable_f = remote ^ 1;
-
-
-        }
-
         if (conSet === 0)
             st.radarStatusText[9] = "連線方式: 光纖";
         else
             st.radarStatusText[9] = "連線方式: 無線";
+        */
 
         return;
     }
@@ -1446,9 +1471,9 @@ class TargetPane {
         opts.margin = 6;
         opts.xm = 2;
         opts.ym = 4;
-        var yr = (1 / 9).toFixed(3) + "rh";
-        opts.yArr = [yr, yr, yr, yr, yr, yr, yr, yr, yr, yr, yr];
-        opts.xyArr = [[9999], [9999], ["0.5rw", 9999], ["0.5rw", 9999], ["0.5rw", 9999], [9999], [9999], [9999], ["0.5rw", 9999], [9999]];
+        var yr = (1 / 8).toFixed(3) + "rh";
+        opts.yArr = [yr, yr, yr, yr, yr, yr, yr, yr, yr, yr];
+        opts.xyArr = [[9999], ["0.33rw","0.33rw", 9999], ["0.33rw","0.33rw", 9999], ["0.5rw", 9999], ["0.5rw", 9999], ["0.5rw", 9999], ["0.5rw", 9999], ["0.33rw","0.33rw", 9999], [9999]];
         var lyInx = 0;
         layouts[cname] = {name: cname, type: "Layout~Ly_base~xyArray.sys0", opts: opts};
         lyMaps["mainBody"] = cname;
@@ -1457,7 +1482,7 @@ class TargetPane {
         opts.innerText = op.title;
         blocks[cname] = {name: "basePanel", type: "Component~Cp_base~label.title", opts: opts};
         //==============================
-        for (var i = 0; i < 10; i++) {
+        for (var i = 0; i < 15; i++) {
             var cname = lyMaps["mainBody"] + "~" + lyInx++;
             var opts = {};
             opts.fontSize = "0.5rh";
@@ -1645,23 +1670,23 @@ class MasterRadarPane {
 
             var savePara_f = 0;
             if (iobj.setId === "mastToSub1CommType") {
-                gr.paraSet[iobj.setId]=iobj.buttonInx;
+                gr.paraSet[iobj.setId] = iobj.buttonInx;
                 savePara_f = 1;
             }
             if (iobj.setId === "mastToSub2CommType") {
-                gr.paraSet[iobj.setId]=iobj.buttonInx;
+                gr.paraSet[iobj.setId] = iobj.buttonInx;
                 savePara_f = 1;
             }
             if (iobj.setId === "mastPulseSource") {
-                gr.paraSet[iobj.setId]=iobj.buttonInx;
+                gr.paraSet[iobj.setId] = iobj.buttonInx;
                 savePara_f = 1;
             }
-            
+
             if (iobj.setId === "mastPulseSource") {
                 if (gr.paraSet[iobj.setId] !== iobj.buttonInx)
                     mac.saveParaSet(iobj.setId, iobj.buttonInx);
                 else {
-                    if(iobj.buttonInx===0)
+                    if (iobj.buttonInx === 0)
                         return;
                     //gr.gbcs.command({'act': preText + "RadiationOnOff"});
                     var opts = {};
@@ -1728,9 +1753,9 @@ class MasterRadarPane {
                 }
                 return;
             }
-            
-            
-            
+
+
+
             if (savePara_f) {
                 var fileName = "paraSet";
                 var content = JSON.stringify(gr.paraSet);
@@ -1991,8 +2016,8 @@ class DummyTargetSub {
                 }
             }
             if (gr.viewDatas_f) {
-                for (var i = 0; i < 8; i++) {
-                    gr.viewDatas[i] = KvLib.trsIntToHexStr(gr.radarData.viewDatas[i]);
+                for (var i = 0; i < 64; i++) {
+                    gr.viewDatas[i] = KvLib.trsIntToHexStrFix(gr.radarData.viewDatas[i]);
                 }
             }
 
@@ -2095,8 +2120,8 @@ class DummyTargetSub {
             str += gr.radarData.conRxA[17] & 7;
             str += gr.radarData.conRxA[18] & 7;
             gr.footBarStatus0 = str;
-            
-            
+
+
 
             var str = "MST:";
             str += gr.radarData.conRxA[0] & 7;
@@ -2208,7 +2233,7 @@ class DummyTargetSub {
                 var mesObj = mda.popObj(0, 0, kvObj);
                 return;
             }
-            
+
             if (iobj.buttonId === "wave") {
                 var opts = {};
                 opts.actionFunc = function (iobj) {
@@ -2241,7 +2266,7 @@ class DummyTargetSub {
                 MdaPopWin.popObj(opts);
                 return;
             }
-            
+
 
             if (iobj.buttonId === "setting") {
                 DummyTargetMaster.paraSetPrg();
@@ -2497,7 +2522,7 @@ class SubRadarPane {
                 if (gr.paraSet[iobj.setId] !== iobj.buttonInx)
                     mac.saveParaSet(iobj.setId, iobj.buttonInx);
                 else {
-                    if(iobj.buttonInx===0)
+                    if (iobj.buttonInx === 0)
                         return;
                     //gr.gbcs.command({'act': preText + "RadiationOnOff"});
                     var opts = {};
@@ -3350,6 +3375,8 @@ class LocationTarget {
             for (var i = 0; i < 8; i++) {
                 if (iobj[i] === "---")
                     return null;
+                if (iobj[i] === null)
+                    return null;
             }
             var pos = [];
             var vv = iobj[0];
@@ -3395,127 +3422,127 @@ class LocationTarget {
                 attitudeA[0], attitudeA[1], "---", "---", "---"
             ];
         } else {
-            if (gr.appId < 2) {
-                for (var i = 0; i < 3; i++) {
-                    hides[i] = 1;
-                    if (!gr.radarData["gngga" + i]) {
-                        continue;
-                    }
-                    var gngga = KvLib.bytes2String(gr.radarData["gngga" + i]);
-                    var strA = gngga.split(",");
-                    if (strA[0] === "$GNGGA") {
-                        var strB = strA[1].split(".");
-                        var hour = KvLib.toInt(strB[0].substring(0, 2), 0) + 8;
-                        var min = KvLib.toInt(strB[0].substring(2, 4), 0);
-                        var sec = KvLib.toInt(strB[0].substring(4, 6), 0);
-                        var strB = strA[2].split(".");
-                        var nDegree = KvLib.toInt(strB[0].substring(0, 2), 0);
-                        var nMin = KvLib.toInt(strB[0].substring(2, 4), 0);
-                        var nMinRest = KvLib.toFloat("0." + strB[1], 0);
-                        var nSec = (nMinRest * 60) | 0;
-                        var nSecRest = nMinRest * 60 - nSec;
-                        var nSecPercent = (nMinRest * 100) | 0;
-                        var strB = strA[4].split(".");
-                        var eDegree = KvLib.toInt(strB[0].substring(0, 3), 0);
-                        var eMin = KvLib.toInt(strB[0].substring(3, 5), 0);
-                        var eMinRest = KvLib.toFloat("0." + strB[1], 0);
-                        var eSec = (eMinRest * 60) | 0;
-                        var eSecRest = nMinRest * 60 - eSec;
-                        var eSecPercent = (eMinRest * 100) | 0;
-                        var posq = KvLib.toInt(strA[6], 0);
-                        var satAmt = KvLib.toInt(strA[7], 0);
-                        var height = KvLib.toFloat(strA[9], 0);
-                        var posqTbl = ["未定位", "非差分定位", "差分定位", "---", "---", "---", "正在估算", "---", "---", "---"];
-                        var posqStr = posqTbl[posq];
-                        var ang = 0;
-                        if (hour < 10)
-                            hour = "0" + hour;
-                        if (min < 10)
-                            min = "0" + min;
-                        if (sec < 10)
-                            sec = "0" + sec;
-                        var timeStr = "" + hour + ":" + min + ":" + sec;
-                        gpsDatas[i] = [nDegree, nMin, nSec, nSecPercent, eDegree, eMin, eSec, eSecPercent, height, ang, posqStr, timeStr, satAmt];
-                        hides[i] = 0;
-                    }
+            for (var i = 0; i < 3; i++) {
+                hides[i] = 1;
+                if (!gr.radarData["gngga" + i]) {
+                    continue;
                 }
-                //<<debug
-                /*
-                for (i = 0; i < 13; i++) {
-                    gpsDatas[1][i] = gpsDatas[0][i];
-                    gpsDatas[2][i] = gpsDatas[0][i];
-                }
-                gpsDatas[1][2] += 1;
-                gpsDatas[2][6] += 1;
-                hides = [0, 0, 0];
-                */
-
-
-            }
-        }
-        if (gr.appId === 1) {
-            var radarScreen = md.blockRefs["radarScreen"];
-            radarScreen.opts.messages.mastRadar.hide_f = 1;
-            if (gr.paraSet.subNumber === 0) {
-                radarScreen.opts.messages.sub2Radar.hide_f = 1;
-                var radar = radarScreen.opts.messages.sub1Radar;
-                var nowString = gpsDatas[1][9] + "~" + 0.5 + "~" + 0.5 + "~" + 0;
-                if (radar.preString !== nowString) {
-                    radar.preString = nowString;
-                    radarScreen.opts.symbleEdit_f = 1;
-                    radar.angle = gpsDatas[1][9];
-                    radar.yr = 0.5;
-                    radar.xr = 0.5;
-                    radar.hide_f = 0;
+                var gngga = KvLib.bytes2String(gr.radarData["gngga" + i]);
+                if (!gngga.length)
+                    continue;
+                var strA = gngga.split(",");
+                if (strA[0] === "$GNGGA") {
+                    var strB = strA[1].split(".");
+                    var hour = KvLib.toInt(strB[0].substring(0, 2), 0) + 8;
+                    var min = KvLib.toInt(strB[0].substring(2, 4), 0);
+                    var sec = KvLib.toInt(strB[0].substring(4, 6), 0);
+                    var strB = strA[2].split(".");
+                    var nDegree = KvLib.toInt(strB[0].substring(0, 2), 0);
+                    var nMin = KvLib.toInt(strB[0].substring(2, 4), 0);
+                    var nMinRest = KvLib.toFloat("0." + strB[1], 0);
+                    var nSec = (nMinRest * 60) | 0;
+                    var nSecRest = nMinRest * 60 - nSec;
+                    var nSecPercent = (nMinRest * 100) | 0;
+                    var strB = strA[4].split(".");
+                    var eDegree = KvLib.toInt(strB[0].substring(0, 3), 0);
+                    var eMin = KvLib.toInt(strB[0].substring(3, 5), 0);
+                    var eMinRest = KvLib.toFloat("0." + strB[1], 0);
+                    var eSec = (eMinRest * 60) | 0;
+                    var eSecRest = nMinRest * 60 - eSec;
+                    var eSecPercent = (eMinRest * 100) | 0;
+                    var posq = KvLib.toInt(strA[6], 0);
+                    var satAmt = KvLib.toInt(strA[7], 0);
+                    var height = KvLib.toFloat(strA[9], 0);
+                    var posqTbl = ["未定位", "非差分定位", "差分定位", "---", "---", "---", "正在估算", "---", "---", "---"];
+                    var posqStr = posqTbl[posq];
+                    var ang = 0;
+                    if (hour < 10)
+                        hour = "0" + hour;
+                    if (min < 10)
+                        min = "0" + min;
+                    if (sec < 10)
+                        sec = "0" + sec;
+                    var timeStr = "" + hour + ":" + min + ":" + sec;
+                    gpsDatas[i] = [nDegree, nMin, nSec, nSecPercent, eDegree, eMin, eSec, eSecPercent, height, ang, posqStr, timeStr, satAmt];
+                    hides[i] = 0;
                 }
             }
-            if (gr.paraSet.subNumber === 1) {
-                radarScreen.opts.messages.sub1Radar.hide_f = 1;
-                var radar = radarScreen.opts.messages.sub2Radar;
-                var nowString = gpsDatas[2][9] + "~" + 0.5 + "~" + 0.5 + "~" + 0;
-                if (radar.preString !== nowString) {
-                    radar.preString = nowString;
-                    radarScreen.opts.symbleEdit_f = 1;
-                    radar.angle = gpsDatas[1][9];
-                    radar.yr = 0.5;
-                    radar.xr = 0.5;
-                    radar.hide_f = 0;
-                }
-            }
-            //return;
         }
         st.mistRadarPos = duTrans(gpsDatas[0]);
         st.sub1RadarPos = duTrans(gpsDatas[1]);
         st.sub2RadarPos = duTrans(gpsDatas[2]);
-
+        if(!st.mistRadarPos)
+            hides[0]=1;
+        if(!st.sub1RadarPos)
+            hides[1]=1;
+        if(!st.sub2RadarPos)
+            hides[2]=1;
+        if(gr.paraSet.appId===0){
+            if(hides[0]){
+                hides[1]=1;
+                hides[2]=1;
+            }
+        }
+        if(gr.paraSet.appId===1){
+            if(gr.paraSet.subNumber===0){
+                if(hides[0])
+                    st.mistRadarPos=st.sub1RadarPos;
+                if(hides[1]){
+                    hides[0]=1;
+                    hides[2]=1;                    
+                }    
+            }    
+            if(gr.paraSet.subNumber===1){
+                if(hides[0])
+                    st.mistRadarPos=st.sub2RadarPos;
+                if(hides[1]){
+                    hides[0]=1;
+                    hides[1]=1;                    
+                }    
+            }    
+            
+        }
+            
+            
+        
+        
+            
+        
+        
+        //===================================================================================
         var radarScanDatas = location.radarScanDatas = [];
         radarScanDatas.push(gr.paraSet.radarStartAngle);
         radarScanDatas.push(gr.paraSet.radarEndAngle);
         radarScanDatas.push(gr.paraSet.radarScanRpm);
         radarScanDatas.push(gr.paraSet.radarFadeTime);
-
+        //===================================================================================
         var radarDirections = location.radarDirections = [null, null, null];
-
         var posOut = self.calPos(st.mistRadarPos, st.sub1RadarPos);
         st.posOutA = posOut;
         if (posOut) {
             var dir = (Math.pow(posOut[0] * posOut[0] + posOut[1] * posOut[1], 0.5)).toFixed(0);
             radarDirections[0] = dir;
+            if(hides[0]||hides[1] )
+                radarDirections[0]=null;
         }
         var posOut = self.calPos(st.mistRadarPos, st.sub2RadarPos);
         st.posOutB = posOut;
         if (posOut) {
             var dir = (Math.pow(posOut[0] * posOut[0] + posOut[1] * posOut[1], 0.5)).toFixed(0);
             radarDirections[1] = dir;
+            if(hides[0]||hides[2] )
+                radarDirections[1]=null;
         }
         var posOut = self.calPos(st.sub1RadarPos, st.sub2RadarPos);
+        st.posOutC = posOut;
         if (posOut) {
             var dir = (Math.pow(posOut[0] * posOut[0] + posOut[1] * posOut[1], 0.5)).toFixed(0);
             radarDirections[2] = dir;
+            if(hides[1]||hides[2] )
+                radarDirections[2]=null;
         }
-
+        //===================================================================================
         var radarPositions = location.radarPositions = [];
-
         if (st.posOutA) {
             var pos0 = st.posOutA[0] | 0;
             var pos1 = st.posOutA[1] | 0;
@@ -3524,8 +3551,11 @@ class LocationTarget {
             var pos2 = st.posOutB[0] | 0;
             var pos3 = st.posOutB[1] | 0;
         }
+        if (st.posOutC) {
+            var pos4 = st.posOutC[0] | 0;
+            var pos5 = st.posOutC[1] | 0;
+        }
         var radarScreen = md.blockRefs["radarScreen"];
-
         var scale = radarScreen.opts.roomInTbl[radarScreen.opts.roomInInx];
         var sRate = radarScreen.stas.sRadius * 2 / radarScreen.stas.containerHeight;
         //======================
@@ -3535,16 +3565,8 @@ class LocationTarget {
             hides[0] = 1;
         var rateY = (sRate * yRate * 0.5 + 0.5);
         var rateX = (sRate * xRate * 0.5 + 0.5);
-        var nowString = gr.paraSet.mastAttitude[1] + "~" + rateY.toFixed(2) + "~" + rateX.toFixed(2) + "~" + hides[0];
-        if (radarScreen.opts.messages.mastRadar.preString !== nowString) {
-            radarScreen.opts.messages.mastRadar.preString = nowString;
-            radarScreen.opts.symbleEdit_f = 1;
-            radarScreen.opts.messages.mastRadar.angle = angles[0];
-            radarScreen.opts.messages.mastRadar.yr = 1 - rateY;
-            radarScreen.opts.messages.mastRadar.xr = rateX;
-            radarScreen.opts.messages.mastRadar.hide_f = hides[0];
-        }
-        //======================
+        var mastSym=[gr.paraSet.mastAttitude[1],rateX,rateY,hides[0]];
+        //===============
         if (!st.posOutA) {
             pos0 = scale;
             pos1 = scale;
@@ -3555,16 +3577,8 @@ class LocationTarget {
             hides[1] = 1;
         var rateY = (sRate * yRate * 0.5 + 0.5);
         var rateX = (sRate * xRate * 0.5 + 0.5);
-        var nowString = gr.paraSet.sub1Attitude[1] + "~" + rateY.toFixed(2) + "~" + rateX.toFixed(2) + "~" + hides[1];
-        if (radarScreen.opts.messages.sub1Radar.preString !== nowString) {
-            radarScreen.opts.messages.sub1Radar.preString = nowString;
-            radarScreen.opts.symbleEdit_f = 1;
-            radarScreen.opts.messages.sub1Radar.angle = angles[1];
-            radarScreen.opts.messages.sub1Radar.yr = 1 - rateY;
-            radarScreen.opts.messages.sub1Radar.xr = rateX;
-            radarScreen.opts.messages.sub1Radar.hide_f = hides[1];
-        }
-        //======================
+        var sub1Sym=[gr.paraSet.sub1Attitude[1],rateX,rateY,hides[1]];
+        //=====================================
         if (!st.posOutB) {
             pos2 = scale;
             pos3 = scale;
@@ -3575,15 +3589,76 @@ class LocationTarget {
             hides[2] = 1;
         var rateY = (sRate * yRate * 0.5 + 0.5);
         var rateX = (sRate * xRate * 0.5 + 0.5);
-        var nowString = gr.paraSet.sub2Attitude[1] + "~" + rateY.toFixed(2) + "~" + rateX.toFixed(2) + "~" + +hides[2];
+        var sub2Sym=[gr.paraSet.sub2Attitude[1],rateX,rateY,hides[2]];
+        
+        var deltaX=0;
+        var deltaY=0;
+        if(gr.paraSet.appId===1){
+            var deltaX=0.5-sub1Sym[1];
+            var deltaY=0.5-sub1Sym[2];;
+            if(gr.paraSet.subNumber===1){
+                var deltaX=0.5-sub2Sym[1];
+                var deltaY=0.5-sub2Sym[2];
+            }
+        }    
+        mastSym[1] += deltaX;
+        mastSym[2] += deltaY;
+        sub1Sym[1] += deltaX;
+        sub1Sym[2] += deltaY;
+        sub2Sym[1] += deltaX;
+        sub2Sym[2] += deltaY;
+        
+        if (mastSym[1]>1 || mastSym[1]<0)
+            mastSym[3] = 1;
+        if (mastSym[2]>1 || mastSym[2]<0)
+            mastSym[3] = 1;
+        if (sub1Sym[1]>1 || sub1Sym[1]<0)
+            sub1Sym[3] = 1;
+        if (sub1Sym[2]>1 || sub1Sym[2]<0)
+            sub1Sym[3] = 1;
+        if (sub2Sym[1]>1 || sub2Sym[1]<0)
+            sub2Sym[3] = 1;
+        if (sub2Sym[2]>1 || sub2Sym[2]<0)
+            sub2Sym[3] = 1;
+
+        
+        
+        
+        
+        var nowString = mastSym[0] + "~" + mastSym[1] + "~" + mastSym[2] + "~" + mastSym[3];
+        if (radarScreen.opts.messages.mastRadar.preString !== nowString) {
+            radarScreen.opts.messages.mastRadar.preString = nowString;
+            radarScreen.opts.symbleEdit_f = 1;
+            radarScreen.opts.messages.mastRadar.angle = mastSym[0];
+            radarScreen.opts.messages.mastRadar.yr = 1 - mastSym[2];
+            radarScreen.opts.messages.mastRadar.xr = mastSym[1];
+            radarScreen.opts.messages.mastRadar.hide_f = mastSym[3];
+        }
+        //======================
+        
+        
+        
+        var nowString = sub1Sym[0] + "~" + sub1Sym[1] + "~" + sub1Sym[2] + "~" + sub1Sym[3];
+        
+        if (radarScreen.opts.messages.sub1Radar.preString !== nowString) {
+            radarScreen.opts.messages.sub1Radar.preString = nowString;
+            radarScreen.opts.symbleEdit_f = 1;
+            radarScreen.opts.messages.sub1Radar.angle = sub1Sym[0];
+            radarScreen.opts.messages.sub1Radar.yr = 1 - sub1Sym[2];
+            radarScreen.opts.messages.sub1Radar.xr = sub1Sym[1];
+            radarScreen.opts.messages.sub1Radar.hide_f = sub1Sym[3];
+        }
+        //======================
+        var nowString = sub2Sym[0] + "~" + sub2Sym[1] + "~" + sub2Sym[2] + "~" + sub2Sym[3];
         if (radarScreen.opts.messages.sub2Radar.preString !== nowString) {
             radarScreen.opts.messages.sub2Radar.preString = nowString;
             radarScreen.opts.symbleEdit_f = 1;
-            radarScreen.opts.messages.sub2Radar.angle = angles[2];
-            radarScreen.opts.messages.sub2Radar.yr = 1 - rateY;
-            radarScreen.opts.messages.sub2Radar.xr = rateX;
-            radarScreen.opts.messages.sub2Radar.hide_f = hides[2];
+            radarScreen.opts.messages.sub2Radar.angle = sub2Sym[0];
+            radarScreen.opts.messages.sub2Radar.yr = 1 - sub2Sym[2];
+            radarScreen.opts.messages.sub2Radar.xr = sub2Sym[1];
+            radarScreen.opts.messages.sub2Radar.hide_f = sub2Sym[3];
         }
+        
 
 
 
@@ -3592,6 +3667,7 @@ class LocationTarget {
 
     }
 
+    //out [x,y,z]
     calPos(gps0, gps1)
     {
         //////////////////////////////////////////////////////////
@@ -3612,9 +3688,11 @@ class LocationTarget {
         var Rm = a * (1.0 - e2) / Math.pow((1.0 - e2 * Math.pow(Math.sin(mid_lat), 2.0)), 1.5);
         var Rn = a / Math.sqrt(1.0 - e2 * Math.pow(Math.sin(mid_lat), 2.0));
         var posOut = [];
-        posOut.push(((pos1[0] - pos0[0]) * (Rm + mid_h)).toFixed(0));
-        posOut.push(((pos1[1] - pos0[1]) * (Rn + mid_h) * Math.cos(mid_lat)).toFixed(0));
-        posOut.push((-1 * (pos0[2] - pos1[2]).toFixed(0)));
+        posOut.push(Math.round(  (pos1[0] - pos0[0]) * (Rm + mid_h) )  );
+        posOut.push(Math.round(  (pos1[1] - pos0[1]) * (Rn + mid_h) * Math.cos(mid_lat)  )  );
+        posOut.push(Math.round(-1 * (pos0[2] - pos1[2])));
+        
+        
         return posOut;
     }
 
@@ -3815,7 +3893,58 @@ class LocationTarget {
         };
         var actionPrg = function (iobj) {
             console.log(iobj);
+
+            var setOkPrg = function (iobj) {
+                console.log(iobj);
+                if (iobj.act !== "padEnter")
+                    return;
+                if (sender.name === "ladarLaunchPanel") {
+                    if (setInx === 0)
+                        var name0 = "radarStartAngle";
+                    if (setInx === 1)
+                        var name0 = "radarEndAngle";
+                    if (setInx === 2)
+                        var name0 = "radarScanRpm";
+                    if (setInx === 3)
+                        var name0 = "radarFadeTime";
+                    gr.paraSet[name0] = iobj.inputText;
+                } else {
+                    if (sender.name === "ladarGpsPanel")
+                        var name0 = "mast";
+                    if (sender.name === "targetGpsPanel1")
+                        var name0 = "sub1";
+                    if (sender.name === "targetGpsPanel2")
+                        var name0 = "sub2";
+                    if (setInx <= 3) {
+                        name0 += "Latitude";
+                        var index = setInx;
+                    } else if (setInx >= 8) {
+                        name0 += "Attitude";
+                        var index = setInx - 8;
+                    } else {
+                        name0 += "Longitude";
+                        var index = setInx - 4;
+                    }
+                    gr.paraSet[name0][index] = KvLib.toInt(iobj.inputText, 0);
+                }
+                var fileName = "paraSet";
+                var content = JSON.stringify(gr.paraSet);
+                sv.saveStringToFile("responseDialogError", "null", fileName, content);
+            };
+
+
+
             var sender = iobj.sender;
+            if (iobj.act === "pressEnter") {
+                iobj.act = "padEnter";
+                iobj.sender.stas.blurObjName = iobj.setOptsObj.name;
+                var setInx = KvLib.toInt(iobj.setOptsObj.name.split("#")[1], null);
+                if(setInx===null)
+                    return;
+                iobj.inputText=iobj.value;
+                setOkPrg(iobj);
+
+            }
             if (iobj.act === "actButtonClick") {
                 if (iobj.buttonId === "pad") {
                     var st = iobj.sender.stas;
@@ -3835,43 +3964,7 @@ class LocationTarget {
                         opts.setOpts.titleWidth = 0;
                         opts.setOpts.unitWidth = 0;
                         opts.title = opts.setOpts.title;
-                        opts.actionFunc = function (iobj) {
-                            console.log(iobj);
-                            if (iobj.act !== "padEnter")
-                                return;
-                            if (sender.name === "ladarLaunchPanel") {
-                                if (setInx === 0)
-                                    var name0 = "radarStartAngle";
-                                if (setInx === 1)
-                                    var name0 = "radarEndAngle";
-                                if (setInx === 2)
-                                    var name0 = "radarScanRpm";
-                                if (setInx === 3)
-                                    var name0 = "radarFadeTime";
-                                gr.paraSet[name0] = iobj.inputText;
-                            } else {
-                                if (sender.name === "ladarGpsPanel")
-                                    var name0 = "mast";
-                                if (sender.name === "targetGpsPanel1")
-                                    var name0 = "sub1";
-                                if (sender.name === "targetGpsPanel2")
-                                    var name0 = "sub2";
-                                if (setInx <= 3) {
-                                    name0 += "Latitude";
-                                    var index = setInx;
-                                } else if (setInx >= 8) {
-                                    name0 += "Attitude";
-                                    var index = setInx - 8;
-                                } else {
-                                    name0 += "Longitude";
-                                    var index = setInx - 4;
-                                }
-                                gr.paraSet[name0][index] = KvLib.toInt(iobj.inputText, 0);
-                            }
-                            var fileName = "paraSet";
-                            var content = JSON.stringify(gr.paraSet);
-                            sv.saveStringToFile("responseDialogError", "null", fileName, content);
-                        };
+                        opts.actionFunc = setOkPrg;
                         box.intPadBox(opts);
                     }
                     return;
@@ -3888,11 +3981,16 @@ class LocationTarget {
                                 var setLineObj = sender.blockRefs[key];
                                 var inputText = setLineObj.blockRefs["inputText"];
                                 var value = inputText.elems["inputText"].value;
-                                values.push(value);
+                                values.push(KvLib.strToInt(value,0));
                             }
-                            var latitude = values[0] + " " + values[1] + " " + values[2] + " " + values[3];
-                            var longitude = values[4] + " " + values[5] + " " + values[6] + " " + values[7];
-                            var attitude = values[8] + " " + values[9];
+                            
+                            
+                            var latitude = [values[0],values[1],values[2],values[3]];
+                            var longitude = [values[4],values[5],values[6],values[7]];
+                            var attitude = [values[8] ,values[9]];
+                                
+                            
+                            
                             if (sender.name === "ladarGpsPanel") {
                                 gr.paraSet.mastLatitude = latitude;
                                 gr.paraSet.mastLongitude = longitude;
@@ -4834,7 +4932,14 @@ class SyncTest {
             }
             commDatas[2] = "" + gr.radarData.adjTimeOf1588A[i];
             commDatas[3] = "" + gr.radarData.commPackageCntA[i];
-            commDatas[4] = "" + gr.radarData.commOkRateA[i];
+            if (gr.radarData.commOkRateA[i] === 0)
+                commDatas[4] = "0.0 %";
+            else {
+                var retCnt=gr.radarData.commOkRateA[i] + 2;
+                if(retCnt>1000)
+                    retCnt=1000;
+                commDatas[4] = "" + ( retCnt/ 10).toFixed(1) + " %";
+            }
 
         }
 
@@ -4871,7 +4976,7 @@ class SyncTest {
         //======================================    
         var cname = lyMaps["body"] + "~" + 0;
         var opts = {};
-        opts.yArr = [50, 160, 9999, 80];
+        opts.yArr = [50, 180, 9999, 60];
         opts.ym = 10;
         opts.margin = 4;
         layouts[cname] = {name: cname, type: "Layout~Ly_base~xyArray.sys0", opts: opts};
@@ -4904,20 +5009,21 @@ class SyncTest {
         opts.title = "系統";
         opts.setOptss = [];
         var setOptss = opts.setOptss;
-        opts.yArr = ["0.5rw", 9999];
+        opts.yArr = ["0.33rw", "0.33rw","0.33rw"];
         opts.xm = 10;
         opts.ym = 5;
         opts.xyArr = [
             ["0.5rw", 9999],
             ["0.5rw", 9999]
         ];
+        /*
         var setOpts = sopt.getParaSetOpts({paraSetName: "commTestPacks", titleWidth: 200, titleFontSize: "0.5rh"});
         var watchDatas = setOpts.watchDatas = [];
         watchDatas.push(["directName", "gr.paraSet." + "commTestPacks", "editValue", 1]);
         setOptss.push(setOpts);
+        */
+        
         var setOpts = sopt.getParaSetOpts({paraSetName: "vgTimeDelay", titleWidth: 200, titleFontSize: "0.5rh"});
-        setOpts.actButtons = [];
-        setOpts.readOnly_f = 1;
         var watchDatas = setOpts.watchDatas = [];
         watchDatas.push(["directName", "gr.paraSet." + "vgTimeDelay", "editValue", 1]);
         setOptss.push(setOpts);
@@ -4940,7 +5046,10 @@ class SyncTest {
             opts.actionFunc = function (iobj) {
                 console.log(iobj);
                 if (iobj.act === "checkChanged" || iobj.act === "pressEnter") {
-                    var setLine = iobj.kvObj.fatherMd;
+                    if(iobj.kvObj.baseType==="MdaSetLine")
+                        var setLine = iobj.kvObj;
+                    else
+                        var setLine = iobj.kvObj.fatherMd;
                     var value = setLine.opts.setOpts.value;
                     gr.paraSet[setLine.opts.setOpts.paraSetName] = value;
                     var fileName = "paraSet";
@@ -4950,7 +5059,8 @@ class SyncTest {
             };
             opts.setOptss = [];
             var setOptss = opts.setOptss;
-            opts.yArr = ["0.1rh", "0.1rh", "0.1rh", "0.1rh", "0.1rh", "0.1rh", "0.1rh", "0.1rh", "0.1rh", "0.1rh"];
+            
+            opts.yArr = ["0.09rh", "0.09rh", "0.09rh", "0.09rh", "0.09rh", "0.09rh", "0.09rh", "0.09rh", "0.09rh", "0.09rh", "0.09rh"];
             opts.ym = 10;
             opts.xm = 8;
             if (opts.deviceInx === 0)
@@ -4960,15 +5070,16 @@ class SyncTest {
             opts.xyArr = [
                 [9999],
                 [9999],
-                ["0.5rw", 9999],
                 [9999],
                 [9999],
-                ["0.5rw", 9999],
                 [9999],
-                ["0.5rw", 9999],
-                ["0.5rw", 9999],
-                ["0.5rw", 9999],
-                ["0.5rw", 9999],
+                [9999],
+                [9999],
+                [9999],
+                [9999],
+                [9999],
+                [9999],
+                [9999],
                 [9999],
                 [9999],
                 [9999],
@@ -5001,6 +5112,7 @@ class SyncTest {
             }
             setOptss.push(setOpts);
             //===============
+            /*
             var setOpts = sopt.getView({title: "光纖連線狀態:", titleWidth: 140, value: ""});
             var watchDatas = setOpts.watchDatas = [];
             watchDatas.push(["directName", watchReg0 + "[0]", "editValue", 1]);
@@ -5013,14 +5125,15 @@ class SyncTest {
             watchDatas.push(["directName", watchReg1 + "[1]", "editBaseColor", 1]);
             setOptss.push(setOpts);
             //===============
+            */
             var setOpts = sopt.getParaSetOpts({paraSetName: preText + "ChSyncType", titleWidth: 200, titleFontSize: "0.4rh"});
             var watchDatas = setOpts.watchDatas = [];
             watchDatas.push(["directName", "gr.paraSet." + preText + "ChSyncType", "editValue", 1]);
             setOptss.push(setOpts);
             //=======
 
-            var setOpts = sopt.getParaSetOpts({paraSetName: preText + "ChTimeFineTune", titleWidth: 250, titleFontSize: "0.4rh"});
-            setOpts.actButtons = ["pad"];
+            var setOpts = sopt.getParaSetOpts({paraSetName: preText + "ChTimeFineTune", titleWidth: 200, titleFontSize: "0.4rh"});
+            //setOpts.actButtons = ["pad"];
             var watchDatas = setOpts.watchDatas = [];
             watchDatas.push(["directName", "gr.paraSet." + preText + "ChTimeFineTune", "editValue", 1]);
             setOptss.push(setOpts);
@@ -5028,14 +5141,14 @@ class SyncTest {
 
 
             var setOpts = sopt.getParaSetOpts({paraSetName: preText + "ChFiberDelay", titleWidth: 200, titleFontSize: "0.4rh"});
-            setOpts.actButtons = ["pad"];
+            //setOpts.actButtons = ["pad"];
             setOpts.unitWidth = 0;
             var watchDatas = setOpts.watchDatas = [];
             watchDatas.push(["directName", "gr.paraSet." + preText + "ChFiberDelay", "editValue", 1]);
             setOptss.push(setOpts);
             //========
             var setOpts = sopt.getParaSetOpts({paraSetName: preText + "ChRfDelay", titleWidth: 200, titleFontSize: "0.4rh"});
-            setOpts.actButtons = ["pad"];
+            //setOpts.actButtons = ["pad"];
             setOpts.unitWidth = 0;
             var watchDatas = setOpts.watchDatas = [];
             watchDatas.push(["directName", "gr.paraSet." + preText + "ChRfDelay", "editValue", 1]);
@@ -5046,38 +5159,38 @@ class SyncTest {
 
 
 
-            var setOpts = sopt.getView({title: "1588修正時間:", titleWidth: 250, "unitWidth": 50, unit: "5us", value: ""});
+            var setOpts = sopt.getView({title: "1588修正時間:", titleWidth: 200, "unitWidth": 50, unit: "6.25ns", value: ""});
             var watchDatas = setOpts.watchDatas = [];
             watchDatas.push(["directName", watchReg0 + "[2]", "editValue", 1]);
             setOptss.push(setOpts);
             //=================
 
 
-            var setOpts = sopt.getParaSetOpts({paraSetName: preText + "ChRfTxCh", titleWidth: 180, titleFontSize: "0.4rh"});
-            setOpts.actButtons = ["pad"];
+            var setOpts = sopt.getParaSetOpts({paraSetName: preText + "ChRfTxCh", titleWidth: 200, titleFontSize: "0.4rh"});
+            //setOpts.actButtons = ["pad"];
             var watchDatas = setOpts.watchDatas = [];
             watchDatas.push(["directName", "gr.paraSet." + preText + "ChRfTxCh", "editValue", 1]);
             setOptss.push(setOpts);
 
-            var setOpts = sopt.getParaSetOpts({paraSetName: preText + "ChRfRxCh", titleWidth: 180, titleFontSize: "0.4rh"});
-            setOpts.actButtons = ["pad"];
+            var setOpts = sopt.getParaSetOpts({paraSetName: preText + "ChRfRxCh", titleWidth: 200, titleFontSize: "0.4rh"});
+            //setOpts.actButtons = ["pad"];
             var watchDatas = setOpts.watchDatas = [];
             watchDatas.push(["directName", "gr.paraSet." + preText + "ChRfRxCh", "editValue", 1]);
             setOptss.push(setOpts);
 
             //================
-            var setOpts = sopt.getView({title: "封包發送數:", titleWidth: 160, value: ""});
+            var setOpts = sopt.getView({title: "封包發送數:", titleWidth: 200, value: ""});
             var watchDatas = setOpts.watchDatas = [];
             watchDatas.push(["directName", watchReg0 + "[3]", "editValue", 1]);
             setOptss.push(setOpts);
             //=================
-            var setOpts = sopt.getView({title: "封包正確率:", titleWidth: 160, value: ""});
+            var setOpts = sopt.getView({title: "封包正確率:", titleWidth: 200, value: ""});
             var watchDatas = setOpts.watchDatas = [];
             watchDatas.push(["directName", watchReg0 + "[4]", "editValue", 1]);
             setOptss.push(setOpts);
             //=================
 
-
+            /*
             var setOpts = sopt.getView({title: "主控RF接收能量:", titleWidth: 180, "unitWidth": 50, unit: "DB", value: ""});
             var watchDatas = setOpts.watchDatas = [];
             watchDatas.push(["directName", watchReg0 + "[5]", "editValue", 1]);
@@ -5087,6 +5200,7 @@ class SyncTest {
             var watchDatas = setOpts.watchDatas = [];
             watchDatas.push(["directName", watchReg0 + "[6]", "editValue", 1]);
             setOptss.push(setOpts);
+            */
 
         };
         var cname = lyMaps["centerBody"] + "~" + 0;
@@ -5101,29 +5215,32 @@ class SyncTest {
         opts.title = "副控2";
         targFunc(opts);
         blocks[cname] = {name: "syncPanel#1", type: "Model~MdaSetGroup~base.sys0", opts: opts};
-        var cname = lyMaps["mainBody"] + "~" + 3;
-        var opts = {};
-        opts.buttons = ["傳輸開始", "傳輸停止", "邏輯分析", "波形顯示"];
-        opts.buttonIds = ["location", "selfTest", "sync", "setting"];
-        opts.actionFunc = function (iobj) {
-            if (iobj.buttonId === "location") {
-                gr.appType = "Model~LocationTarget~base.sys0";
-                sys.dispWebPage();
-                return;
-            }
-            if (iobj.buttonId === "selfTest") {
-                gr.appType = "Model~SelfTest~base.sys0";
-                sys.dispWebPage();
-                return;
-            }
-            if (iobj.buttonId === "sync") {
-                gr.appType = "Model~SyncTest~base.sys0";
-                sys.dispWebPage();
-                return;
-            }
-        };
-        opts.buttonAmt = 4;
-        blocks[cname] = {name: "headButtons", type: "Model~MdaButtons~base.sys0", opts: opts};
+
+        /*
+         var cname = lyMaps["mainBody"] + "~" + 3;
+         var opts = {};
+         opts.buttons = ["傳輸開始", "傳輸停止", "邏輯分析", "波形顯示"];
+         opts.buttonIds = ["location", "selfTest", "sync", "setting"];
+         opts.actionFunc = function (iobj) {
+         if (iobj.buttonId === "location") {
+         gr.appType = "Model~LocationTarget~base.sys0";
+         sys.dispWebPage();
+         return;
+         }
+         if (iobj.buttonId === "selfTest") {
+         gr.appType = "Model~SelfTest~base.sys0";
+         sys.dispWebPage();
+         return;
+         }
+         if (iobj.buttonId === "sync") {
+         gr.appType = "Model~SyncTest~base.sys0";
+         sys.dispWebPage();
+         return;
+         }
+         };
+         opts.buttonAmt = 4;
+         blocks[cname] = {name: "headButtons", type: "Model~MdaButtons~base.sys0", opts: opts};
+         */
     }
 }
 class StatusBar {
@@ -5266,9 +5383,15 @@ class DummyTargetCtr {
                 }
             }
             if (gr.viewDatas_f) {
-                for (var i = 0; i < 8; i++) {
-                    gr.viewDatas[i] = KvLib.trsIntToHexStr(gr.radarData.viewDatas[i]);
+                for (var i = 0; i < 64; i++) {
+                    gr.viewDatas[i] = KvLib.trsIntToHexStrFix(gr.radarData.viewDatas[i]);
                 }
+                for (var i = 0; i < 6; i++) {
+                    gr.viewDatas[i + 64] = KvLib.trsShortToHexStrFix(gr.radarData.ioInA[i]);
+                }
+
+
+
             }
             var rd = gr.radarData;
             //rd.pulseFormAddBufA0=[90*1000*2+0,10*1000*2+1];
@@ -5805,10 +5928,10 @@ class DummyTargetCtrPane {
          */
         wd[2] = gr.paraSet["ctr1TxLoad"];
         wd[3] = gr.paraSet["ctr1BatShort"];
-        
+
         //wd[2] = (gr.radarData.systemStatus1 >> 20) & 1;
         //wd[3] = (gr.radarData.systemStatus1 >> 22) & 1;
-        
+
         mac.messageEditor(md);
     }
     afterCreate() {
@@ -6053,7 +6176,7 @@ class DummyTargetCtrPane {
                 opts.title = "放大器電源總電流";
                 var setOpts = opts.setOpts = sopt.getOptsPara("lcdView");
                 setOpts.value = "";//
-                setOpts.fontSize="1.2rh";
+                setOpts.fontSize = "1.2rh";
                 var watchDatas = setOpts.watchDatas = [];
                 watchDatas.push(["directReg", regName + "#9", "innerText", 1]);
                 watchDatas.push(["directReg", regName1 + "#9", "innerTextColor", 1]);
@@ -6176,9 +6299,9 @@ class DummyTargetCtrPane {
                 setOpts.value = para.value;
                 setOpts.fontSize = "0.4rh";
                 setOpts.id = preText + "TxLoad";
-                
-                
-                
+
+
+
                 var watchDatas = setOpts.watchDatas = [];
                 watchDatas.push(["directReg", regName + "#2", "setOpts.value", 1]);
                 setOpts.actViewNone_f = 1;
@@ -6629,7 +6752,7 @@ class CtrRadarStatus {
                 var itemInx = 0;
                 for (var j = 0; j < 40; j++) {
                     var setOpts = opts.setOpts = sopt.getOptsPara("leds");
-                    if (j === 2 || j === 3 || j === 38 || j === 39) {
+                    if (j === 0 || j === 2 || j === 37 || j === 39) {
                         opts.setOptss.push(null);
                         continue;
                     }
@@ -6663,7 +6786,7 @@ class CtrRadarStatus {
                 var itemInx = 0;
                 for (var j = 0; j < 40; j++) {
                     var setOpts = opts.setOpts = sopt.getOptsPara("leds");
-                    if (j === 2 || j === 3 || j === 38 || j === 39) {
+                    if (j === 0 || j === 2 || j === 37 || j === 39) {
                         opts.setOptss.push(null);
                         continue;
                     }
@@ -6916,6 +7039,13 @@ class CtrSspaPowerStatus {
                     if (noInx === 2)
                         noInx += 2;
                     var noStr = (((noInx / 4) | 0) + 1) + "-" + ((noInx % 4) + 1);
+                    if (noInx === 0)
+                        noStr = "1-2";
+                    if (noInx === 1)
+                        noStr = "1-4";
+                    if (noInx === 37)
+                        noStr = "10-3";
+
                     var watch = kopt.itemWatch = {};
                     watch["c0#0"] = regName + "#" + itemInx + "#0";
                     watch["c1#0"] = regName + "#" + itemInx + "#1";
@@ -7207,6 +7337,15 @@ class CtrSspaModuleStatus {
                     if (noInx === 2)
                         noInx += 2;
                     var noStr = (((noInx / 4) | 0) + 1) + "-" + ((noInx % 4) + 1);
+
+                    if (noInx === 0)
+                        noStr = "1-2";
+                    if (noInx === 1)
+                        noStr = "1-4";
+                    if (noInx === 37)
+                        noStr = "10-3";
+
+
                     var watch = kopt.itemWatch = {};
                     watch["c0#0"] = regName + "#" + itemInx + "#0";
                     watch["c2#0"] = regName + "#" + itemInx + "#1";
@@ -7803,7 +7942,7 @@ class SyncGloble {
         for (var i = 0; i < 3; i++)
             rd.gpsDataAA.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         rd.adjTimeOf1588A = [0, 0];
-        rd.commPackageCntA = [0, 0];
+        rd.commPackageCntA = [1000, 1000];
         rd.commOkRateA = [0, 0];
         rd.rfRxPowerA = [0, 0, 0, 0];//mast rx1,mast rx1,sub1 rx sub2 rx
         rd.pulseFormAddBufA0 = [];
@@ -7940,6 +8079,15 @@ class SyncGloble {
         var emergency = gr.radarData.systemStatus0 & (1 << (shift + 4));
         var ready_f = rd.systemStatus0 & 3;
 
+        if (iobj.act === "mastSubRadarSet") {
+            ws.cmd(iobj.act, [iobj.value+iobj.idInx*256]);
+            return;
+        }    
+        if (iobj.act === "mastSubRadarCtr") {
+            ws.cmd(iobj.act, [iobj.value+iobj.idInx*256]);
+            return;
+        }    
+
         if (iobj.act === "selfTestStartAll") {
             gr.logMessage.messages.push({type: "cmd", text: "全系統測試"});
             ws.cmd(iobj.act);
@@ -7968,7 +8116,7 @@ class SyncGloble {
             if (iobj.act === "mastRadiationOn") {
                 gr.logMessage.messages.push({type: "cmd", text: "脈波開啟"});
                 ws.cmd(iobj.act, iobj.paras);
-                
+
                 return;
             }
             if (iobj.act === "mastRadiationOff") {
@@ -7976,8 +8124,8 @@ class SyncGloble {
                 ws.cmd(iobj.act, iobj.paras);
                 return;
             }
-            
-            
+
+
             if (iobj.act === "mastCtr1RadarSet") {
                 var str = "副控1參數設定";
                 for (var i = 0; i < 3; i++) {
@@ -8012,7 +8160,7 @@ class SyncGloble {
                 ws.cmd(iobj.act);
                 return;
             }
-            
+
             if (iobj.act === "mastCtr1SspaPowerOn") {
                 gr.logMessage.messages.push({type: "cmd", text: "開啟副控1電源模組"});
                 ws.cmd(iobj.act);
@@ -8203,6 +8351,11 @@ class SyncGloble {
         }
         if (iobj.act === "exeLogic") {
             gr.logMessage.messages.push({type: "cmd", text: "exeLogic"});
+            ws.cmd(iobj.act);
+            return;
+        }
+        if (iobj.act === "powerDown") {
+            gr.logMessage.messages.push({type: "cmd", text: "powerDown"});
             ws.cmd(iobj.act);
             return;
         }

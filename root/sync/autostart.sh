@@ -1,6 +1,3 @@
-
 #!/bin/bash
-sleep 2
-sudo /usr/bin/google-chrome-stable --kiosk http://127.0.0.1
-#cd /home/admintx/syncSetExe
-#sudo java -jar ./dist/base3.jar
+/home/admintx/syncSetExe/x.sh &
+/usr/bin/google-chrome-stable --disable-session-crashed-bubble --kiosk http://127.0.0.1 

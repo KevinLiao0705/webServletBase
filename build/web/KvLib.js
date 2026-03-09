@@ -1410,6 +1410,36 @@ class KvLib {
         return str;
     }
 
+    static trsIntToHexStrFix(num) {
+        var ba = [0, 0, 0, 0, 0, 0, 0, 0];
+        for (var index = 0; index < ba.length; index++) {
+            var byte = num & 15;
+            ba [ index ] = byte;
+            num = (num - byte) / 16;
+        }
+        var str = "";
+        for (var i = 0; i < ba.length; i++) {
+            str += gr.hexTable[ba[7-i]];
+        }
+        return str;
+    }
+
+    static trsShortToHexStrFix(num) {
+        var ba = [0, 0, 0, 0];
+        for (var index = 0; index < ba.length; index++) {
+            var byte = num & 15;
+            ba [ index ] = byte;
+            num = (num - byte) / 16;
+        }
+        var str = "";
+        for (var i = 0; i < ba.length; i++) {
+            str += gr.hexTable[ba[3-i]];
+        }
+        return str;
+    }
+
+
+
     static pt1(num) {
         var str = "";
         num = num % 256;

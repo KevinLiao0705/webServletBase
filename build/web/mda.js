@@ -3005,6 +3005,7 @@ class MdaSetLine {
                     obj.kvObj = md;
                     obj.setOptsObj=md;
                     obj.act = "checkChanged";
+                    obj.sender=md;
                     obj.value = setOpts.value;
                     KvLib.exe(op.actionFunc, obj);
                 }
@@ -5743,7 +5744,9 @@ class MdaSetGroup {
 
     actionFunc(iobj) {
         console.log(iobj);
-        var md = iobj.sender.fatherMd;
+        var md=iobj.sender.fatherMd;
+        if(!md)
+            md=iobj.sender;
         var st = md.stas;
         var op = md.opts;
         if (iobj.act === "blur") {

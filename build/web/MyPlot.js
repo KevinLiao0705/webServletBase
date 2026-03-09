@@ -28,10 +28,6 @@ class MyNewScopeCtr {
         if (gr.appId === 1)
             opts.chNames = ["關閉", "測試信號", "脈波信號"];
         if (gr.appId === 2)
-            opts.chNames = ["關閉", "測試信號", "脈波信號"];
-        if (gr.appId === 3)
-            opts.chNames = ["關閉", "測試信號", "脈波信號", "功率信號", "電源信號", "放大器信號"];
-        if (gr.appId === 4)
             opts.chNames = ["關閉", "測試信號", "脈波信號", "功率信號", "電源信號", "放大器信號"];
         //==============
         opts.xScale = 8;

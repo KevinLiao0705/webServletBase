@@ -23,6 +23,10 @@ class GlobalRes {
             self.deviceId="sipphoneUiSet";
             self.appType = "Model~SipphoneUiWeb~base.sys0";
         }
+        if (self.systemName === "sip6In1Ui") {
+            self.deviceId="sip6In1UiSet";
+            self.appType = "Model~Sip6In1UiWeb~base.sys0";
+        }
     }
     constructor() {
         this.version = "w3.2";
@@ -30,6 +34,7 @@ class GlobalRes {
         //this.systemName="josnSipPhone";
         //this.systemName="josnSipUi";
         //this.systemName="webBuilder";
+        //this.systemName="sip6In1Ui";
         this.appId=0;
         this.debug_f = 0;
         
@@ -37,7 +42,7 @@ class GlobalRes {
         //=================================
         
         this.webSocketEnable_f=1;
-        this.showLogo_f = 1;
+        this.showLogo_f = 0;
         this.showLogoTime = 1000;//ms
         this.logoImage = "systemResource/dummyTargetLogo.png";
         //this.logoImage = 'systemResource/robot_aiot_1920x1080.jpg';

@@ -17,7 +17,7 @@ class SipphoneWeb {
                 }
             }
             gr.sipphoneData.rxed_f = 1;
-            gr.webSocketConnectTime=0;
+            gr.webSocketConnectTime = 0;
             console.log("sipphoneData");
         };
 
@@ -38,7 +38,7 @@ class SipphoneWeb {
         var op = md.opts;
         var st = md.stas;
         ws.tick();
-        st.watchDataA = ["", "", "", "", "","",""];
+        st.watchDataA = ["", "", "", "", "", "", ""];
         if (gr.sipphoneData) {
             st.watchDataA[0] = gr.sipphoneData.realSipphoneIp;
             st.watchDataA[1] = gr.sipphoneData.realSipphoneMac;
@@ -46,17 +46,17 @@ class SipphoneWeb {
             st.watchDataA[3] = gr.sipphoneData.sipNo;
             st.watchDataA[4] = gr.sipphoneData.sipServerIp;
             st.watchDataA[5] = gr.sipphoneData.ntppServerIp;
-            st.watchDataA[6] = gr.sipphoneData.version+"-"+gr.version;
+            st.watchDataA[6] = gr.sipphoneData.version + "-" + gr.version;
         }
         gr.footBarStatus2 = "Connected " + (gr.webSocketConnectCnt % 10);
         gr.webSocketConnectTime++;
-        if(gr.webSocketConnectTime>=60){
-            if(gr.sipphoneData){
-                gr.sipphoneData.status="";
-                gr.sipphoneData.action="";
-                
+        if (gr.webSocketConnectTime >= 60) {
+            if (gr.sipphoneData) {
+                gr.sipphoneData.status = "";
+                gr.sipphoneData.action = "";
+
             }
-            
+
         }
 
 
@@ -79,7 +79,7 @@ class SipphoneWeb {
                     if (gr.sipphoneData.phoneFlag & 1) {
                         var sipCmd = "Redirect -a off\n";
                         //ws.cmd("sipCommandDirect", [sipCmd]);
-                        ws.cmd("phoneCommand", ["reDirect "+"reset"]);
+                        ws.cmd("phoneCommand", ["reDirect " + "reset"]);
                         return;
                     }
                     var opts = {};
@@ -90,7 +90,7 @@ class SipphoneWeb {
                             if (iobj.inputText.length !== 0) {
                                 var sipCmd = "Redirect -t always " + iobj.inputText + "\n";
                                 //ws.cmd("sipCommandDirect", [sipCmd]);
-                                ws.cmd("phoneCommand", ["reDirect "+iobj.inputText]);
+                                ws.cmd("phoneCommand", ["reDirect " + iobj.inputText]);
                                 return;
                             }
                         }
@@ -104,8 +104,8 @@ class SipphoneWeb {
                     opts.actionFunc = function (iobj) {
                         console.log(iobj);
                         if (iobj.act === "padEnter") {
-                                ws.cmd("phoneCommand", ["transferNumber "+iobj.inputText]);
-                                return;
+                            ws.cmd("phoneCommand", ["transferNumber " + iobj.inputText]);
+                            return;
                         }
                     };
                     box.intPadBox(opts);
@@ -289,8 +289,8 @@ class SipphoneWeb {
         var regName = "self.fatherMd.fatherMd.fatherMd.fatherMd.stas.watchDataA";
         var setOptsA = [];
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemName"}));
-        
-        
+
+
         var setOpts = sopt.getParaSetOpts({paraSetName: "version"});
         var watchDatas = setOpts.watchDatas = [];
         watchDatas.push(["directReg", regName + "#6", "editValue", 1]);
@@ -330,8 +330,8 @@ class SipphoneWeb {
         var watchDatas = setOpts.watchDatas = [];
         watchDatas.push(["directReg", regName + "#5", "editValue", 1]);
         setOptsA.push(setOpts);
-        
-        
+
+
         var setObjs = [];
         var inx = 0;
         for (var ii = 0; ii < setOptsA.length; ii++) {
@@ -434,7 +434,7 @@ class SipphoneUiWeb {
             st.watchDataA[7] = gr.sipphoneUiData.sipServerIp;
             st.watchDataA[8] = gr.sipphoneUiData.switchIp;
             st.watchDataA[9] = gr.sipphoneUiData.ntpIp;
-            st.watchDataA[10] =gr.sipphoneUiData.version+"-"+gr.version;
+            st.watchDataA[10] = gr.sipphoneUiData.version + "-" + gr.version;
 
         }
         gr.footBarStatus2 = "Connected " + (gr.webSocketConnectCnt % 10);
@@ -478,7 +478,7 @@ class SipphoneUiWeb {
                         if (iobj.act === "padEnter") {
                             if (iobj.inputText.length !== 0) {
                                 var sipCmd = "Redirect -t always " + iobj.inputText + "\n";
-                                ws.cmd("phoneCommand", [iobj.key+" "+iobj.inputText]);
+                                ws.cmd("phoneCommand", [iobj.key + " " + iobj.inputText]);
                                 //ws.cmd("sipCommandDirect", [sipCmd]);
                                 return;
                             }
@@ -947,16 +947,16 @@ class SipphoneUiWeb {
         //==============================
         var setOptsA = [];
         setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemName"}));
-        
-        
-        
+
+
+
         var regName = "self.fatherMd.fatherMd.fatherMd.fatherMd.stas.watchDataA";
         var setOpts = sopt.getParaSetOpts({paraSetName: "version"});
         var watchDatas = setOpts.watchDatas = [];
         watchDatas.push(["directReg", regName + "#10", "editValue", 1]);
         setOptsA.push(setOpts);
-        
-        
+
+
         //===============
         var setOpts = sopt.getParaSetOpts({paraSetName: "systemMacAddress"});
         var watchDatas = setOpts.watchDatas = [];
@@ -1412,4 +1412,586 @@ class NamesMenu {
 }
 
 
+
+
+
+class Sip6In1UiWeb {
+    constructor() {
+        gr.sipphoneUiData = {};
+        gr.socketRetPrgTbl["tick"] = function (sipphoneUiData) {
+            var keys = Object.keys(sipphoneUiData);
+            for (var i = 0; i < keys.length; i++) {
+                var strA = keys[i].split("#");
+                if (strA.length === 1) {
+                    gr.sipphoneUiData[keys[i]] = sipphoneUiData[keys[i]];
+                    continue;
+                }
+                if (strA.length === 2) {
+                    var inx0 = KvLib.toInt(strA[1], 0);
+                    gr.sipphoneUiData[strA[0]][inx0] = sipphoneUiData[keys[i]];
+                    continue;
+                }
+            }
+            gr.sipphoneUiData.rxed_f = 1;
+            console.log("sipphoneUiData");
+        };
+    }
+    initOpts(md)
+    {
+        var self = this;
+        var opts = {};
+        Block.setBaseOpts(opts);
+        opts.tabInx = 1;
+        return opts;
+    }
+    chkWatch() {
+        var self = this;
+        var md = this.md;
+        var op = md.opts;
+        var st = md.stas;
+        if (gr.paraSet.emulate !== 1)
+            ws.tick();
+
+        st.headButtonColors = ["#ccc", "#ccc", "#ccc", "#ccc", "#ccc", "#ccc"];
+        if (!gr.tabInx)
+            gr.tabInx = 0;
+        st.headButtonColors[gr.tabInx] = "#ccf";
+
+
+    }
+
+    setPrg(id, setId) {
+        var self = this;
+        var md = self.md;
+        var op = md.opts;
+        var opts = {};
+        var setOptsA = [];
+
+
+    }
+    afterCreate() {
+        var md = this.md;
+        var op = md.opts;
+        var st = md.stas;
+        var kvObj = md.blockRefs["headButtons"];
+        var regName = "self.fatherMd.fatherMd.stas.headButtonColors#";
+        for (var i = 0; i < 6; i++) {
+            var but = kvObj.blockRefs["button#" + i];
+            Block.setInputWatch(but.opts, "directReg", regName + i, "baseColor", 1);
+        }
+        st.actInx = 0;
+
+
+    }
+
+    build() {
+        var self = this;
+        var md = self.md;
+        var op = md.opts;
+        var lyMaps = md.lyMaps;
+        var blocks = op.blocks;
+        var layouts = op.layouts;
+        //======================================    
+        var cname = "c";
+        var opts = {};
+        layouts[cname] = {name: cname, type: "Layout~Ly_base~array.sys0", opts: opts};
+        lyMaps["body"] = cname;
+        var opts = {};
+        md.setPns(opts);
+        opts.mouseClick_f = 1;
+        opts.baseColor = "#0c8";
+        blocks[cname] = {name: "basePanel", type: "Component~Cp_base~plate.none", opts: opts};
+        //======================================    
+        var cname = lyMaps["body"] + "~" + 0;
+        var opts = {};
+        opts.yArr = [0, 50, 9999];
+        layouts[cname] = {name: cname, type: "Layout~Ly_base~xyArray.sys0", opts: opts};
+        lyMaps["mainBody"] = cname;
+        //==============================
+
+        var cname = lyMaps["mainBody"] + "~" + 0;
+        var keyPrg = function (iobj) {
+            console.log(iobj);
+
+        };
+
+        //==============================
+        var cname = lyMaps["mainBody"] + "~" + 1;
+        var opts = {};
+        opts.buttons = ["語音", "手機", "無線電", "交換器", "序列埠", "系統"];
+        opts.buttonIds = ["speech", "handSet", "radio", "switch", "serial", "system"];
+        opts.actionFunc = function (iobj) {
+            if (iobj.act !== "mouseClick")
+                return;
+            console.log(iobj);
+            gr.tabInx = iobj.buttonInx;
+            gr.repaint_f = 1;
+            return;
+
+        };
+        opts.buttonAmt = 6;
+        opts.fontSize = "0.5rh";
+        opts.xm = 4;
+        opts.buttonColor = "#ccc";
+        blocks[cname] = {name: "headButtons", type: "Model~MdaButtons~base.sys0", opts: opts};
+        //==============================
+
+
+        if (!gr.tabInx) {
+            var cname = lyMaps["mainBody"] + "~" + 2;
+            var opts = {};
+            opts.xArr = [9999, 200];
+            layouts[cname] = {name: cname, type: "Layout~Ly_base~xyArray.sys0", opts: opts};
+            lyMaps["centerBody"] = cname;
+            //==============================
+            var cname = lyMaps["centerBody"] + "~" + 1;
+            var opts = {};
+            opts.yc = 4;
+            opts.ym = 30;
+            opts.tm = 2;
+            opts.bm = 20;
+            layouts[cname] = {name: cname, type: "Layout~Ly_base~array.sys0", opts: opts};
+            lyMaps["rightBody"] = cname;
+            //==============================
+            var rightButPrg = function (iobj) {
+                console.log(iobj);
+                if (iobj.kvObj.opts.id === "ptt") {
+                    var opts = {};
+                    opts.kvTexts = ["ICS:192.168.3.230", "連線中斷"];
+                    box.errorBox(opts);
+                    return;
+                }
+                if (iobj.kvObj.opts.id === "broadcast") {
+                    var opts = {};
+                    opts.kvTexts = ["ROUTER:192.168.3.230", "連線中斷"];
+                    box.errorBox(opts);
+                    return;
+
+                }
+                if (iobj.kvObj.opts.id === "meet") {
+
+                }
+                if (iobj.kvObj.opts.id === "general") {
+
+                }
+
+            };
+            var cname = lyMaps["rightBody"] + "~" + 0;
+            var opts = {};
+            opts.innerText = "PTT";
+            opts.id = "ptt";
+            opts.baseColor = "#cf0";
+            opts.actionFunc = rightButPrg;
+            blocks[cname] = {name: "button#" + 0, type: "Component~Cp_base~button.sys0", opts: opts};
+
+            var cname = lyMaps["rightBody"] + "~" + 1;
+            var opts = {};
+            opts.innerText = "廣播";
+            opts.id = "broadcast";
+            opts.baseColor = "#cf0";
+            opts.actionFunc = rightButPrg;
+            blocks[cname] = {name: "button#" + 1, type: "Component~Cp_base~button.sys0", opts: opts};
+
+            var cname = lyMaps["rightBody"] + "~" + 2;
+            var opts = {};
+            opts.innerText = "會議";
+            opts.id = "meet";
+            opts.baseColor = "#cf0";
+            opts.actionFunc = rightButPrg;
+            blocks[cname] = {name: "button#" + 2, type: "Component~Cp_base~button.sys0", opts: opts};
+
+            var cname = lyMaps["rightBody"] + "~" + 3;
+            var opts = {};
+            opts.innerText = "總機";
+            opts.id = "general";
+            opts.baseColor = "#cf0";
+            opts.actionFunc = rightButPrg;
+            blocks[cname] = {name: "button#" + 3, type: "Component~Cp_base~button.sys0", opts: opts};
+
+
+
+
+
+
+            var cname = lyMaps["centerBody"] + "~" + 0;
+            var opts = {};
+            opts.margin = 6;
+            opts.xm = 1;
+            opts.ym = 1;
+            opts.yArr = ["0.14rh", "0.2rh", "0.1rh", "0.14rh", "0.12rh", "0.12rh", "0.12rh"];
+            opts.xyArr = [[9999], [9999], [9999], [9999], ["0.5rw", 9999], ["0.5rw", 9999], ["0.5rw", 9999]];
+            layouts[cname] = {name: cname, type: "Layout~Ly_base~xyArray.sys0", opts: opts};
+            lyMaps["listBody"] = cname;
+
+            var cname = lyMaps["listBody"] + "~" + 0;
+            var opts = {};
+            opts.innerText = "語音通話";
+            opts.innerTextColor = "#006";
+            opts.textShadow = "1px 1px 1px #fff";
+            opts.lpd = 10;
+            blocks[cname] = {name: "title", type: "Component~Cp_base~plate.none", opts: opts};
+
+            var cname = lyMaps["listBody"] + "~" + 1;
+            var opts = {};
+            opts.innerText = "系統準備中....";
+            opts.baseColor = "#afa";
+            opts.textAlign = "left";
+            opts.fontSize = "0.4rh";
+            opts.textShadow = "1px 1px 1px #fff";
+            opts.innerTextColor = "#000";
+            opts.lpd = 8;
+            opts.fontWeight = "normal";
+            opts.fontFamily = "monospace";
+            opts.insideShadowBlur = "0.1rh";
+            var texts = [];
+            texts.push("本機資訊");
+            texts.push("本機號碼");
+            texts.push("133");
+            texts.push("本機 IP");
+            texts.push("192.168.1.4");
+            texts.push("軟體版本");
+            texts.push("2.4");
+            blocks[cname] = {name: "button#" + 3, type: "Component~Cp_base~images.lcd", opts: opts};
+            for (var i = 0; i < 7; i++) {
+                var cname = lyMaps["listBody"] + "~" + (i + 3);
+                var opts = {};
+                opts.innerText = texts[i];
+                opts.borderType = "normal";//none|normal|buttonPush|buttonFree
+                opts.borderWidth = 1;
+                opts.borderColor = "#fff";
+                blocks[cname] = {name: "list#" + i, type: "Component~Cp_base~plate.none", opts: opts};
+            }
+            return;
+        }
+
+        var regName = "self.fatherMd.fatherMd.fatherMd.fatherMd.stas.watchDataA";
+        var cname = lyMaps["mainBody"] + "~" + 2;
+        var opts = {};
+        opts.margin = 6;
+        opts.xm = 1;
+        opts.ym = 1;
+        opts.yArr = ["0.14rh", 9999];
+        opts.xyArr = [[9999], [9999]];
+        layouts[cname] = {name: cname, type: "Layout~Ly_base~xyArray.sys0", opts: opts};
+        lyMaps["listBody"] = cname;
+
+        if (gr.tabInx === 5) {
+
+            var actPrg = function (iobj) {
+                console.log(iobj);
+                if (iobj.act === "mouseClick") {
+                    var selectObj = md.blockRefs["selectButtons"];
+                    actInx = -1;
+                    if (iobj.kvObj.opts.buttonId === "ok") {
+                        if (selectObj.opts.selectInx < 0)
+                            return;
+                        var actInx = md.stas.actInx * 10 + selectObj.opts.selectInx + 1;
+                        if(md.stas.setParaPass_f)
+                            selectObj.opts.selectInx = -1;
+                    }
+                    if (iobj.kvObj.opts.buttonId === "back") {
+                        if (md.stas.actInx === 0) {
+                            selectObj.opts.selectInx = -1;
+                            selectObj.reCreate();
+                            return;
+                        }
+                        var actInx = (md.stas.actInx / 10) | 0;
+                        selectObj.opts.selectInx = (md.stas.actInx % 10) - 1;
+
+                    }
+                    if (actInx < 0)
+                        return;
+
+                    if (actInx === 0) {
+                        selectObj.opts.kvTexts = [];
+                        selectObj.opts.kvTexts.push("1. 關機");
+                        selectObj.opts.kvTexts.push("2. 重新開機");
+                        selectObj.opts.kvTexts.push("3. 參數設定");
+                        selectObj.opts.kvTexts.push("4. 系統自測");
+                        selectObj.opts.kvTexts.push("5. VOIP重新連線");
+                        selectObj.reCreate();
+                        md.stas.actInx = actInx;
+                        return;
+                    }
+                    if (actInx === 32) {
+                        selectObj.opts.kvTexts = [];
+                        selectObj.opts.kvTexts.push("1. IP");
+                        selectObj.opts.kvTexts.push("2. Netmask");
+                        selectObj.opts.kvTexts.push("3. Gatewat");
+                        selectObj.reCreate();
+                        md.stas.actInx = actInx;
+                        return;
+                    }
+
+
+
+                    if (actInx === 3) {
+                        if (md.stas.setParaPass_f) {
+                            selectObj.opts.kvTexts = [];
+                            selectObj.opts.kvTexts.push("1. ICS IP設定");
+                            selectObj.opts.kvTexts.push("2. 人機界面 設定");
+                            selectObj.opts.kvTexts.push("3. 手機界面 設定");
+                            selectObj.opts.kvTexts.push("4. 無線電分機 設定");
+                            selectObj.opts.kvTexts.push("5. 交換機 設定");
+                            selectObj.opts.kvTexts.push("6. 序列埠 設定");
+                            selectObj.opts.kvTexts.push("7. 本機 設定");
+                            selectObj.opts.kvTexts.push("8. 其他 設定");
+                            selectObj.reCreate();
+                            md.stas.actInx = actInx;
+                            return;
+                        }
+                        else {
+                            md.stas.tmpIobj=iobj;
+                            var opts = {};
+                            opts.title = "請輸入密碼";
+                            opts.setOpts = {};
+                            opts.setOpts.password_f = 1;
+                            opts.actionFunc = function (iobj) {
+                                console.log(iobj);
+                                if (iobj.act === "padEnter") {
+                                    if (iobj.inputText === gr.paraSet.uiParaSetPin) {
+                                        md.stas.setParaPass_f=1;
+                                        actPrg(md.stas.tmpIobj);
+                                        return;
+                                    } else {
+                                        var opts = {};
+                                        opts.kvTexts = ["密碼錯誤"];
+                                        box.errorBox(opts);
+                                        md.stas.actInx = 0;
+                                    }
+
+                                }
+                            };
+                            box.intPadBox(opts);
+
+                        }
+                    }
+
+
+
+                }
+            };
+
+            var cname = lyMaps["listBody"] + "~" + 1;
+            var opts = {};
+            opts.yArr = [9999, "0.1rh", "0.13rh"];
+            opts.xyArr = [[9999], [9999], [9999]];
+            layouts[cname] = {name: cname, type: "Layout~Ly_base~xyArray.sys0", opts: opts};
+            lyMaps["centerBody"] = cname;
+
+
+            var cname = lyMaps["listBody"] + "~" + 0;
+            var opts = {};
+            opts.innerText = "系統設定";
+            opts.innerTextColor = "#006";
+            opts.textShadow = "1px 1px 1px #fff";
+            opts.lpd = 10;
+            blocks[cname] = {name: "title", type: "Component~Cp_base~plate.none", opts: opts};
+
+            var cname = lyMaps["centerBody"] + "~" + 0;
+            var opts = {};
+            opts.margin = 10;
+            opts.xm = 10;
+            opts.ym = 10;
+            opts.xc = 2;
+            opts.yc = 4;
+            opts.baseColor = "#ff0";
+            opts.kvTexts = [];
+            opts.kvTexts.push("1. 關機");
+            opts.kvTexts.push("2. 重新開機");
+            opts.kvTexts.push("3. 參數設定");
+            opts.kvTexts.push("4. 系統自測");
+            opts.kvTexts.push("5. VOIP重新連線");
+            opts.textAlign = "left";
+            opts.tm = 10;
+            opts.lpd = 10;
+            opts.selectEsc_f = 0;
+            opts.selectAble_f = 1;
+            blocks[cname] = {name: "selectButtons", type: "Model~MdaSelector~base.sys0", opts: opts};
+
+            var cname = lyMaps["centerBody"] + "~" + 1;
+            var opts = {};
+            opts.innerText = "數字鍵選擇欲執行之命令，按OK鍵執行，按<鍵離開";
+            opts.innerTextColor = "#006";
+            opts.textShadow = "1px 1px 1px #fff";
+            opts.lpd = 10;
+            blocks[cname] = {name: "title", type: "Component~Cp_base~plate.none", opts: opts};
+
+
+
+            var cname = lyMaps["centerBody"] + "~" + 2;
+            var opts = {};
+            opts.xArr = [9999, "0.15rw", "0.15rw"];
+            opts.xyArr = [[9999], [9999], [9999]];
+            opts.xm = 4;
+            layouts[cname] = {name: cname, type: "Layout~Ly_base~xyArray.sys0", opts: opts};
+            lyMaps["downBody"] = cname;
+
+            var cname = lyMaps["downBody"] + "~" + 0;
+            var opts = {};
+            opts.innerText = "1234";
+            opts.lpd = 10;
+            opts.textAlign = "left";
+            opts.baseColor = "#cff";
+            opts.fontSize = "0.5rh";
+            opts.textShadow = "1px 1px 1px #fff";
+            blocks[cname] = {name: "statusBar", type: "Component~Cp_base~plate.none", opts: opts};
+
+
+            var cname = lyMaps["downBody"] + "~" + 1;
+            var opts = {};
+            opts.innerText = "<";
+            opts.buttonId = "back";
+            opts.actionFunc = actPrg;
+            blocks[cname] = {name: "backButton", type: "Component~Cp_base~button.sys0", opts: opts};
+
+            var cname = lyMaps["downBody"] + "~" + 2;
+            var opts = {};
+            opts.innerText = "OK";
+            opts.buttonId = "ok";
+            opts.actionFunc = actPrg;
+            blocks[cname] = {name: "okButton", type: "Component~Cp_base~button.sys0", opts: opts};
+
+
+
+
+
+            return;
+        }
+
+        if (gr.tabInx === 1) {
+            var cname = lyMaps["listBody"] + "~" + 0;
+            var opts = {};
+            opts.innerText = "手持式話機";
+            opts.innerTextColor = "#006";
+            opts.textShadow = "1px 1px 1px #fff";
+            opts.lpd = 10;
+            blocks[cname] = {name: "title", type: "Component~Cp_base~plate.none", opts: opts};
+            var cname = lyMaps["listBody"] + "~" + 1;
+            var setOptsA = [];
+            var setOpts = sopt.getParaSetOpts({paraSetName: "version"});
+            var watchDatas = setOpts.watchDatas = [];
+            watchDatas.push(["directReg", regName + "#10", "editValue", 1]);
+            setOptsA.push(setOpts);
+            //===============
+            var setOpts = sopt.getParaSetOpts({paraSetName: "systemMacAddress"});
+            var watchDatas = setOpts.watchDatas = [];
+            watchDatas.push(["directReg", regName + "#0", "editValue", 1]);
+            setOptsA.push(setOpts);
+            //===============
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemId"}));
+        }
+        if (gr.tabInx === 2) {
+            var cname = lyMaps["listBody"] + "~" + 0;
+            var opts = {};
+            opts.innerText = "無線電閘道器";
+            opts.innerTextColor = "#006";
+            opts.textShadow = "1px 1px 1px #fff";
+            blocks[cname] = {name: "title", type: "Component~Cp_base~plate.none", opts: opts};
+            var cname = lyMaps["listBody"] + "~" + 1;
+            var setOptsA = [];
+            var setOpts = sopt.getParaSetOpts({paraSetName: "version"});
+            var watchDatas = setOpts.watchDatas = [];
+            watchDatas.push(["directReg", regName + "#10", "editValue", 1]);
+            setOptsA.push(setOpts);
+            //===============
+            var setOpts = sopt.getParaSetOpts({paraSetName: "systemMacAddress"});
+            var watchDatas = setOpts.watchDatas = [];
+            watchDatas.push(["directReg", regName + "#0", "editValue", 1]);
+            setOptsA.push(setOpts);
+            //===============
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemId"}));
+        }
+
+        if (gr.tabInx === 3) {
+            var cname = lyMaps["listBody"] + "~" + 0;
+            var opts = {};
+            opts.innerText = "L3網路交換器";
+            opts.innerTextColor = "#006";
+            opts.textShadow = "1px 1px 1px #fff";
+            blocks[cname] = {name: "title", type: "Component~Cp_base~plate.none", opts: opts};
+            var cname = lyMaps["listBody"] + "~" + 1;
+            var setOptsA = [];
+            var setOpts = sopt.getParaSetOpts({paraSetName: "version"});
+            var watchDatas = setOpts.watchDatas = [];
+            watchDatas.push(["directReg", regName + "#10", "editValue", 1]);
+            setOptsA.push(setOpts);
+            //===============
+            var setOpts = sopt.getParaSetOpts({paraSetName: "systemMacAddress"});
+            var watchDatas = setOpts.watchDatas = [];
+            watchDatas.push(["directReg", regName + "#0", "editValue", 1]);
+            setOptsA.push(setOpts);
+            //===============
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemId"}));
+        }
+        if (gr.tabInx === 4) {
+            var cname = lyMaps["listBody"] + "~" + 0;
+            var opts = {};
+            opts.innerText = "RS422傳輸埠";
+            opts.innerTextColor = "#006";
+            opts.textShadow = "1px 1px 1px #fff";
+            blocks[cname] = {name: "title", type: "Component~Cp_base~plate.none", opts: opts};
+            var cname = lyMaps["listBody"] + "~" + 1;
+            var setOptsA = [];
+            var setOpts = sopt.getParaSetOpts({paraSetName: "version"});
+            var watchDatas = setOpts.watchDatas = [];
+            watchDatas.push(["directReg", regName + "#10", "editValue", 1]);
+            setOptsA.push(setOpts);
+            //===============
+            var setOpts = sopt.getParaSetOpts({paraSetName: "systemMacAddress"});
+            var watchDatas = setOpts.watchDatas = [];
+            watchDatas.push(["directReg", regName + "#0", "editValue", 1]);
+            setOptsA.push(setOpts);
+            //===============
+            setOptsA.push(sopt.getParaSetOpts({paraSetName: "systemId"}));
+        }
+
+        //===============================
+        var setObjs = [];
+        var inx = 0;
+        for (var ii = 0; ii < setOptsA.length; ii++) {
+            var ksObj = {};
+            ksObj.name = "setLine#" + ii;
+            ksObj.type = "Model~MdaSetLine~base.sys0";
+            var kopts = ksObj.opts = {};
+            kopts.setOpts = setOptsA[ii];
+            kopts.setOpts.setType = "inputText";
+            kopts.setOpts.dataType = "str";
+            kopts.setOpts.checkType = "str";
+            kopts.setOpts.actButtons = [];
+            kopts.setOpts.titleWidth = 400;
+            kopts.setOpts.readOnly_f = 1;
+            kopts.setOpts.editBaseColor = "#e8e8ff";
+            setObjs.push(ksObj);
+        }
+        //================================
+        var opts = {};
+        opts.ksObjss = [];
+        var inx = 0;
+        for (var i = 0; i < setOptsA.length; i++) {
+            var ksObjs = [];
+            for (var j = 0; j < 1; j++) {
+                if (inx >= setObjs.length)
+                    break;
+                var ksObj = setObjs[inx];
+                ksObjs.push(ksObj);
+                inx++;
+            }
+            if (j >= 1)
+                opts.ksObjss.push(ksObjs);
+        }
+        opts.ksObjWs = [9999];
+        var obj = mac.setLineBoxOpts(opts);
+        obj.opts.baseColor = "#cfc";
+        obj.opts.title = "";
+        obj.opts.baseColor = "#0c8";
+        obj.opts.ksObj.opts.baseColor = "#0c8";
+        obj.opts.ksObj.opts.eh = 50;
+        blocks[cname] = {name: "infPanel", type: obj.type, opts: obj.opts};
+
+
+
+
+    }
+}
 
