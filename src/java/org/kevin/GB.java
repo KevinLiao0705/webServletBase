@@ -23,7 +23,7 @@ public class GB {
     public static String josnSipUiLinuxParaSet = "/home/pi/kevin/sipui2in1/paraSetUi.json";
     public static String webBuilderWinParaSet = "e:/kevin/myCode/webSet/webBuilderSet/paraSet.json";
     public static String webBuilderLinuxParaSet = "/home/pi/kevin/webBuilderSet/paraSet.json";
-    public static String sip6In1UiWinParaSet = "e:/kevin/myCode/webSet/sip6In1UiSet/paraSetUi.json";
+    public static String sip6In1UiWinParaSet = "e:/kevin/myCode/webSet/josnSip6In1Set/paraSetUi.json";
     public static String sip6In1UiLinuxParaSet = "/home/pi/kevin/sip6In1Ui/paraSetUi.json";
     
     

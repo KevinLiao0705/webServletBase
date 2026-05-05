@@ -1,3 +1,11 @@
+/*
+ * command table 
+ * 0x----  low byte 00
+ *  
+ * 
+ */
+
+
 class DummyTargetMaster {
     constructor() {
         gr.hideWavePageElem = null;
@@ -76,7 +84,7 @@ class DummyTargetMaster {
                     duty = duty.toFixed(1);
                     freq = ((freq + 290) / 100).toFixed(2);
                     gr.footBarMessageText = "Width:" + phigh + " us, Duty:" + duty + "%, Freq:" + freq + " GHz";
-                    if((gr.radarData.systemStatus0 >> 25) & 1)
+                    if ((gr.radarData.systemStatus0 >> 25) & 1)
                         gr.footBarMessageColor = "#f00";
                     else
                         gr.footBarMessageColor = "#00f";
@@ -153,8 +161,8 @@ class DummyTargetMaster {
                 opts.kvTexts.push("測試脈波設定");
                 opts.kvTexts.push("脈波寬度設定");
                 opts.kvTexts.push("進階設定");
-                
-                
+
+
                 opts.kvTexts.push("下載記錄檔");
                 opts.kvTexts.push("幫助");
                 opts.kvTexts.push("下載設定檔");
@@ -1409,6 +1417,16 @@ class TargetPane {
         if (op.deviceInx === 1) {
             statusFlag = rd.subStatusA[1];
         }
+        
+        //<<debug
+        conOk = 1;
+        statusFlag |= 1 << 15;
+        //statusFlag |= 1<<9;
+        //statusFlag |= 1<<10;
+        //statusFlag |= 1<<11;
+        //statusFlag |= 1<<12;
+        statusFlag |= 1 << 13;
+
 
         if (conOk === 1) {
             for (var i = 0; i < 14; i++)
@@ -1436,8 +1454,7 @@ class TargetPane {
                 st.radarStatusText[6] = "連線方式:光纖";
             if ((statusFlag >> 6) & 1)
                 st.radarStatusText[7] = "脈波來源:本機";
-            
-            
+
             if ((statusFlag >> 15) & 1) {
                 for (var i = 0; i < 7; i++)
                     st.radarStatusColor[i + 8] = "#fff";
@@ -1452,7 +1469,7 @@ class TargetPane {
                 if ((statusFlag >> 11) & 1)
                     st.radarStatusColor[12] = "#cfc";
                 if ((statusFlag >> 12) & 1)
-                    st.radarStatusColor[13] = "#fccc";
+                    st.radarStatusColor[13] = "#fcc";
                 if ((statusFlag >> 13) & 1) {
                     st.radarStatusColor[14] = "#cfc";
                     st.remoteDisable_f = 0;
@@ -2110,7 +2127,7 @@ class DummyTargetSub {
                     duty = duty.toFixed(1);
                     freq = ((freq + 290) / 100).toFixed(2);
                     gr.footBarMessageText = "Width:" + phigh + " us, Duty:" + duty + "%, Freq:" + freq + " GHz";
-                    if((gr.radarData.systemStatus0 >> 25) & 1)
+                    if ((gr.radarData.systemStatus0 >> 25) & 1)
                         gr.footBarMessageColor = "#f00";
                     else
                         gr.footBarMessageColor = "#00f";
@@ -2155,9 +2172,9 @@ class DummyTargetSub {
             str += gr.radarData.conRxA[24] & 7;
             str += gr.radarData.conRxA[25] & 7;
             str += "P";
-            str += gr.radarData.conRxA[16] & 7;
-            str += gr.radarData.conRxA[17] & 7;
-            str += gr.radarData.conRxA[18] & 7;
+            str += gr.radarData.conRxA[16] & 7;//syncRfPack
+            str += gr.radarData.conRxA[17] & 7;//syncFiberPack
+            str += gr.radarData.conRxA[18] & 7;//pulseFormData
             gr.footBarStatus0 = str;
 
 
@@ -2423,6 +2440,32 @@ class SubRadarPane {
         var wb = md.stas.buttonInxA = [-1, -1, -1, -1, -1, -1, 0, 0, 0, 0];
         var wc = md.stas.buttonColorA = ["#888", "#888", "#888", "#888"];
         var rd = gr.radarData;
+        if(rd.webReturnCmd){
+            if(rd.webReturnCmd!==0){
+                var cmd=rd.webReturnCmd;
+                var para=rd.webReturnCmdPara&255;
+                
+                if(cmd===0x2020){
+                    gr.gbcs.command({'act': "sub1SetFlags","index": para});
+                }
+                if(cmd===0x2021){
+                    var cmdTbl=[];
+                    cmdTbl.push("sub1SspaPowerOff");
+                    cmdTbl.push("sub1SspaPowerOn");
+                    cmdTbl.push("sub1SspaModuleOff");
+                    cmdTbl.push("sub1SspaModuleOn");
+                    cmdTbl.push("remoteRadOff");
+                    cmdTbl.push("remoteRadOn");
+                    cmdTbl.push("sub1EmergencyOff");
+                    cmdTbl.push("sub1EmergencyOn");
+                    gr.gbcs.command({'act': cmdTbl[para&7],"index": -1});
+                }
+                
+                 rd.webReturnCmd=0;
+            }
+        }
+        
+        
         var sta = (rd.systemStatus0 >> 0) & 3;
         if (sta === 1)
             wa[0] = 3;
@@ -2439,6 +2482,8 @@ class SubRadarPane {
 
         var commType = gr.paraSet["sub1CommType"];
         wb[0] = commType;
+        var pulseSource = gr.paraSet["sub1PulseSource"];
+        wb[1] = pulseSource;
 
         if (md.fatherMd.mdClass.subRxFromCtr_f) {
             wa[3] = ((rd.systemStatus1 >> 7) & 1) + 1;
@@ -2632,10 +2677,18 @@ class SubRadarPane {
                 return;
             }
             if (iobj.setId === preText + "BatShort") {
+                //gr.gbcs.command({'act': preText + "SetFlags", "index": 15});//<<deb
                 gr.gbcs.command({'act': preText + "BatShort", "paras": [iobj.buttonInx]});
                 return;
             }
             if (iobj.buttonText) {
+                if (iobj.buttonText === "緊急停止") {
+                    gr.gbcs.command({'act': preText + "EmergencyOnOff"});
+                    return;
+                }
+                if((gr.radarData.systemStatus0>>26)&1)
+                    return;
+                
                 if (iobj.buttonText === "放大器電源") {
                     gr.gbcs.command({'act': preText + "AllSspaPowerOnOff"});
                     return;
@@ -2646,10 +2699,6 @@ class SubRadarPane {
                 }
                 if (iobj.buttonText === "脈波輸出") {
                     gr.gbcs.command({'act': "remoteRadOnOff"});
-                    return;
-                }
-                if (iobj.buttonText === "緊急停止") {
-                    gr.gbcs.command({'act': preText + "EmergencyOnOff"});
                     return;
                 }
 
@@ -2745,8 +2794,8 @@ class SubRadarPane {
                 setOpts.enum = para.enum;
                 setOpts.id = "sub1CommType";
                 setOpts.value = para.value;
-                //var watchDatas = setOpts.watchDatas = [];
-                //watchDatas.push(["directReg", regName1 + "#0", "setOpts.value", 1]);
+                var watchDatas = setOpts.watchDatas = [];
+                watchDatas.push(["directReg", regName1 + "#0", "setOpts.value", 1]);
             }
             if (i === inx++) {
                 var setOpts = opts.setOpts = sopt.getOptsPara("buttonSelect");
@@ -2755,9 +2804,9 @@ class SubRadarPane {
                 setOpts.enum = ["遙控脈波", "本機脈波"];
                 setOpts.id = "sub1PulseSource";
                 setOpts.value = para.value;
-                //var watchDatas = setOpts.watchDatas = [];
-                //watchDatas.push(["directReg", regName1 + "#1", "setOpts.value", 1]);
-                //setOpts.actViewNone_f = 1;
+                var watchDatas = setOpts.watchDatas = [];
+                watchDatas.push(["directReg", regName1 + "#1", "setOpts.value", 1]);
+                setOpts.actViewNone_f = 1;
             }
             if (i === inx++) {
                 var setOpts = opts.setOpts = sopt.getOptsPara("buttonSelect");
@@ -5418,8 +5467,10 @@ class DummyTargetCtr {
                 }
                 if (strA.length === 2) {
                     if (strA[0] === "paraSetStr") {
-                        var ddd = radarData[keys[i]];
-                        gr.paraSet[strA[1]] = ddd[strA[1]];
+                        var newDatas = radarData[keys[i]];
+                        var strC=strA[1].split("~");
+                        for(var ii=0;ii<strC.length;ii++)
+                            gr.paraSet[strC[ii]] = newDatas[strC[ii]];
                         continue;
                     }
                     var inx0 = KvLib.toInt(strA[1], 0);
@@ -5499,7 +5550,7 @@ class DummyTargetCtr {
                     duty = duty.toFixed(1);
                     freq = ((freq + 290) / 100).toFixed(2);
                     gr.footBarMessageText = "Width:" + phigh + " us, Duty:" + duty + "%, Freq:" + freq + " GHz";
-                    if((gr.radarData.systemStatus0 >> 25) & 1)
+                    if ((gr.radarData.systemStatus0 >> 25) & 1)
                         gr.footBarMessageColor = "#f00";
                     else
                         gr.footBarMessageColor = "#00f";
@@ -6147,6 +6198,7 @@ class DummyTargetCtrPane {
                         opts.kvTexts.push("停止");
                         opts.actionFunc = function (iobj) {
                             console.log(iobj);
+                            MdaPopWin.popOff(2);
                             if (iobj.act === "selected") {
                                 if (iobj.selectText === "隨機脈波") {
                                     gr.gbcs.command({'act': preText + "RadiationOn", "paras": [255]});
@@ -7645,7 +7697,7 @@ class Emulate {
             var moduleStatusA = rd.sspaModuleStatusAA[0];
         }
 
-
+        /*
         var powerOn_f = 0;
         var moduleOn_f = 0;
         for (var i = 0; i < 36; i++) {
@@ -7653,10 +7705,10 @@ class Emulate {
                 powerOn_f = 1;
             if ((moduleStatusA[i] >> 1) & 1)
                 moduleOn_f = 1;
-
         }
-        moduleOn_f = (gr.radarData.systemStatus0 >> 24) & 1;
-
+        */                                                                    
+        var powerOn_f = (gr.radarData.systemStatus0 >> 23) & 1;
+        var moduleOn_f = (gr.radarData.systemStatus0 >> 24) & 1;
         var emergency = gr.radarData.systemStatus0 & (1 << (shift + 4));
         var ready_f = rd.systemStatus0 & 3;
 
@@ -8122,8 +8174,8 @@ class SyncGloble {
         }
 
         if (gr.appId === 1) {
-            var powerOn_f = (rd.systemStatus0 >> 23);
-            var moduleOn_f = (rd.systemStatus0 >> 24);
+            var powerOn_f = (rd.systemStatus0 >> 23)&1;
+            var moduleOn_f = (rd.systemStatus0 >> 24)&1;
         }
 
 
@@ -8142,14 +8194,6 @@ class SyncGloble {
         var emergency = gr.radarData.systemStatus0 & (1 << (shift + 4));
         var ready_f = rd.systemStatus0 & 3;
 
-        if (iobj.act === "mastSubRadarSet") {
-            ws.cmd(iobj.act, [iobj.value + iobj.idInx * 256]);
-            return;
-        }
-        if (iobj.act === "mastSubRadarCtr") {
-            ws.cmd(iobj.act, [iobj.value + iobj.idInx * 256]);
-            return;
-        }
 
         if (iobj.act === "selfTestStartAll") {
             gr.logMessage.messages.push({type: "cmd", text: "全系統測試"});
@@ -8176,6 +8220,39 @@ class SyncGloble {
 
 
         if (gr.appId === 0) {
+
+            if (iobj.act === "mastSubRadarSet") {
+                var str = "副控1";
+                if (iobj.idInx === 1)
+                    str = "副控2";
+                str+="裝置設定 "+ iobj.value;
+                gr.logMessage.messages.push({type: "cmd", text: str});
+                ws.cmd(iobj.act, [iobj.value + iobj.idInx * 256]);
+                return;
+            }
+            if (iobj.act === "mastSubRadarCtr") {
+                var str = "副控1";
+                if (iobj.idInx === 1)
+                    str = "副控2";
+                var strTbl=[];
+                strTbl.push("放大器電源 關閉");
+                strTbl.push("放大器電源 開啟");
+                strTbl.push("放大器致能 關閉");
+                strTbl.push("放大器致能 開啟");
+                strTbl.push("脈波輸出 關閉");
+                strTbl.push("脈波輸出 開啟");
+                strTbl.push("緊急停止 關閉");
+                strTbl.push("緊急停止 開啟");
+                str+=strTbl[iobj.value];
+                
+                gr.logMessage.messages.push({type: "cmd", text: str});
+                ws.cmd(iobj.act, [iobj.value + iobj.idInx * 256]);
+                return;
+            }
+
+
+
+
             if (iobj.act === "mastRadiationOn") {
                 gr.logMessage.messages.push({type: "cmd", text: "脈波開啟"});
                 ws.cmd(iobj.act, iobj.paras);
@@ -8275,6 +8352,9 @@ class SyncGloble {
                 return;
             }
         }
+
+
+
         if (iobj.act === preText + "AllSspaPowerOnOff") {
             if (powerOn_f)
                 gr.gbcs.command({'act': preText + "SspaPowerOff", 'index': -1});
@@ -8304,6 +8384,16 @@ class SyncGloble {
                 gr.logMessage.messages.push({type: "cmd", text: "遙控脈波開啟"});
                 ws.cmd("remoteRadOn");
             }
+            return;
+        }
+        if (iobj.act === "remoteRadOff") {
+            gr.logMessage.messages.push({type: "cmd", text: "遙控脈波關閉"});
+            ws.cmd("remoteRadOff");
+            return;
+        }
+        if (iobj.act === "remoteRadOn") {
+            gr.logMessage.messages.push({type: "cmd", text: "遙控脈波開啟"});
+            ws.cmd("remoteRadOn");
             return;
         }
 
@@ -8427,9 +8517,9 @@ class SyncGloble {
             ws.cmd(iobj.act);
             return;
         }
-        
-        
-        
+
+
+
         //=====================================================================
         if (iobj.act === preText + "PulseSource") {
             gr.logMessage.messages.push({type: "cmd", text: "脈波來源 " + iobj.paras[0]});
@@ -8444,6 +8534,23 @@ class SyncGloble {
         if (iobj.act === preText + "BatShort") {
             gr.logMessage.messages.push({type: "cmd", text: "戰備短路 " + iobj.paras[0]});
             ws.cmd(iobj.act, iobj.paras);
+            return;
+        }
+        if (iobj.act === preText + "SetFlags") {
+            gr.logMessage.messages.push({type: "cmd", text: "裝置設定 " + iobj.index});
+            ws.cmd(iobj.act, [iobj.index]);
+            gr.paraSet["sub1CommType"] = iobj.index&1;
+            gr.paraSet["sub1PulseSource"] = (iobj.index>>1)&1;
+            var fileName = "paraSet";
+            var content = JSON.stringify(gr.paraSet);
+            sv.saveStringToFile("responseDialogError", "null", fileName, content);
+                
+                
+            /*
+            if (iobj.setId === preText + "PulseSource") {
+                if (gr.paraSet[iobj.setId] !== iobj.buttonInx)
+                    mac.saveParaSet(iobj.setId, iobj.buttonInx);
+            */
             return;
         }
 

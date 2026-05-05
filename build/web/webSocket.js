@@ -20,8 +20,9 @@ class MyWebSocket {
             //    sockIp=gr.paraSet.systemIpAddress;
             if(gr.paraSet.webSocketAddr)
                 sockIp=gr.paraSet.webSocketAddr;
-            
             self.socket = new WebSocket('ws://' + sockIp + ':' + gr.webSocketPort + '/websocket');
+            console.log("connect to webServer:"+sockIp + ':' + gr.webSocketPort);
+            
         } catch (ex) {
             console.log(ex);
         }
@@ -108,14 +109,23 @@ class MyWebSocket {
         }
     }
 
-    tick() {
+    tick(iobj) {
         var self = this;
         if (++self.tickTime >= self.tickTimeK) {
             self.tickTime = 0;
-            var obj = {};
-            obj.act = "tick";
+            if(iobj){
+                var obj=iobj;
+                if(obj.uiCmd)
+                    console.log(obj.uiCmd);
+            }    
+            else{
+                var obj = {};
+                 obj.act = "tick";
+            }     
             self.sendSocket(obj);
+            return 1;
         }
+        return 0;
     }
 
     cmd(cmd, paras) {

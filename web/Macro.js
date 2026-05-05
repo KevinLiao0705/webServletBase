@@ -1342,6 +1342,7 @@ class KvSetOpts {
             }
         }
         KvLib.deepCoverObject(kopts, op);
+        kopts.paraSetName = op.paraSetName;
         return kopts;
     }
 
@@ -1813,8 +1814,10 @@ class KvBox {
         opts.actionFunc = function (iobj) {
             console.log(iobj);
             if (iobj.act === "selected") {
-                if (iobj.kvObj.fatherMd.opts.selectEsc_f)
-                    MdaPopWin.popOffTo(iobj.sender.opts.popStackCnt);
+                if (iobj.kvObj) {
+                    if (iobj.kvObj.fatherMd.opts.selectEsc_f)
+                        MdaPopWin.popOffTo(iobj.sender.opts.popStackCnt);
+                }
                 KvLib.exeFunc(_op.actionFunc, iobj);
                 return;
             }
@@ -1847,7 +1850,7 @@ class KvBox {
         op.readOnly_f = 0;
         op.hideNo_f = 1;
         op.wrapSize = 80;
-        op.nextRow=20;
+        op.nextRow = 20;
 
 
         KvLib.deepCoverObject(op, _op);
@@ -1882,12 +1885,12 @@ class KvBox {
                 if (iobj.kvObj.opts.id === "nextButton") {
                     var kvObj = iobj.sender.blockRefs["mainMd"];
                     KvLib.lineMoveEditor(kvObj, kvObj.opts.nextRow);
-                    
+
                     return;
                 }
                 if (iobj.kvObj.opts.id === "prevButton") {
                     var kvObj = iobj.sender.blockRefs["mainMd"];
-                    KvLib.lineMoveEditor(kvObj, 0-kvObj.opts.nextRow);
+                    KvLib.lineMoveEditor(kvObj, 0 - kvObj.opts.nextRow);
                     return;
                 }
             }
@@ -1909,7 +1912,7 @@ class KvBox {
         KvLib.deepCoverObject(op, _op);
         op.headButtons = ["ESC"];
         op.headButtonIds = ["esc"];
-        this.intHexPadBox(op);
+        return this.intHexPadBox(op);
     }
 
     hexPadBox(_op) {
@@ -2076,6 +2079,7 @@ class KvBox {
         };
         var kvObj = new Block("mdaBox", "Model~MdaBox~base.sys0", opts);
         mda.popObj(op.w, op.h, kvObj);
+        return kvObj;
     }
 
     strPadBox(_op) {
@@ -2376,6 +2380,7 @@ class KvBox {
         var obj = mac.setLineBoxOpts(_op);
         var kvObj = new Block("setLineBox", obj.type, obj.opts);
         mda.popObj(_op.w, _op.h, kvObj);
+        return kvObj;
     }
 
     paraEditBox(_op) {

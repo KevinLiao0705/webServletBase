@@ -25,7 +25,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.RequestContext;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
-import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
+//import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpLoad;
+
+//import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -101,84 +103,6 @@ public final class MainServlet extends HttpServlet {
         JSONObject webInJo = new JSONObject();
         JSONObject webOutJo = new JSONObject();
         if (isMultipart) {
-            //int maxFileSize = 50 * 1024;
-            //int maxMemSize = 4 * 1024;
-            File file;
-            DiskFileItemFactory factory = new DiskFileItemFactory();
-            // maximum size that will be stored in memory
-            //factory.setSizeThreshold(maxMemSize);
-            // Location to save data that is larger than maxMemSize.
-            factory.setRepository(new File("c:\\temp"));
-            // Create a new file upload handler
-            ServletFileUpload upload = new ServletFileUpload(factory);
-            // maximum file size to be uploaded.
-            //upload.setSizeMax(maxFileSize);
-            try {
-                // Parse the request to get file items.
-                List fileItems = upload.parseRequest((RequestContext) request);
-                // Process the uploaded file items
-                Iterator i = fileItems.iterator();
-                while (i.hasNext()) {
-                    FileItem fi = (FileItem) i.next();
-                    //if (!fi.isFormField()) {
-                    if (!fi.isFormField()) {
-                        // Get the uploaded file parameters
-                        String fieldName = fi.getFieldName();
-                        String fileName = fi.getName();
-                        String contentType = fi.getContentType();
-                        boolean isInMemory = fi.isInMemory();
-                        long sizeInBytes = fi.getSize();
-                        //=======================================================
-                        System.out.println("fieldName=  " + fieldName);
-                        System.out.println("fileName=  " + fileName);
-                        System.out.println("contentType=  " + contentType);
-                        System.out.println("isInMemory=  " + isInMemory);
-                        System.out.println("sizeInBytes=  " + sizeInBytes);
-                        //========================================================
-                        String[] strF = fieldName.split("~");
-                        switch (strF[0]) {
-                            case "unzipFileToDir":
-                                file = new File(GB.webRootPath + "tmp.zip");
-                                if (file.exists()) {
-                                    file.delete();
-                                }
-                                fi.write(file);
-                                File dirFile = new File(GB.webRootPath + strF[1]);
-                                if (dirFile.exists() && dirFile.isDirectory()) {
-                                    Lib.deleteDir(dirFile);
-                                }
-                                Lib.unzipFile(GB.webRootPath + "tmp.zip", GB.webRootPath);
-                                file.delete();
-                                break;
-
-                            case "saveFileToDir":
-                                filePath = GB.webRootPath + strF[1] + "/";
-                                if (strF.length >= 3) {
-                                    file = new File(filePath + strF[2]);
-                                } else {
-                                    file = new File(filePath + fileName);
-                                }
-                                fi.write(file);
-                                break;
-
-                        }
-
-                    }
-                }
-
-                JSONObject outJo = new JSONObject();
-                JSONObject outOpts = new JSONObject();
-                putJoO(outJo, "act", "filesProcess");
-                putJoO(outJo, "type", "response");
-                putJoO(outJo, "responseMessage", "Commands OK !");
-                putJoJo(outJo, "opts", outOpts);
-                response.setContentType("application/json;charset=utf-8");//指定返回的格式为JSON格式
-                try (PrintWriter out = response.getWriter()) {
-                    out.print(outJo);
-                }
-            } catch (Exception ex) {
-                System.out.println(ex.toString());
-            }
             return;
         }
         //===========================================================
