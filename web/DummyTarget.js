@@ -6721,7 +6721,7 @@ class CtrRadarStatus {
             var regName1 = "gr.radarData.meterValueColorA";
 
             if (i === inx++) {
-                opts.title = "順向輸出功率";
+                opts.title = "順向輸出功率(dBm)";
                 var setOpts = opts.setOpts = sopt.getOptsPara("lcdView");
                 setOpts.value = "";//
                 var watchDatas = setOpts.watchDatas = [];
@@ -6729,7 +6729,7 @@ class CtrRadarStatus {
                 watchDatas.push(["directReg", regName1 + "#4", "innerTextColor", 1]);
             }
             if (i === inx++) {
-                opts.title = "反向輸出功率";
+                opts.title = "反向輸出功率(dBm)";
                 var setOpts = opts.setOpts = sopt.getOptsPara("lcdView");
                 setOpts.value = "";//
                 var watchDatas = setOpts.watchDatas = [];
@@ -6737,7 +6737,7 @@ class CtrRadarStatus {
                 watchDatas.push(["directReg", regName1 + "#5", "innerTextColor", 1]);
             }
             if (i === inx++) {
-                opts.title = "放大器電源總電流";
+                opts.title = "放大器電源總電流(A)";
                 var setOpts = opts.setOpts = sopt.getOptsPara("lcdView");
                 setOpts.value = "";//
                 var watchDatas = setOpts.watchDatas = [];
@@ -6745,7 +6745,7 @@ class CtrRadarStatus {
                 watchDatas.push(["directReg", regName1 + "#9", "innerTextColor", 1]);
             }
             if (i === inx++) {
-                opts.title = "輸入功率";
+                opts.title = "輸入功率(dBm)";
                 var setOpts = opts.setOpts = sopt.getOptsPara("lcdView");
                 setOpts.value = "";//
                 var watchDatas = setOpts.watchDatas = [];
@@ -6757,7 +6757,7 @@ class CtrRadarStatus {
 
             }
             if (i === inx++) {
-                opts.title = "前置放大器輸出功率";
+                opts.title = "前置放大器輸出功率(dBm)";
                 var setOpts = opts.setOpts = sopt.getOptsPara("lcdView");
                 setOpts.value = "";//
                 var watchDatas = setOpts.watchDatas = [];
@@ -6765,7 +6765,7 @@ class CtrRadarStatus {
                 watchDatas.push(["directReg", regName1 + "#2", "innerTextColor", 1]);
             }
             if (i === inx++) {
-                opts.title = "驅動放大器輸出功率";
+                opts.title = "驅動放大器輸出功率(dBm)";
                 var setOpts = opts.setOpts = sopt.getOptsPara("lcdView");
                 setOpts.value = "";//
                 var watchDatas = setOpts.watchDatas = [];

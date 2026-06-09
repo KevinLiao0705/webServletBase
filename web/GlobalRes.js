@@ -72,8 +72,8 @@ class GlobalRes {
         //==============================
         this.kid = 0;
         this.ser = 0;
-        //this.webSocketAddress = "192.168.0.28";
-        this.webSocketAddress = "127.0.0.1";
+        this.webSocketAddress = "192.168.0.219";
+        //this.webSocketAddress = "127.0.0.1";
         this.webSocketPort = "8899";
         this.webSocketConnect_f = 0;
         //
