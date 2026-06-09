@@ -1416,10 +1416,11 @@ class TargetPane {
         }
         if (op.deviceInx === 1) {
             statusFlag = rd.subStatusA[1];
+            conOk = 0;
         }
         
         //<<debug
-        conOk = 1;
+        //conOk = 1;
         statusFlag |= 1 << 15;
         //statusFlag |= 1<<9;
         //statusFlag |= 1<<10;
