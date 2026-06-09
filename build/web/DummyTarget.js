@@ -6262,7 +6262,7 @@ class DummyTargetCtrPane {
 
 
             if (i === inx++) {
-                opts.title = "輸入功率";
+                opts.title = "輸入功率(dBm)";
                 var setOpts = opts.setOpts = sopt.getOptsPara("lcdView");
                 setOpts.value = "";//
                 var watchDatas = setOpts.watchDatas = [];
@@ -6270,7 +6270,7 @@ class DummyTargetCtrPane {
                 watchDatas.push(["directReg", regName1 + "#0", "innerTextColor", 1]);
             }
             if (i === inx++) {
-                opts.title = "順向輸出功率";
+                opts.title = "順向輸出功率(dBm)";
                 var setOpts = opts.setOpts = sopt.getOptsPara("lcdView");
                 setOpts.value = "";//
                 var watchDatas = setOpts.watchDatas = [];
@@ -6278,7 +6278,7 @@ class DummyTargetCtrPane {
                 watchDatas.push(["directReg", regName1 + "#4", "innerTextColor", 1]);
             }
             if (i === inx++) {
-                opts.title = "反向輸出功率";
+                opts.title = "反向輸出功率(dBm)";
                 var setOpts = opts.setOpts = sopt.getOptsPara("lcdView");
                 setOpts.value = "";//
                 var watchDatas = setOpts.watchDatas = [];
@@ -6286,7 +6286,7 @@ class DummyTargetCtrPane {
                 watchDatas.push(["directReg", regName1 + "#5", "innerTextColor", 1]);
             }
             if (i === inx++) {
-                opts.title = "放大器電源總電流";
+                opts.title = "放大器電源總電流(A)";
                 var setOpts = opts.setOpts = sopt.getOptsPara("lcdView");
                 setOpts.value = "";//
                 setOpts.fontSize = "1.2rh";
@@ -6975,6 +6975,12 @@ class CtrSspaPowerStatus {
         };
         for (var i = 0; i < 36; i++) {
             //0 existCheck, 1 faultLed, 2:v50enLed, 3:v32enLed, 4:v50v, 5:v50i, 6:v50i, 7:v32v, 8:v32i, 9:v32t  
+            if(gr.radarData.sspaPowerV32tAA[i]>1000)
+                gr.radarData.sspaPowerV32tAA[i]=0;
+            if(gr.radarData.sspaPowerV50vAA[i]>1000)
+                gr.radarData.sspaPowerV50vAA[i]=0;
+            if(gr.radarData.sspaPowerV32vAA[i]>1000)
+                gr.radarData.sspaPowerV32vAA[i]=0;
             var va = [0, "#ccc", 0, 0, 0, "---", "#eef", "---", "#eef", "---", "#eef", "---", "#eef", "---", "#eef", "---", "#eef"];
             va[0] = gr.paraSet[preText + "SspaPowerExistA"][i];
             if (!(powerStatusA[i] & 1) || !va[0]) {//connect flag
@@ -7008,6 +7014,8 @@ class CtrSspaPowerStatus {
             va[14] = obj[1];
             var obj = prg(gr.radarData.sspaPowerV32tAA[i], "SspaPowerV32t", 0);
             va[15] = obj[0];
+            if((obj[0])>100)
+                var dd=1;
             if (!va[3])//
                 obj[1] = "#eef";
             va[16] = obj[1];
@@ -7285,13 +7293,12 @@ class CtrSspaModuleStatus {
 
         for (var i = 0; i < 36; i++) {
             var arr = [0, 0, 0, 0, 0, 0, 0, "---", "#eef", "---", "#eef"];
-            if (moduleStatus[i] & (1 << 1))
-                arr[1] = 1;
             arr[0] = gr.paraSet[preText + "SspaModuleExistA"][i];
             if (!(moduleStatus[i] & 1) || !gr.paraSet[preText + "SspaModuleExistA"][i]) {
                 watchAA.push(arr);
                 continue;
             }
+            arr[1] = 1;
             if (moduleStatus[i] & (1 << 2))
                 arr[2] = 2;
             if (moduleStatus[i] & (1 << 3))
